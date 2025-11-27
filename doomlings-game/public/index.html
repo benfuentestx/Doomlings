@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doomlings - Card Game</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="landing-container">
+    <h1 class="game-title">DOOMLINGS</h1>
+    <p class="game-subtitle">A card game for the end of the world</p>
+
+    <div class="landing-options">
+      <div class="option-card">
+        <h2>Create Game</h2>
+        <p>Start a new game and invite your friends with a game code</p>
+        <input type="text" id="create-name" placeholder="Enter your name" maxlength="20">
+        <button id="create-btn">Create Game</button>
+      </div>
+
+      <div class="option-card">
+        <h2>Join Game</h2>
+        <p>Enter a game code to join an existing game</p>
+        <input type="text" id="join-name" placeholder="Enter your name" maxlength="20">
+        <input type="text" id="join-code" placeholder="Game Code (e.g., ABC123)" maxlength="6" style="margin-top: 10px; text-transform: uppercase;">
+        <button id="join-btn" style="margin-top: 10px;">Join Game</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center; color: var(--text-secondary);">
+      <p>2-6 Players | Classic Edition | ~20-45 min</p>
+    </div>
+  </div>
+
+  <div id="error-message" class="message-overlay" style="display: none;">
+    <p id="error-text"></p>
+    <button onclick="hideError()" style="margin-top: 15px;">OK</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    // Store session info
+    let playerData = null;
+
+    // DOM Elements
+    const createNameInput = document.getElementById('create-name');
+    const createBtn = document.getElementById('create-btn');
+    const joinNameInput = document.getElementById('join-name');
+    const joinCodeInput = document.getElementById('join-code');
+    const joinBtn = document.getElementById('join-btn');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+
+    // Create Game
+    createBtn.addEventListener('click', () => {
+      const name = createNameInput.value.trim();
+      if (!name) {
+        showError('Please enter your name');
+        return;
+      }
+
+      createBtn.disabled = true;
+      createBtn.textContent = 'Creating...';
+
+      socket.emit('createGame', name, (response) => {
+        createBtn.disabled = false;
+        createBtn.textContent = 'Create Game';
+
+        if (response.success) {
+          playerData = response;
+          sessionStorage.setItem('playerData', JSON.stringify(playerData));
+          window.location.href = '/lobby.html';
+        } else {
+          showError(response.error || 'Failed to create game');
+        }
+      });
+    });
+
+    // Join Game
+    joinBtn.addEventListener('click', () => {
+      const name = joinNameInput.value.trim();
+      const code = joinCodeInput.value.trim().toUpperCase();
+
+      if (!name) {
+        showError('Please enter your name');
+        return;
+      }
+      if (!code || code.length !== 6) {
+        showError('Please enter a valid 6-character game code');
+        return;
+      }
+
+      joinBtn.disabled = true;
+      joinBtn.textContent = 'Joining...';
+
+      socket.emit('joinGame', { gameId: code, playerName: name }, (response) => {
+        joinBtn.disabled = false;
+        joinBtn.textContent = 'Join Game';
+
+        if (response.success) {
+          playerData = response;
+          sessionStorage.setItem('playerData', JSON.stringify(playerData));
+          window.location.href = '/lobby.html';
+        } else {
+          showError(response.error || 'Failed to join game');
+        }
+      });
+    });
+
+    // Enter key support
+    createNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') createBtn.click();
+    });
+
+    joinCodeInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') joinBtn.click();
+    });
+
+    // Auto-uppercase game code
+    joinCodeInput.addEventListener('input', () => {
+      joinCodeInput.value = joinCodeInput.value.toUpperCase();
+    });
+
+    // Error handling
+    function showError(message) {
+      errorText.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+
+    function hideError() {
+      errorMessage.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
