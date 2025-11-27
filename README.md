@@ -4,9 +4,19 @@ This repository contains card data and instructions for the Doomlings card game.
 
 ## Contents
 
+### Documentation
 - **`DOOMLINGS_INSTRUCTIONS.md`** - Game rules and how to play
+- **`ANDROID_DOWNLOAD_GUIDE.md`** - 📱 Step-by-step guide for downloading card images on Android
+- **`README.md`** - This file
+
+### Card Data
 - **`doomlings_cards.json`** - Complete database of 337 cards with attributes
+- **`card_image_urls.txt`** - List of all 337 card page URLs
+
+### Download Scripts
+- **`download_card_images.py`** - Automated script to download all card images
 - **`download_cards_from_github.py`** - Script to download card data from GitHub
+- **`browser_download_solution.html`** - Browser-based bookmarklet and tools
 - **`scrape_doomlings.py`** - Reference web scraping script (requires direct web access)
 
 ## Card Data
@@ -43,14 +53,26 @@ Each card in the JSON includes:
 
 ## Card Artwork
 
-### Current Limitations
+### 📱 **Android Users: See [ANDROID_DOWNLOAD_GUIDE.md](ANDROID_DOWNLOAD_GUIDE.md) for step-by-step instructions!**
 
 The card artwork is **not currently included** in this repository due to:
-1. Access restrictions on the official Doomlings website
+1. Access restrictions on the official Doomlings website (403 Forbidden errors in automated environments)
 2. Copyright considerations
-3. Network/proxy limitations in the current environment
+3. Network/proxy limitations
 
-### Options for Obtaining Card Images
+### Download Solutions Available
+
+**Multiple options are provided** to download all 337 card images:
+
+1. **`download_card_images.py`** - Automated Python script (works in Termux on Android)
+2. **`browser_download_solution.html`** - Browser-based bookmarklet and tools
+3. **`card_image_urls.txt`** - List of all 337 card page URLs
+
+**→ Android users**: See **[ANDROID_DOWNLOAD_GUIDE.md](ANDROID_DOWNLOAD_GUIDE.md)** for detailed instructions
+
+**→ Desktop users**: Run `python download_card_images.py` in an unrestricted environment
+
+### Other Options for Obtaining Card Images
 
 If you have access to Tabletop Simulator, you can extract card images from the official mods:
 

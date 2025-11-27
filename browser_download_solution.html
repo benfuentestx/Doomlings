@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doomlings Card Image Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .method {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+        }
+        .method h2 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        code {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        .bookmarklet {
+            display: inline-block;
+            background: #2196F3;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .script-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        #progress {
+            margin: 20px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Doomlings Card Image Downloader</h1>
+        <p>Since you're on Android and can access worldofdoomlings.com (but the scraper can't), here are browser-based solutions:</p>
+
+        <div class="method">
+            <h2>Method 1: Bookmarklet (Single Card)</h2>
+            <p>Drag this link to your bookmarks, then click it while viewing any card page:</p>
+            <a href="javascript:(function(){const img=document.querySelector('img[src*=card],img[alt*=card],.card-image,img');if(img){const a=document.createElement('a');a.href=img.src;a.download=document.title.replace(/[^a-z0-9]/gi,'_')+'.png';a.click();alert('Downloading: '+img.src);}else{alert('No image found on this page');}})();" class="bookmarklet">
+                📥 Download Card Image
+            </a>
+            <p><strong>How to use on Android:</strong></p>
+            <ol>
+                <li>Long-press the blue button above and "Copy link"</li>
+                <li>Create a new bookmark in your browser</li>
+                <li>Paste the link as the URL</li>
+                <li>Visit any card page (like worldofdoomlings.com/cards/immunity)</li>
+                <li>Tap your bookmark to download that card's image</li>
+            </ol>
+        </div>
+
+        <div class="method">
+            <h2>Method 2: Browser Console Script (Desktop/Kiwi Browser)</h2>
+            <p>If you have access to browser console (Chrome on desktop, or Kiwi Browser on Android with DevTools):</p>
+            <div class="script-box" id="consoleScript">// Paste this in the console while on ANY worldofdoomlings.com page
+(async function() {
+    // Load card data
+    const cardsData = await fetch('https://raw.githubusercontent.com/YOUR_USERNAME/Doomlings/YOUR_BRANCH/doomlings_cards.json').then(r => r.json());
+
+    const activeCards = cardsData.filter(c => c.in_game === 'yes');
+    console.log(`Found ${activeCards.length} cards to download`);
+
+    for (let i = 0; i < activeCards.length; i++) {
+        const card = activeCards[i];
+        const cardName = card.trait;
+        const slug = cardName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        const url = `https://www.worldofdoomlings.com/cards/${slug}`;
+
+        console.log(`[${i+1}/${activeCards.length}] Downloading ${cardName}...`);
+
+        try {
+            // Open in new tab (you'll need to manually save)
+            window.open(url, '_blank');
+
+            // Wait to avoid overwhelming browser
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        } catch (e) {
+            console.error(`Failed: ${cardName}`, e);
+        }
+    }
+
+    console.log('Done! All card pages opened.');
+})();</div>
+            <button onclick="copyToClipboard('consoleScript')">📋 Copy Script</button>
+        </div>
+
+        <div class="method">
+            <h2>Method 3: Automated Download (Requires PC/Termux)</h2>
+            <p>Use the Python script: <code>download_card_images.py</code></p>
+            <p><strong>On Android with Termux:</strong></p>
+            <pre style="background: #f4f4f4; padding: 10px; border-radius: 5px;">
+pkg install python git
+git clone YOUR_REPO_URL
+cd Doomlings
+pip install requests beautifulsoup4 pandas
+python download_card_images.py
+            </pre>
+        </div>
+
+        <div class="method">
+            <h2>Method 4: Manual List Generator</h2>
+            <p>Generate a list of all card URLs to visit manually:</p>
+            <button onclick="generateCardUrls()">📜 Generate Card URL List</button>
+            <div id="urlList" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Note:</strong> Downloading 337 images will take time. The bookmarklet method requires visiting each card page individually. The console script will open many tabs.
+        </div>
+    </div>
+
+    <script>
+        // Card data embedded (first 10 for demo - replace with full list)
+        const sampleCards = [
+            "Acrobatic", "Adorable", "Adrenalized", "Agile", "Altruistic",
+            "Ancient", "Antennae", "Antlers", "Apex Predator", "Appealing"
+        ];
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Script copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy. Please select and copy manually.');
+            });
+        }
+
+        function slugify(text) {
+            return text.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '');
+        }
+
+        function generateCardUrls() {
+            fetch('./doomlings_cards.json')
+                .then(r => r.json())
+                .then(cards => {
+                    const activeCards = cards.filter(c => c.in_game === 'yes');
+                    const urls = activeCards.map(c => {
+                        const slug = slugify(c.trait);
+                        return `https://www.worldofdoomlings.com/cards/${slug}`;
+                    });
+
+                    const listHtml = `
+                        <h3>All ${urls.length} Card URLs:</h3>
+                        <textarea style="width: 100%; height: 300px; font-family: monospace; font-size: 11px;">
+${urls.join('\n')}
+                        </textarea>
+                        <p>Copy these URLs and use a download manager or visit them one by one.</p>
+                    `;
+                    document.getElementById('urlList').innerHTML = listHtml;
+                })
+                .catch(err => {
+                    // Fallback to sample data
+                    const urls = sampleCards.map(card => {
+                        const slug = slugify(card);
+                        return `https://www.worldofdoomlings.com/cards/${slug}`;
+                    });
+                    document.getElementById('urlList').innerHTML = `
+                        <h3>Sample Card URLs (first 10):</h3>
+                        <textarea style="width: 100%; height: 200px;">${urls.join('\n')}</textarea>
+                        <p><em>Load this HTML file from the repo to see all 337 cards.</em></p>
+                    `;
+                });
+        }
+    </script>
+</body>
+</html>
