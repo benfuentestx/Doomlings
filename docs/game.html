@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doomlings - Game</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div class="game-container" id="game-container">
+    <!-- Game Header -->
+    <div class="game-header">
+      <div class="age-display">
+        <div class="age-card" id="age-card">
+          <div class="age-name">Loading...</div>
+          <div class="age-effect"></div>
+        </div>
+        <div class="catastrophe-counter">
+          <div class="catastrophe-dot" id="cat-1"></div>
+          <div class="catastrophe-dot" id="cat-2"></div>
+          <div class="catastrophe-dot" id="cat-3"></div>
+        </div>
+      </div>
+      <div id="turn-indicator"></div>
+      <div class="game-stats">
+        <span>Round: <strong id="round-num">1</strong></span>
+        <span>Deck: <strong id="deck-size">0</strong></span>
+        <span>Discard: <strong id="discard-size">0</strong></span>
+      </div>
+    </div>
+
+    <!-- Left Panel - Opponents -->
+    <div class="opponents-panel" id="opponents-left"></div>
+
+    <!-- Main Play Area -->
+    <div class="play-area">
+      <!-- Action Area -->
+      <div class="action-area" id="action-area">
+        <div class="action-message" id="action-message">Waiting for game to start...</div>
+        <div class="action-options" id="action-options"></div>
+      </div>
+
+      <!-- My Trait Pile -->
+      <div class="my-traits">
+        <h3>
+          <span>Your Trait Pile</span>
+          <span class="my-score" id="my-score">0 pts</span>
+        </h3>
+        <div class="trait-pile" id="my-trait-pile"></div>
+      </div>
+
+      <!-- Action Log -->
+      <div class="log-panel">
+        <h4>Game Log</h4>
+        <div id="action-log"></div>
+      </div>
+    </div>
+
+    <!-- Right Panel - More Opponents -->
+    <div class="opponents-panel" id="opponents-right"></div>
+
+    <!-- My Hand -->
+    <div class="my-hand-area">
+      <div class="hand-header">
+        <h3>Your Hand (<span id="hand-count">0</span> cards)</h3>
+        <span id="play-instruction"></span>
+      </div>
+      <div class="my-hand" id="my-hand"></div>
+    </div>
+  </div>
+
+  <!-- Modal for card selection -->
+  <div class="modal-overlay" id="modal" style="display: none;">
+    <div class="modal-content">
+      <h2 id="modal-title">Select</h2>
+      <div class="modal-cards" id="modal-cards"></div>
+      <div class="modal-actions" id="modal-actions">
+        <button id="modal-confirm" style="display: none;">Confirm</button>
+        <button id="modal-skip" class="secondary" style="display: none;">Skip</button>
+        <button id="modal-close" class="secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Overlay -->
+  <div class="game-over-overlay" id="game-over" style="display: none;">
+    <div class="game-over-content">
+      <h1>Game Over!</h1>
+      <div class="final-scores" id="final-scores"></div>
+      <button onclick="location.href='index.html'">Back to Home</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="loading" class="message-overlay">
+    <div class="spinner"></div>
+    <p>Loading game...</p>
+  </div>
+
+  <script type="module">
+    import { peerManager } from './js/peer-manager.js';
+
+    // Get player data
+    let playerData = JSON.parse(sessionStorage.getItem('playerData'));
+    let gameState = null;
+    let selectedCards = [];
+    let pendingAction = null;
+
+    // DOM Elements
+    const loadingOverlay = document.getElementById('loading');
+    const ageCard = document.getElementById('age-card');
+    const turnIndicator = document.getElementById('turn-indicator');
+    const roundNum = document.getElementById('round-num');
+    const deckSize = document.getElementById('deck-size');
+    const discardSize = document.getElementById('discard-size');
+    const actionMessage = document.getElementById('action-message');
+    const actionOptions = document.getElementById('action-options');
+    const myTraitPile = document.getElementById('my-trait-pile');
+    const myHand = document.getElementById('my-hand');
+    const myScore = document.getElementById('my-score');
+    const handCount = document.getElementById('hand-count');
+    const playInstruction = document.getElementById('play-instruction');
+    const actionLog = document.getElementById('action-log');
+    const opponentsLeft = document.getElementById('opponents-left');
+    const opponentsRight = document.getElementById('opponents-right');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalCards = document.getElementById('modal-cards');
+    const modalConfirm = document.getElementById('modal-confirm');
+    const modalSkip = document.getElementById('modal-skip');
+    const modalClose = document.getElementById('modal-close');
+    const gameOverOverlay = document.getElementById('game-over');
+    const finalScores = document.getElementById('final-scores');
+
+    // Check session
+    if (!playerData) {
+      window.location.href = 'index.html';
+    } else {
+      // Set up game state update callback
+      peerManager.onGameStateUpdate = (state) => {
+        loadingOverlay.style.display = 'none';
+        gameState = state;
+        renderGame();
+      };
+
+      peerManager.onError = (error) => {
+        alert(error);
+      };
+
+      peerManager.onDisconnected = () => {
+        alert('Disconnected from game');
+        window.location.href = 'index.html';
+      };
+
+      // Initial render
+      const initialState = peerManager.getMyState();
+      if (initialState) {
+        loadingOverlay.style.display = 'none';
+        gameState = initialState;
+        renderGame();
+      }
+
+      // Periodic refresh for host
+      if (sessionStorage.getItem('isHost') === 'true') {
+        setInterval(() => {
+          const state = peerManager.getMyState();
+          if (state) {
+            gameState = state;
+            renderGame();
+          }
+        }, 200);
+      }
+    }
+
+    // Render the game
+    function renderGame() {
+      if (!gameState) return;
+
+      // Update catastrophe dots
+      for (let i = 1; i <= 3; i++) {
+        document.getElementById(`cat-${i}`).classList.toggle('active', i <= gameState.catastropheCount);
+      }
+
+      // Update age card
+      if (gameState.currentAge) {
+        const isCatastrophe = gameState.currentAge.type === 'catastrophe';
+        ageCard.className = 'age-card' + (isCatastrophe ? ' catastrophe' : '');
+        ageCard.innerHTML = `
+          <div class="age-name">${gameState.currentAge.name}</div>
+          <div class="age-effect">${gameState.currentAge.effect || ''}</div>
+        `;
+      }
+
+      // Update stats
+      roundNum.textContent = gameState.round;
+      deckSize.textContent = gameState.deckSize;
+      discardSize.textContent = gameState.discardSize;
+
+      // Update turn indicator
+      if (gameState.state === 'finished') {
+        turnIndicator.innerHTML = '<span class="turn-indicator" style="background: var(--success);">Game Over</span>';
+      } else if (gameState.isMyTurn) {
+        turnIndicator.innerHTML = '<span class="turn-indicator">Your Turn!</span>';
+      } else {
+        const currentPlayer = gameState.players.find(p => p.isCurrentPlayer);
+        turnIndicator.innerHTML = `<span style="color: var(--text-secondary);">${currentPlayer?.name || 'Unknown'}'s turn</span>`;
+      }
+
+      // Update my score
+      myScore.textContent = `${gameState.myScore} pts`;
+
+      // Render my trait pile
+      renderTraitPile(myTraitPile, gameState.myTraitPile);
+
+      // Render my hand
+      renderHand();
+
+      // Render opponents
+      renderOpponents();
+
+      // Update action area
+      updateActionArea();
+
+      // Update log
+      renderLog();
+
+      // Check for game over
+      if (gameState.state === 'finished') {
+        showGameOver();
+      }
+
+      // Handle pending action
+      if (gameState.pendingAction) {
+        handlePendingAction(gameState.pendingAction);
+      }
+    }
+
+    // Render a trait pile
+    function renderTraitPile(container, cards) {
+      container.innerHTML = '';
+      cards.forEach((card, index) => {
+        container.appendChild(createCardElement(card, false, index));
+      });
+    }
+
+    // Render hand
+    function renderHand() {
+      myHand.innerHTML = '';
+      handCount.textContent = gameState.myHand.length;
+
+      const canPlay = gameState.isMyTurn && gameState.turnPhase === 'play' && !gameState.pendingAction;
+
+      gameState.myHand.forEach((card, index) => {
+        const cardEl = createCardElement(card, canPlay, index);
+        if (canPlay) {
+          cardEl.addEventListener('click', () => playCard(index));
+        }
+        myHand.appendChild(cardEl);
+      });
+
+      playInstruction.textContent = canPlay ? 'Click a card to play it' : '';
+    }
+
+    // Create a card element
+    function createCardElement(card, playable = false, index = 0) {
+      const div = document.createElement('div');
+      const colorClass = getColorClass(card.color);
+      div.className = `card ${colorClass}${playable ? ' playable' : ''}`;
+      div.dataset.index = index;
+
+      let typeText = '';
+      if (card.dominant) typeText = 'DOMINANT';
+      else if (card.action) typeText = 'ACTION';
+      else if (card.drops) typeText = 'DROP';
+      else if (card.gene_pool) typeText = 'GENE POOL';
+      else if (card.worlds_end) typeText = "WORLD'S END";
+      else if (card.effectless) typeText = 'TRAIT';
+
+      let effectText = getCardEffectText(card);
+
+      div.innerHTML = `
+        <div class="card-color" style="background: ${getColorValue(card.color)}"></div>
+        <div class="card-face">${formatFace(card.face)}</div>
+        <div class="card-name">${card.trait}</div>
+        <div class="card-effect">${effectText}</div>
+        <div class="card-type">${typeText}</div>
+      `;
+
+      return div;
+    }
+
+    function getColorClass(color) {
+      if (!color) return 'colorless';
+      if (color.includes('_')) return 'multi';
+      return color.toLowerCase();
+    }
+
+    function getColorValue(color) {
+      const colors = {
+        'Red': '#e74c3c', 'Blue': '#3498db', 'Green': '#27ae60',
+        'Purple': '#9b59b6', 'Colorless': '#95a5a6'
+      };
+      if (color && color.includes('_')) {
+        return 'linear-gradient(135deg, #e74c3c, #3498db, #27ae60, #9b59b6)';
+      }
+      return colors[color] || colors['Colorless'];
+    }
+
+    function formatFace(face) {
+      if (face === 'variable') return '?';
+      if (face === 'copy_1st_dominant') return '=';
+      return face;
+    }
+
+    function getCardEffectText(card) {
+      if (card.effectless) return '';
+      if (card.drop_effect) return formatDropEffect(card.drop_effect);
+      if (card.action) return 'Action effect';
+      if (card.dominant) return 'Dominant';
+      return '';
+    }
+
+    function formatDropEffect(effect) {
+      if (!effect) return '';
+      const parts = effect.split(' ');
+      if (parts.length < 3) return effect;
+      const value = parts[0];
+      const condition = parts[2] || '';
+      const conditionMap = {
+        'n_hand': 'per card in hand', 'n_traits': 'per trait',
+        'n_blue': 'per Blue', 'n_green': 'per Green',
+        'n_purple': 'per Purple', 'n_colorless': 'per Colorless',
+        'n_colors': 'per unique color', 'if_most_traits': 'if most traits'
+      };
+      const text = conditionMap[condition] || condition.replace(/_/g, ' ');
+      if (value === 'n') return `Variable: ${text}`;
+      return `${value > 0 ? '+' : ''}${value} ${text}`;
+    }
+
+    // Render opponents
+    function renderOpponents() {
+      const opponents = gameState.players.filter(p => p.id !== playerData.playerId);
+      opponentsLeft.innerHTML = '';
+      opponentsRight.innerHTML = '';
+
+      opponents.forEach((opp, i) => {
+        const container = i % 2 === 0 ? opponentsLeft : opponentsRight;
+        const div = document.createElement('div');
+        div.className = `opponent-card${opp.isCurrentPlayer ? ' current-turn' : ''}`;
+
+        div.innerHTML = `
+          <div class="opponent-header">
+            <span class="opponent-name">${opp.name}</span>
+            <span class="opponent-score">${opp.score}</span>
+          </div>
+          <div class="opponent-info">
+            Hand: ${opp.handSize} | Traits: ${opp.traitPile.length}
+            ${opp.hasPlayedThisRound ? ' | Played' : ''}
+          </div>
+          <div class="opponent-traits">
+            ${opp.traitPile.map(t => `
+              <div class="mini-trait ${getColorClass(t.color)}" title="${t.trait} (${t.face})">
+                ${formatFace(t.face)}
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    // Update action area
+    function updateActionArea() {
+      actionOptions.innerHTML = '';
+
+      if (gameState.state === 'finished') {
+        actionMessage.textContent = 'Game Over!';
+        return;
+      }
+
+      if (gameState.pendingAction) {
+        actionMessage.textContent = gameState.pendingAction.message || 'Action required';
+        return;
+      }
+
+      if (gameState.isMyTurn) {
+        actionMessage.textContent = gameState.turnPhase === 'play' ?
+          'Play a trait from your hand' : 'Waiting for next phase...';
+      } else {
+        const currentPlayer = gameState.players.find(p => p.isCurrentPlayer);
+        actionMessage.textContent = `Waiting for ${currentPlayer?.name || 'opponent'}...`;
+      }
+    }
+
+    // Render action log
+    function renderLog() {
+      actionLog.innerHTML = '';
+      (gameState.actionLog || []).slice().reverse().forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.textContent = entry.message;
+        actionLog.appendChild(div);
+      });
+    }
+
+    // Play a card
+    function playCard(cardIndex) {
+      if (!gameState.isMyTurn || gameState.turnPhase !== 'play') return;
+      const result = peerManager.playCard(cardIndex);
+      if (!result.success && result.error) {
+        alert(result.error);
+      }
+    }
+
+    // Handle pending action
+    function handlePendingAction(action) {
+      pendingAction = action;
+
+      switch (action.inputType) {
+        case 'view_cards':
+          showViewCardsModal(action);
+          break;
+        case 'select_opponent':
+          showSelectOpponentModal(action);
+          break;
+        case 'select_opponent_trait':
+          showSelectOpponentTraitModal(action);
+          break;
+        case 'select_own_cards':
+          showSelectOwnCardsModal(action);
+          break;
+        case 'select_own_trait':
+          showSelectOwnTraitModal(action);
+          break;
+        case 'select_from_discard':
+          showSelectFromDiscardModal(action);
+          break;
+      }
+    }
+
+    // Modal helpers
+    function showModal(title, content, showConfirm = false, showSkip = false) {
+      modalTitle.textContent = title;
+      modalCards.innerHTML = content;
+      modalConfirm.style.display = showConfirm ? 'block' : 'none';
+      modalSkip.style.display = showSkip ? 'block' : 'none';
+      modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+      modal.style.display = 'none';
+      selectedCards = [];
+      pendingAction = null;
+    }
+
+    modalClose.addEventListener('click', hideModal);
+
+    modalSkip.addEventListener('click', () => {
+      peerManager.skipAction();
+      hideModal();
+    });
+
+    function showViewCardsModal(action) {
+      const cardsHtml = action.cards.map(card => {
+        if (card.type) {
+          return `<div class="card colorless">
+            <div class="card-name">${card.name}</div>
+            <div class="card-effect">${card.effect || ''}</div>
+          </div>`;
+        }
+        return createCardElement(card, false).outerHTML;
+      }).join('');
+      showModal(action.message || 'Cards', cardsHtml, false, true);
+    }
+
+    function showSelectOpponentModal(action) {
+      const content = action.options.map(opp => `
+        <button class="secondary" style="padding: 20px 30px; margin: 5px;"
+                onclick="window.selectOpponent('${opp.id}')">
+          ${opp.name}${opp.handSize !== undefined ? ` (${opp.handSize} cards)` : ''}
+        </button>
+      `).join('');
+      showModal(action.message || 'Select Opponent', content, false, action.optional);
+    }
+
+    window.selectOpponent = function(targetId) {
+      const result = peerManager.selectTarget({ targetId, effectType: pendingAction.effectType });
+      if (result.viewHand) {
+        const cardsHtml = result.viewHand.map(c => createCardElement(c, false).outerHTML).join('');
+        showModal(result.message || "Opponent's Hand", cardsHtml, false, true);
+      } else {
+        hideModal();
+      }
+    };
+
+    function showSelectOpponentTraitModal(action) {
+      let content = '';
+      action.options.forEach(opp => {
+        content += `<div style="margin-bottom: 20px;">
+          <h4 style="margin-bottom: 10px;">${opp.name}</h4>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            ${opp.traits.map(t => `
+              <div class="card ${getColorClass(t.color)}" style="cursor: pointer;"
+                   onclick="window.selectOpponentTrait('${opp.id}', ${t.index})">
+                <div class="card-face">${formatFace(t.face)}</div>
+                <div class="card-name">${t.trait}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      });
+      showModal(action.message || 'Select Trait', content, false, action.optional);
+    }
+
+    window.selectOpponentTrait = function(targetId, traitIndex) {
+      peerManager.selectTarget({ targetId, traitIndex, effectType: pendingAction.effectType });
+      hideModal();
+    };
+
+    function showSelectOwnCardsModal(action) {
+      selectedCards = [];
+      const count = action.count || 1;
+      const cardsHtml = action.options.map((c, i) => `
+        <div class="card ${getColorClass(c.color)}" data-index="${c.index}"
+             style="cursor: pointer;" onclick="window.toggleCardSelection(${c.index}, ${count})">
+          <div class="card-face">${formatFace(c.face)}</div>
+          <div class="card-name">${c.trait}</div>
+        </div>
+      `).join('');
+      showModal(`Select ${count} card(s)`, cardsHtml, true, action.optional);
+
+      modalConfirm.onclick = () => {
+        if (selectedCards.length === 0) {
+          alert('Select at least one card');
+          return;
+        }
+        peerManager.selectCards({ indices: selectedCards, effectType: pendingAction.effectType });
+        hideModal();
+      };
+    }
+
+    window.toggleCardSelection = function(index, maxCount) {
+      const card = modalCards.querySelector(`[data-index="${index}"]`);
+      const idx = selectedCards.indexOf(index);
+      if (idx === -1) {
+        if (selectedCards.length < maxCount) {
+          selectedCards.push(index);
+          card.classList.add('selected');
+        }
+      } else {
+        selectedCards.splice(idx, 1);
+        card.classList.remove('selected');
+      }
+    };
+
+    function showSelectOwnTraitModal(action) {
+      const cardsHtml = action.options.map(t => `
+        <div class="card ${getColorClass(t.color)}" style="cursor: pointer;"
+             onclick="window.selectOwnTrait(${t.index})">
+          <div class="card-face">${formatFace(t.face)}</div>
+          <div class="card-name">${t.trait}</div>
+        </div>
+      `).join('');
+      showModal(action.message || 'Select Trait', cardsHtml, false, action.optional);
+    }
+
+    window.selectOwnTrait = function(index) {
+      peerManager.selectCards({ index, effectType: pendingAction.effectType });
+      hideModal();
+    };
+
+    function showSelectFromDiscardModal(action) {
+      const cardsHtml = action.options.map(c => `
+        <div class="card ${getColorClass(c.color)}" style="cursor: pointer;"
+             onclick="window.selectFromDiscard(${c.index})">
+          <div class="card-face">${formatFace(c.face)}</div>
+          <div class="card-name">${c.trait}</div>
+        </div>
+      `).join('');
+      showModal('Select from Discard', cardsHtml, false, action.optional);
+    }
+
+    window.selectFromDiscard = function(index) {
+      peerManager.selectCards({ index, effectType: pendingAction.effectType });
+      hideModal();
+    };
+
+    // Show game over
+    function showGameOver() {
+      const sorted = [...gameState.players].sort((a, b) => b.score - a.score);
+      finalScores.innerHTML = sorted.map((p, i) => `
+        <div class="score-row${i === 0 ? ' winner' : ''}">
+          <span class="rank">#${i + 1}</span>
+          <span class="name">${p.name}${p.id === playerData.playerId ? ' (You)' : ''}</span>
+          <span class="score">${p.score} pts</span>
+        </div>
+      `).join('');
+      gameOverOverlay.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

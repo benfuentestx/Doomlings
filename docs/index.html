@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doomlings - Card Game</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div class="landing-container">
+    <h1 class="game-title">DOOMLINGS</h1>
+    <p class="game-subtitle">A card game for the end of the world</p>
+
+    <div class="landing-options">
+      <div class="option-card">
+        <h2>Create Game</h2>
+        <p>Start a new game and invite your friends with a game code</p>
+        <input type="text" id="create-name" placeholder="Enter your name" maxlength="20">
+        <button id="create-btn">Create Game</button>
+      </div>
+
+      <div class="option-card">
+        <h2>Join Game</h2>
+        <p>Enter a game code to join an existing game</p>
+        <input type="text" id="join-name" placeholder="Enter your name" maxlength="20">
+        <input type="text" id="join-code" placeholder="Game Code (e.g., ABC123)" maxlength="6" style="margin-top: 10px; text-transform: uppercase;">
+        <button id="join-btn" style="margin-top: 10px;">Join Game</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center; color: var(--text-secondary);">
+      <p>2-6 Players | Classic Edition | ~20-45 min</p>
+      <p style="font-size: 0.8rem; margin-top: 1rem;">Peer-to-peer multiplayer - no server required!</p>
+    </div>
+  </div>
+
+  <div id="error-message" class="message-overlay" style="display: none;">
+    <p id="error-text"></p>
+    <button onclick="hideError()" style="margin-top: 15px;">OK</button>
+  </div>
+
+  <div id="loading-message" class="message-overlay" style="display: none;">
+    <div class="spinner"></div>
+    <p id="loading-text">Connecting...</p>
+  </div>
+
+  <script type="module">
+    import { peerManager } from './js/peer-manager.js';
+
+    // DOM Elements
+    const createNameInput = document.getElementById('create-name');
+    const createBtn = document.getElementById('create-btn');
+    const joinNameInput = document.getElementById('join-name');
+    const joinCodeInput = document.getElementById('join-code');
+    const joinBtn = document.getElementById('join-btn');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const loadingMessage = document.getElementById('loading-message');
+    const loadingText = document.getElementById('loading-text');
+
+    // Create Game
+    createBtn.addEventListener('click', async () => {
+      const name = createNameInput.value.trim();
+      if (!name) {
+        showError('Please enter your name');
+        return;
+      }
+
+      createBtn.disabled = true;
+      showLoading('Creating game...');
+
+      try {
+        const result = await peerManager.createGame(name);
+        hideLoading();
+
+        if (result.success) {
+          sessionStorage.setItem('playerData', JSON.stringify(result));
+          sessionStorage.setItem('isHost', 'true');
+          window.location.href = 'lobby.html';
+        } else {
+          showError(result.error || 'Failed to create game');
+        }
+      } catch (err) {
+        hideLoading();
+        showError(err.error || 'Failed to create game');
+      }
+
+      createBtn.disabled = false;
+    });
+
+    // Join Game
+    joinBtn.addEventListener('click', async () => {
+      const name = joinNameInput.value.trim();
+      const code = joinCodeInput.value.trim().toUpperCase();
+
+      if (!name) {
+        showError('Please enter your name');
+        return;
+      }
+      if (!code || code.length !== 6) {
+        showError('Please enter a valid 6-character game code');
+        return;
+      }
+
+      joinBtn.disabled = true;
+      showLoading('Joining game...');
+
+      try {
+        const result = await peerManager.joinGame(code, name);
+        hideLoading();
+
+        if (result.success) {
+          sessionStorage.setItem('playerData', JSON.stringify(result));
+          sessionStorage.setItem('isHost', 'false');
+          window.location.href = 'lobby.html';
+        } else {
+          showError(result.error || 'Failed to join game');
+        }
+      } catch (err) {
+        hideLoading();
+        showError(err.error || 'Failed to join game');
+      }
+
+      joinBtn.disabled = false;
+    });
+
+    // Enter key support
+    createNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') createBtn.click();
+    });
+
+    joinCodeInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') joinBtn.click();
+    });
+
+    // Auto-uppercase game code
+    joinCodeInput.addEventListener('input', () => {
+      joinCodeInput.value = joinCodeInput.value.toUpperCase();
+    });
+
+    // Error/Loading handling
+    function showError(message) {
+      errorText.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+
+    window.hideError = function() {
+      errorMessage.style.display = 'none';
+    };
+
+    function showLoading(message) {
+      loadingText.textContent = message;
+      loadingMessage.style.display = 'block';
+    }
+
+    function hideLoading() {
+      loadingMessage.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
