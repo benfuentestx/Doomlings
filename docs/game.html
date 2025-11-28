@@ -83,6 +83,17 @@
     </div>
   </div>
 
+  <!-- Card Detail View -->
+  <div class="card-detail-overlay" id="card-detail" style="display: none;">
+    <div class="card-detail-backdrop"></div>
+    <div class="card-detail-container">
+      <div class="card-detail-card" id="card-detail-content">
+        <!-- Card content will be injected here -->
+      </div>
+      <button class="card-detail-close" id="card-detail-close">Tap to close</button>
+    </div>
+  </div>
+
   <!-- Game Over Overlay -->
   <div class="game-over-overlay" id="game-over" style="display: none;">
     <div class="game-over-content">
@@ -132,6 +143,14 @@
     const modalClose = document.getElementById('modal-close');
     const gameOverOverlay = document.getElementById('game-over');
     const finalScores = document.getElementById('final-scores');
+    const cardDetailOverlay = document.getElementById('card-detail');
+    const cardDetailContent = document.getElementById('card-detail-content');
+    const cardDetailClose = document.getElementById('card-detail-close');
+    const traitPileArea = document.getElementById('my-trait-pile');
+
+    // Drag state
+    let draggedCardIndex = null;
+    let isDragging = false;
 
     // Check session
     if (!playerData) {
@@ -240,7 +259,14 @@
     function renderTraitPile(container, cards) {
       container.innerHTML = '';
       cards.forEach((card, index) => {
-        container.appendChild(createCardElement(card, false, index));
+        const cardEl = createCardElement(card, false, index);
+        cardEl.addEventListener('click', (e) => {
+          if (!isDragging) {
+            e.stopPropagation();
+            showCardDetail(card);
+          }
+        });
+        container.appendChild(cardEl);
       });
     }
 
@@ -253,13 +279,157 @@
 
       gameState.myHand.forEach((card, index) => {
         const cardEl = createCardElement(card, canPlay, index);
+
+        // Add click to view detail (only if not dragging)
+        cardEl.addEventListener('click', (e) => {
+          if (!isDragging) {
+            e.stopPropagation();
+            showCardDetail(card);
+          }
+        });
+
+        // Add drag functionality if can play
         if (canPlay) {
-          cardEl.addEventListener('click', () => playCard(index));
+          cardEl.draggable = true;
+          cardEl.addEventListener('dragstart', (e) => handleDragStart(e, index));
+          cardEl.addEventListener('dragend', handleDragEnd);
+
+          // Touch events for mobile
+          cardEl.addEventListener('touchstart', (e) => handleTouchStart(e, index), { passive: false });
+          cardEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+          cardEl.addEventListener('touchend', handleTouchEnd);
         }
+
         myHand.appendChild(cardEl);
       });
 
-      playInstruction.textContent = canPlay ? 'Click a card to play it' : '';
+      playInstruction.textContent = canPlay ? 'Drag a card to your trait pile to play it' : '';
+
+      // Set up drop zone on trait pile
+      setupDropZone();
+    }
+
+    // Drag and drop handlers
+    function handleDragStart(e, index) {
+      isDragging = true;
+      draggedCardIndex = index;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', index);
+
+      // Highlight drop zone
+      document.querySelector('.my-traits').classList.add('drop-target');
+    }
+
+    function handleDragEnd(e) {
+      setTimeout(() => { isDragging = false; }, 100);
+      e.target.classList.remove('dragging');
+      draggedCardIndex = null;
+      document.querySelector('.my-traits').classList.remove('drop-target', 'drop-hover');
+    }
+
+    function setupDropZone() {
+      const dropZone = document.querySelector('.my-traits');
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        dropZone.classList.add('drop-hover');
+      });
+
+      dropZone.addEventListener('dragleave', (e) => {
+        dropZone.classList.remove('drop-hover');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drop-hover', 'drop-target');
+        const index = parseInt(e.dataTransfer.getData('text/plain'));
+        if (!isNaN(index)) {
+          playCard(index);
+        }
+      });
+    }
+
+    // Touch drag support for mobile
+    let touchDragElement = null;
+    let touchStartPos = { x: 0, y: 0 };
+    let touchCardIndex = null;
+
+    function handleTouchStart(e, index) {
+      const touch = e.touches[0];
+      touchStartPos = { x: touch.clientX, y: touch.clientY };
+      touchCardIndex = index;
+
+      // Long press to start drag
+      touchDragElement = e.target.closest('.card');
+    }
+
+    function handleTouchMove(e) {
+      if (!touchDragElement || touchCardIndex === null) return;
+
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+      const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+
+      // If moved enough, start dragging
+      if (deltaX > 10 || deltaY > 10) {
+        isDragging = true;
+        e.preventDefault();
+
+        touchDragElement.classList.add('dragging');
+        document.querySelector('.my-traits').classList.add('drop-target');
+
+        // Move the visual element
+        touchDragElement.style.position = 'fixed';
+        touchDragElement.style.left = (touch.clientX - 60) + 'px';
+        touchDragElement.style.top = (touch.clientY - 85) + 'px';
+        touchDragElement.style.zIndex = '1000';
+        touchDragElement.style.pointerEvents = 'none';
+
+        // Check if over drop zone
+        const dropZone = document.querySelector('.my-traits');
+        const rect = dropZone.getBoundingClientRect();
+        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+          dropZone.classList.add('drop-hover');
+        } else {
+          dropZone.classList.remove('drop-hover');
+        }
+      }
+    }
+
+    function handleTouchEnd(e) {
+      if (!touchDragElement || touchCardIndex === null) {
+        touchDragElement = null;
+        touchCardIndex = null;
+        return;
+      }
+
+      const dropZone = document.querySelector('.my-traits');
+      dropZone.classList.remove('drop-target', 'drop-hover');
+
+      // Reset element styles
+      touchDragElement.classList.remove('dragging');
+      touchDragElement.style.position = '';
+      touchDragElement.style.left = '';
+      touchDragElement.style.top = '';
+      touchDragElement.style.zIndex = '';
+      touchDragElement.style.pointerEvents = '';
+
+      // Check if dropped on trait pile
+      if (isDragging) {
+        const touch = e.changedTouches[0];
+        const rect = dropZone.getBoundingClientRect();
+        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+          playCard(touchCardIndex);
+        }
+      }
+
+      setTimeout(() => { isDragging = false; }, 100);
+      touchDragElement = null;
+      touchCardIndex = null;
     }
 
     // Create a card element
@@ -412,6 +582,151 @@
       if (!result.success && result.error) {
         alert(result.error);
       }
+    }
+
+    // Show card detail view
+    function showCardDetail(card) {
+      // Determine card type
+      let typeText = '';
+      let typeClass = '';
+      if (card.dominant) { typeText = 'DOMINANT'; typeClass = 'dominant'; }
+      else if (card.action) { typeText = 'ACTION'; typeClass = 'action'; }
+      else if (card.drops) { typeText = 'DROP'; typeClass = 'drop'; }
+      else if (card.gene_pool) { typeText = 'GENE POOL'; typeClass = 'gene-pool'; }
+      else if (card.worlds_end) { typeText = "WORLD'S END"; typeClass = 'worlds-end'; }
+      else { typeText = 'TRAIT'; typeClass = 'trait'; }
+
+      // Get effect text
+      let effectText = getDetailedEffectText(card);
+
+      // Get color class
+      const colorClass = getColorClass(card.color);
+      const colorValue = getColorValue(card.color);
+
+      // Build the card detail HTML (matching the reference image style)
+      cardDetailContent.className = `card-detail-card ${colorClass}`;
+      cardDetailContent.innerHTML = `
+        <div class="detail-card-inner">
+          <div class="detail-type-badge ${typeClass}">${typeText}</div>
+          ${card.dominant ? '<div class="detail-star">&#9733;</div>' : ''}
+
+          <div class="detail-card-frame">
+            <div class="detail-card-title">
+              <span class="detail-card-name">${card.trait}</span>
+            </div>
+
+            <div class="detail-flavor-text">${card.flavor || ''}</div>
+
+            <div class="detail-artwork">
+              <div class="detail-artwork-placeholder" style="background: ${colorValue};">
+                <div class="detail-creature-icon">?</div>
+              </div>
+            </div>
+
+            <div class="detail-effect-box">
+              <div class="detail-effect-text">${effectText}</div>
+            </div>
+          </div>
+
+          <div class="detail-face-value">${formatFace(card.face)}</div>
+          <div class="detail-color-indicator" style="background: ${colorValue};"></div>
+        </div>
+      `;
+
+      cardDetailOverlay.style.display = 'flex';
+    }
+
+    // Close card detail on backdrop click or close button
+    cardDetailClose.addEventListener('click', hideCardDetail);
+    document.querySelector('.card-detail-backdrop').addEventListener('click', hideCardDetail);
+
+    function hideCardDetail() {
+      cardDetailOverlay.style.display = 'none';
+    }
+
+    // Get detailed effect text for card detail view
+    function getDetailedEffectText(card) {
+      if (card.effectless) return 'No special effect.';
+
+      let effects = [];
+
+      if (card.drop_effect) {
+        effects.push(formatDetailedDropEffect(card.drop_effect));
+      }
+
+      if (card.action) {
+        // Try to get action effect description
+        if (card.action_effect) {
+          effects.push(formatActionEffect(card.action_effect));
+        } else {
+          effects.push('Perform an action when played.');
+        }
+      }
+
+      if (card.gene_pool_effect) {
+        effects.push(`Gene Pool: ${card.gene_pool_effect}`);
+      }
+
+      if (card.trait_effect) {
+        effects.push(card.trait_effect);
+      }
+
+      if (card.worlds_end_task) {
+        effects.push(`World's End: ${card.worlds_end_task}`);
+      }
+
+      if (card.persistent) {
+        effects.push('Persistent effect.');
+      }
+
+      if (card.requirement) {
+        effects.push(`Requires: ${card.requirement}`);
+      }
+
+      return effects.join(' ') || 'No special effect.';
+    }
+
+    function formatDetailedDropEffect(effect) {
+      if (!effect) return '';
+      const parts = effect.split(' ');
+      if (parts.length < 3) return effect;
+
+      const value = parts[0];
+      const target = parts[1];
+      const condition = parts[2] || '';
+
+      const conditionMap = {
+        'n_hand': 'for each card in your hand',
+        'n_traits': 'for each trait in your trait pile',
+        'n_red': 'for each Red trait',
+        'n_blue': 'for each Blue trait',
+        'n_green': 'for each Green trait',
+        'n_purple': 'for each Purple trait',
+        'n_colorless': 'for each Colorless trait',
+        'n_colors': 'for each unique color',
+        'if_most_traits': 'if you have the most traits',
+        'if_least_traits': 'if you have the fewest traits',
+        'n_negative': 'for each trait with a negative face value',
+        'if_negative': 'for each trait with a negative face value in your trait pile'
+      };
+
+      const text = conditionMap[condition] || condition.replace(/_/g, ' ');
+      const sign = value > 0 ? '+' : '';
+      return `${sign}${value} ${text}.`;
+    }
+
+    function formatActionEffect(effect) {
+      if (!effect) return '';
+      const actionMap = {
+        'draw 1': 'Draw 1 card.',
+        'draw 2': 'Draw 2 cards.',
+        'draw 3': 'Draw 3 cards.',
+        'steal_random': 'Steal a random card from an opponent.',
+        'steal_trait': 'Steal a trait from an opponent.',
+        'discard_hand': 'Discard your hand and draw new cards.',
+        'view_hand': "Look at an opponent's hand."
+      };
+      return actionMap[effect] || effect.replace(/_/g, ' ');
     }
 
     // Handle pending action

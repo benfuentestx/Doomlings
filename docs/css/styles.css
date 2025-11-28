@@ -762,3 +762,277 @@ input:focus {
   gap: 15px;
   justify-content: center;
 }
+
+/* Drag and Drop Styles */
+.card.dragging {
+  opacity: 0.7;
+  transform: scale(1.05) rotate(3deg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.card[draggable="true"] {
+  cursor: grab;
+}
+
+.card[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.my-traits.drop-target {
+  border: 3px dashed var(--success);
+  background: rgba(39, 174, 96, 0.1);
+  transition: all 0.2s ease;
+}
+
+.my-traits.drop-hover {
+  border-color: var(--warning);
+  background: rgba(243, 156, 18, 0.2);
+  box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
+}
+
+/* Card Detail View */
+.card-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 600;
+}
+
+.card-detail-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(5px);
+}
+
+.card-detail-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.card-detail-card {
+  width: 300px;
+  min-height: 450px;
+  border-radius: 20px;
+  padding: 0;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+.card-detail-card.red { background: linear-gradient(180deg, #e0a841 0%, #d4923a 50%, #3498db 100%); }
+.card-detail-card.blue { background: linear-gradient(180deg, #e0a841 0%, #d4923a 50%, #3498db 100%); }
+.card-detail-card.green { background: linear-gradient(180deg, #e0a841 0%, #d4923a 50%, #27ae60 100%); }
+.card-detail-card.purple { background: linear-gradient(180deg, #e0a841 0%, #d4923a 50%, #9b59b6 100%); }
+.card-detail-card.colorless { background: linear-gradient(180deg, #e0a841 0%, #d4923a 50%, #95a5a6 100%); }
+.card-detail-card.multi { background: linear-gradient(180deg, #e0a841 0%, #d4923a 50%, #9b59b6 100%); }
+
+.detail-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+}
+
+/* Type badge at top */
+.detail-type-badge {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2c3e50;
+  color: white;
+  padding: 4px 20px;
+  border-radius: 15px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+.detail-type-badge.dominant { background: #c0392b; }
+.detail-type-badge.action { background: #8e44ad; }
+.detail-type-badge.drop { background: #27ae60; }
+.detail-type-badge.gene-pool { background: #16a085; }
+.detail-type-badge.worlds-end { background: #2c3e50; }
+.detail-type-badge.trait { background: #7f8c8d; }
+
+/* Star for dominant */
+.detail-star {
+  position: absolute;
+  top: 8px;
+  right: 15px;
+  font-size: 2rem;
+  color: #f1c40f;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+/* Card frame */
+.detail-card-frame {
+  background: #faf8f0;
+  border-radius: 10px;
+  margin-top: 35px;
+  padding: 15px;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Card title banner */
+.detail-card-title {
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  margin: -15px -15px 10px -15px;
+  padding: 12px 15px;
+  border-radius: 10px 10px 0 0;
+  text-align: center;
+}
+
+.detail-card-name {
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Flavor text */
+.detail-flavor-text {
+  font-style: italic;
+  color: #666;
+  text-align: center;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  min-height: 20px;
+}
+
+/* Artwork area */
+.detail-artwork {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.detail-artwork-placeholder {
+  width: 180px;
+  height: 150px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.detail-creature-icon {
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Effect box */
+.detail-effect-box {
+  background: #faf8f0;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: auto;
+}
+
+.detail-effect-text {
+  color: #2c3e50;
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Face value circle */
+.detail-face-value {
+  position: absolute;
+  bottom: 15px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border: 3px solid white;
+}
+
+/* Color indicator (small earth/planet icon area) */
+.detail-color-indicator {
+  position: absolute;
+  bottom: 15px;
+  right: 20px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  opacity: 0.8;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Close button */
+.card-detail-close {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 10px 30px;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-detail-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: white;
+  color: white;
+}
+
+/* Mobile responsiveness for card detail */
+@media (max-width: 400px) {
+  .card-detail-card {
+    width: 280px;
+    min-height: 400px;
+  }
+
+  .detail-card-name {
+    font-size: 1.2rem;
+  }
+
+  .detail-artwork-placeholder {
+    width: 150px;
+    height: 120px;
+  }
+
+  .detail-face-value {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+  }
+}
