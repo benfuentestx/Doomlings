@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div id="loading" class="message-overlay" style="display: none;">
+  <div id="loading" class="message-overlay">
     <div class="spinner"></div>
     <p>Connecting...</p>
   </div>
@@ -58,11 +58,12 @@
       window.location.href = 'index.html';
     } else {
       gameCodeEl.textContent = playerData.gameId;
-      loadingOverlay.style.display = 'none';
 
       // Set up callbacks
       peerManager.onGameStateUpdate = (state) => {
         if (state.state === 'playing') {
+          // Save state before navigating
+          peerManager.saveGameState();
           window.location.href = 'game.html';
         } else {
           updateFromState(state);
@@ -78,8 +79,29 @@
         window.location.href = 'index.html';
       };
 
-      // Initial update
-      updateUI();
+      // Initialize connection based on role
+      initializeLobby();
+    }
+
+    async function initializeLobby() {
+      try {
+        if (isHost) {
+          // Host needs to restore their peer connection
+          await peerManager.restoreLobbyHost(playerData.gameId, playerData.playerId, playerData.playerName);
+        } else {
+          // Client needs to rejoin
+          if (playerData.playerId) {
+            peerManager.myPlayerId = playerData.playerId;
+          }
+          await peerManager.joinGame(playerData.gameId, playerData.playerName);
+        }
+        loadingOverlay.style.display = 'none';
+        updateUI();
+      } catch (err) {
+        loadingOverlay.style.display = 'none';
+        alert(err.error || 'Failed to connect to game');
+        window.location.href = 'index.html';
+      }
     }
 
     // Update UI from game state
