@@ -180,8 +180,9 @@
     let draggedCardIndex = null;
     let isDragging = false;
 
-    // Action card effect descriptions (for card detail view)
-    const actionEffectDescriptions = {
+    // Card effect descriptions (for card detail view)
+    const cardEffectDescriptions = {
+      // Action cards
       'Automimicry (0)': 'Copy the effect of any trait in an opponent\'s trait pile.',
       'Cold Blood': 'Draw 1 card.',
       'Costly Signaling': 'Steal a random card from an opponent\'s hand.',
@@ -217,7 +218,34 @@
       'Boredom (1)': 'Draw 1 card.',
       'Doting': 'Give 2 cards from your hand to another player.',
       'Introspective': 'Draw 1 card.',
-      'The Third Eye': 'Look at the next 3 age cards.'
+      'The Third Eye': 'Look at the next 3 age cards.',
+      // Dominant cards
+      'Apex Predator': '+4 if you have the most traits in your trait pile.',
+      'Camouflage (1)': '+1 for each card in your hand.',
+      'Camouflage (2)': '+1 for each card in your hand.',
+      'Denial': 'Cannot be removed. +2 for each Dominant in your trait pile.',
+      'Echolocation': '+2 for each Blue trait in your trait pile.',
+      'Faith': '+3 for each Colorless trait in your trait pile.',
+      'Heroic': '+2 for each trait with a negative face value in your trait pile.',
+      'Hyper-Intelligence': '+1 for each trait in your trait pile.',
+      'Immunity': '+2 for each trait with a negative face value in your trait pile.',
+      'Optimistic Nihilism': '+3 for each unique color in your trait pile.',
+      'Pack Behavior': '+2 for each Green trait in your trait pile.',
+      'Sentience': '+1 for each trait in your trait pile.',
+      'Symbiosis': '+2 for each Purple trait in your trait pile.',
+      'Tiny': '+1 for each card in your hand.',
+      'Vampirism': '+2 for each Red trait in your trait pile.',
+      'Viral': '+2 for each trait in your trait pile (including this one).',
+      // Drop cards (non-dominant with drop effects)
+      'Overgrowth': '+1 for each Green trait in your trait pile.',
+      'Bioluminescence': '+1 for each Blue trait in your trait pile.',
+      'Warning Coloration': '+1 for each Red trait in your trait pile.',
+      'Necrosis': '+1 for each Purple trait in your trait pile.',
+      'Mutation': '+1 for each unique color in your trait pile.',
+      'Thick Skin': '+1 for each Colorless trait in your trait pile.',
+      'Junk DNA (1)': '+1 for each card in your hand.',
+      'Junk DNA (2)': '+1 for each card in your hand.',
+      'Opposable Thumbs': '+1 for each trait in your trait pile.'
     };
 
     const isHost = sessionStorage.getItem('isHost') === 'true';
@@ -892,12 +920,12 @@
       // For detail view, prioritize the full effect description
       let effectText = card.effect || '';
 
-      // For action cards, look up the effect description
-      if (!effectText && card.action && actionEffectDescriptions[card.trait]) {
-        effectText = actionEffectDescriptions[card.trait];
+      // Look up effect description from our comprehensive mapping
+      if (!effectText && cardEffectDescriptions[card.trait]) {
+        effectText = cardEffectDescriptions[card.trait];
       }
 
-      // For drop cards, show the drop effect in readable form
+      // For drop cards without a mapped description, parse the drop_effect
       if (!effectText && card.drop_effect) {
         effectText = formatDropEffect(card.drop_effect);
       }
