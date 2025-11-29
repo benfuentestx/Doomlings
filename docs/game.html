@@ -196,6 +196,20 @@
     let draggedCardIndex = null;
     let isDragging = false;
 
+    // Image name mapping for cards that don't have direct name matches
+    // Maps trait name (without suffixes) to actual image file name
+    const cardImageMapping = {
+      'SWARM': 'Swarm Fur',          // Swarm (g) -> Swarm Fur.png
+      'BRAVE': 'Brave',              // Brave (1), Brave (2) -> Brave.png
+      'CAMOUFLAGE': 'Camouflage',    // Camouflage (1), Camouflage (2) -> Camouflage.png
+      'FORTUNATE': 'Fortunate',      // Fortunate (~), Fortunate (1) -> Fortunate.png
+      'BOREDOM': 'Boredom',          // Boredom (1), Boredom (~) -> Boredom.png
+      'SAUDADE': 'Saudade',          // Saudade (1) -> Saudade.png
+      'KIDNEY': 'Kidney Topper',     // Kidney (r) -> Kidney Topper.png
+      'AUTOMIMICRY': 'Camouflage',   // Automimicry (0) - use Camouflage as placeholder
+      'JUNK DNA': 'Mitochondrion',   // Junk DNA (1), (2) - use Mitochondrion as placeholder
+    };
+
     // Card effect descriptions (for card detail view)
     const cardEffectDescriptions = {
       // Action cards
@@ -986,8 +1000,16 @@
       // Clean up card name - remove suffixes like (g), (1), (~), (r), etc.
       let displayName = card.trait.replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
 
-      // Try to get real card image
-      const imageName = displayName.charAt(0) + displayName.slice(1).toLowerCase();
+      // Try to get real card image - check mapping first, then use default conversion
+      let imageName;
+      if (cardImageMapping[displayName]) {
+        imageName = cardImageMapping[displayName];
+      } else {
+        // Convert to title case: "APEX PREDATOR" -> "Apex Predator"
+        imageName = displayName.split(' ').map(word =>
+          word.charAt(0) + word.slice(1).toLowerCase()
+        ).join(' ');
+      }
       const imageUrl = `source-data/cards/images/${imageName}.png`;
 
       cardDetailContent.className = `card-detail-card ${colorClass}`;

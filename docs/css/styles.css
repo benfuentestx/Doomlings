@@ -1779,6 +1779,8 @@ input:focus {
   display: flex;
   gap: 12px;
   margin-top: 20px;
+  position: relative;
+  z-index: 10;
 }
 
 /* Play button in card detail */
@@ -1800,10 +1802,8 @@ input:focus {
 
 /* Card counter */
 .card-detail-counter {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  z-index: 10;
   background: rgba(0, 0, 0, 0.6);
   color: white;
   padding: 8px 16px;
