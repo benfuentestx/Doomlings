@@ -849,8 +849,19 @@
         typeText = 'TRAIT';
       }
 
-      let effectText = getCardEffectText(card);
-      if (!effectText && card.effect) effectText = card.effect;
+      // For detail view, prioritize the full effect description
+      let effectText = card.effect || '';
+
+      // For drop cards, show the drop effect in readable form
+      if (!effectText && card.drop_effect) {
+        effectText = formatDropEffect(card.drop_effect);
+      }
+
+      // For gene pool cards, show the gene pool effect
+      if (!effectText && card.gene_pool) {
+        const gpEffect = card.gene_pool_effect || 0;
+        effectText = `Gene Pool: ${gpEffect >= 0 ? '+' : ''}${gpEffect}`;
+      }
 
       const colorClass = getColorClass(card.color);
 
