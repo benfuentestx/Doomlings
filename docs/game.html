@@ -180,6 +180,46 @@
     let draggedCardIndex = null;
     let isDragging = false;
 
+    // Action card effect descriptions (for card detail view)
+    const actionEffectDescriptions = {
+      'Automimicry (0)': 'Copy the effect of any trait in an opponent\'s trait pile.',
+      'Cold Blood': 'Draw 1 card.',
+      'Costly Signaling': 'Steal a random card from an opponent\'s hand.',
+      'Flight': 'Return one of your traits to your hand.',
+      'Iridescent Scales': 'Swap 1 card from your hand with 1 card from an opponent\'s hand.',
+      'Painted Shell': 'Look at an opponent\'s hand.',
+      'Scutes': 'Your traits cannot be stolen or discarded this round.',
+      'Selective Memory': 'Take a card from the discard pile.',
+      'Sweat': 'Discard 1 card, then draw 2 cards.',
+      'Tentacles': 'Steal a trait from an opponent\'s trait pile.',
+      'Photosynthesis': 'Draw 1 card.',
+      'Propagation': 'If you have another Green trait, draw 1 card.',
+      'Self-Replicating': 'Draw 1 card at the start of each round.',
+      'Tiny Little Melons': 'Give a card from your hand to another player.',
+      'Trunk': 'Draw 2 cards.',
+      'Clever': 'Look at the top 3 cards of the deck.',
+      'Directly Register': 'Draw 1 card.',
+      'Impatience': 'Draw 2 cards, then discard 1 card.',
+      'Inventive': 'Rearrange your traits in any order.',
+      'Memory': 'Take a card from the discard pile.',
+      'Nosy': 'Look at an opponent\'s hand.',
+      'Persuasive': 'Swap one of your traits with an opponent\'s trait.',
+      'Poisonous': 'Discard a trait from an opponent\'s trait pile.',
+      'Selfish': 'Steal a random card from an opponent\'s hand.',
+      'Telekinetic': 'Move a trait from one player to another.',
+      'Venomous': 'An opponent discards 2 cards from their hand.',
+      'Bad': 'An opponent discards 1 card from their hand.',
+      'Brave (2)': 'Draw 1 card.',
+      'Hot Temper': 'Discard up to 2 cards, then draw that many +1.',
+      'Reckless': 'Discard your hand and draw that many +1.',
+      'Territorial': 'Steal a Red trait from an opponent.',
+      'Voracious': 'Draw 2 cards.',
+      'Boredom (1)': 'Draw 1 card.',
+      'Doting': 'Give 2 cards from your hand to another player.',
+      'Introspective': 'Draw 1 card.',
+      'The Third Eye': 'Look at the next 3 age cards.'
+    };
+
     const isHost = sessionStorage.getItem('isHost') === 'true';
 
     // Check session
@@ -851,6 +891,11 @@
 
       // For detail view, prioritize the full effect description
       let effectText = card.effect || '';
+
+      // For action cards, look up the effect description
+      if (!effectText && card.action && actionEffectDescriptions[card.trait]) {
+        effectText = actionEffectDescriptions[card.trait];
+      }
 
       // For drop cards, show the drop effect in readable form
       if (!effectText && card.drop_effect) {
