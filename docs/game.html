@@ -954,12 +954,15 @@
 
       const colorClass = getColorClass(card.color);
 
+      // Clean up card name - remove suffixes like (g), (1), (~), (r), etc.
+      let displayName = card.trait.replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+
       cardDetailContent.className = `card-detail-card ${colorClass}`;
       cardDetailContent.innerHTML = `
         <div class="card-detail-type-badge">${typeText}</div>
         ${showStar ? '<div class="card-detail-star">★</div>' : ''}
         <div class="card-detail-name-banner">
-          <span class="card-detail-name">${card.trait}</span>
+          <span class="card-detail-name">${displayName}</span>
         </div>
         <div class="card-detail-artwork">
           <span class="artwork-placeholder">Artwork Coming Soon</span>
