@@ -116,7 +116,7 @@
     <div class="card-detail-backdrop"></div>
     <div class="card-detail-container">
       <div class="card-detail-card" id="card-detail-content">
-        <!-- Card content will be injected here -->
+        <!-- Card content injected here -->
       </div>
       <button class="card-detail-close" id="card-detail-close">Tap to close</button>
     </div>
@@ -176,7 +176,7 @@
 
     let lastShownAgeName = null; // Track which age we've shown
 
-    // Drag state
+    // Drag-and-drop state
     let draggedCardIndex = null;
     let isDragging = false;
 
@@ -387,13 +387,8 @@
       container.innerHTML = '';
       cards.forEach((card, index) => {
         const cardEl = createCardElement(card, false, index);
-        // Click to view card detail
-        cardEl.addEventListener('click', (e) => {
-          if (!isDragging) {
-            e.stopPropagation();
-            showCardDetail(card);
-          }
-        });
+        // Tap to show card detail
+        cardEl.addEventListener('click', () => showCardDetail(card));
         container.appendChild(cardEl);
       });
     }
@@ -407,40 +402,118 @@
       const isStabilizing = gameState.isMyTurn && gameState.turnPhase === 'stabilize';
       const needsDiscard = gameState.needsDiscard || 0;
 
+      // Set up drop zone for trait pile when can play
+      if (canPlay) {
+        myTraitPile.classList.add('drop-target');
+        myTraitPile.ondragover = (e) => {
+          e.preventDefault();
+          myTraitPile.classList.add('drop-hover');
+        };
+        myTraitPile.ondragleave = () => {
+          myTraitPile.classList.remove('drop-hover');
+        };
+        myTraitPile.ondrop = (e) => {
+          e.preventDefault();
+          myTraitPile.classList.remove('drop-hover');
+          if (draggedCardIndex !== null) {
+            playCard(draggedCardIndex);
+            draggedCardIndex = null;
+          }
+        };
+      } else {
+        myTraitPile.classList.remove('drop-target');
+        myTraitPile.ondragover = null;
+        myTraitPile.ondragleave = null;
+        myTraitPile.ondrop = null;
+      }
+
       gameState.myHand.forEach((card, index) => {
         const cardEl = createCardElement(card, canPlay || isStabilizing, index);
 
-        // Click to view card detail (when not playing or stabilizing)
-        cardEl.addEventListener('click', (e) => {
-          if (!isDragging && !canPlay && !(isStabilizing && needsDiscard > 0)) {
-            e.stopPropagation();
-            showCardDetail(card);
-          }
-        });
-
         if (canPlay) {
-          // Drag to play
+          // Desktop drag-and-drop
           cardEl.draggable = true;
-          cardEl.addEventListener('dragstart', (e) => handleDragStart(e, index));
-          cardEl.addEventListener('dragend', handleDragEnd);
+          cardEl.ondragstart = (e) => {
+            draggedCardIndex = index;
+            isDragging = true;
+            cardEl.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+          };
+          cardEl.ondragend = () => {
+            isDragging = false;
+            cardEl.classList.remove('dragging');
+            myTraitPile.classList.remove('drop-hover');
+          };
 
-          // Touch events for mobile drag
-          cardEl.addEventListener('touchstart', (e) => handleTouchStart(e, index, card), { passive: false });
-          cardEl.addEventListener('touchmove', handleTouchMove, { passive: false });
-          cardEl.addEventListener('touchend', handleTouchEnd);
+          // Mobile touch drag
+          let touchStartX = 0;
+          let touchStartY = 0;
+          let touchMoved = false;
+
+          cardEl.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchMoved = false;
+            draggedCardIndex = index;
+          }, { passive: true });
+
+          cardEl.addEventListener('touchmove', (e) => {
+            const dx = Math.abs(e.touches[0].clientX - touchStartX);
+            const dy = Math.abs(e.touches[0].clientY - touchStartY);
+            if (dx > 20 || dy > 20) {
+              touchMoved = true;
+              isDragging = true;
+              cardEl.classList.add('dragging');
+
+              // Check if over trait pile
+              const touch = e.touches[0];
+              const traitRect = myTraitPile.getBoundingClientRect();
+              if (touch.clientX >= traitRect.left && touch.clientX <= traitRect.right &&
+                  touch.clientY >= traitRect.top && touch.clientY <= traitRect.bottom) {
+                myTraitPile.classList.add('drop-hover');
+              } else {
+                myTraitPile.classList.remove('drop-hover');
+              }
+            }
+          }, { passive: true });
+
+          cardEl.addEventListener('touchend', (e) => {
+            cardEl.classList.remove('dragging');
+            myTraitPile.classList.remove('drop-hover');
+
+            if (!touchMoved) {
+              // Tap - show card detail
+              showCardDetail(card);
+            } else if (isDragging && draggedCardIndex !== null) {
+              // Check if dropped on trait pile
+              const touch = e.changedTouches[0];
+              const traitRect = myTraitPile.getBoundingClientRect();
+              if (touch.clientX >= traitRect.left && touch.clientX <= traitRect.right &&
+                  touch.clientY >= traitRect.top && touch.clientY <= traitRect.bottom) {
+                playCard(draggedCardIndex);
+              }
+            }
+
+            isDragging = false;
+            draggedCardIndex = null;
+            e.preventDefault();
+          });
         } else if (isStabilizing && needsDiscard > 0) {
           // In stabilize mode - can select cards to discard
           cardEl.addEventListener('click', () => toggleStabilizeDiscard(index, cardEl, needsDiscard));
           if (stabilizeDiscards.includes(index)) {
             cardEl.classList.add('selected');
           }
+        } else {
+          // Not playable - just show detail on tap
+          cardEl.addEventListener('click', () => showCardDetail(card));
         }
+
         myHand.appendChild(cardEl);
       });
 
       if (canPlay) {
-        playInstruction.textContent = 'Drag a card to your trait pile to play it';
-        setupDropZone();
+        playInstruction.textContent = 'Drag card to trait pile to play';
       } else if (isStabilizing && needsDiscard > 0) {
         playInstruction.textContent = `Select ${needsDiscard} card(s) to discard, then click Stabilize`;
       } else if (isStabilizing) {
@@ -448,140 +521,6 @@
       } else {
         playInstruction.textContent = '';
       }
-    }
-
-    // Drag and drop handlers
-    function handleDragStart(e, index) {
-      isDragging = true;
-      draggedCardIndex = index;
-      e.target.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', index);
-      document.querySelector('.my-traits').classList.add('drop-target');
-    }
-
-    function handleDragEnd(e) {
-      setTimeout(() => { isDragging = false; }, 100);
-      e.target.classList.remove('dragging');
-      draggedCardIndex = null;
-      document.querySelector('.my-traits').classList.remove('drop-target', 'drop-hover');
-    }
-
-    function setupDropZone() {
-      const dropZone = document.querySelector('.my-traits');
-      // Remove old listeners by cloning
-      const newDropZone = dropZone.cloneNode(true);
-      dropZone.parentNode.replaceChild(newDropZone, dropZone);
-
-      newDropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        newDropZone.classList.add('drop-hover');
-      });
-
-      newDropZone.addEventListener('dragleave', () => {
-        newDropZone.classList.remove('drop-hover');
-      });
-
-      newDropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        newDropZone.classList.remove('drop-hover', 'drop-target');
-        const index = parseInt(e.dataTransfer.getData('text/plain'));
-        if (!isNaN(index)) {
-          playCard(index);
-        }
-      });
-    }
-
-    // Touch drag support for mobile
-    let touchDragElement = null;
-    let touchStartPos = { x: 0, y: 0 };
-    let touchCardIndex = null;
-    let touchCard = null;
-    let touchMoved = false;
-
-    function handleTouchStart(e, index, card) {
-      const touch = e.touches[0];
-      touchStartPos = { x: touch.clientX, y: touch.clientY };
-      touchCardIndex = index;
-      touchCard = card;
-      touchMoved = false;
-      touchDragElement = e.target.closest('.card');
-    }
-
-    function handleTouchMove(e) {
-      if (!touchDragElement || touchCardIndex === null) return;
-
-      const touch = e.touches[0];
-      const deltaX = Math.abs(touch.clientX - touchStartPos.x);
-      const deltaY = Math.abs(touch.clientY - touchStartPos.y);
-
-      if (deltaX > 20 || deltaY > 20) {
-        touchMoved = true;
-        isDragging = true;
-        e.preventDefault();
-
-        touchDragElement.classList.add('dragging');
-        document.querySelector('.my-traits').classList.add('drop-target');
-
-        touchDragElement.style.position = 'fixed';
-        touchDragElement.style.left = (touch.clientX - 60) + 'px';
-        touchDragElement.style.top = (touch.clientY - 85) + 'px';
-        touchDragElement.style.zIndex = '1000';
-        touchDragElement.style.pointerEvents = 'none';
-
-        const dropZone = document.querySelector('.my-traits');
-        const rect = dropZone.getBoundingClientRect();
-        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-          dropZone.classList.add('drop-hover');
-        } else {
-          dropZone.classList.remove('drop-hover');
-        }
-      }
-    }
-
-    function handleTouchEnd(e) {
-      if (!touchDragElement || touchCardIndex === null) {
-        touchDragElement = null;
-        touchCardIndex = null;
-        touchCard = null;
-        return;
-      }
-
-      const dropZone = document.querySelector('.my-traits');
-      dropZone.classList.remove('drop-target', 'drop-hover');
-
-      touchDragElement.classList.remove('dragging');
-      touchDragElement.style.position = '';
-      touchDragElement.style.left = '';
-      touchDragElement.style.top = '';
-      touchDragElement.style.zIndex = '';
-      touchDragElement.style.pointerEvents = '';
-
-      const wasDragging = isDragging && touchMoved;
-
-      if (wasDragging) {
-        const touch = e.changedTouches[0];
-        const rect = dropZone.getBoundingClientRect();
-        if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-            touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-          playCard(touchCardIndex);
-        }
-        e.preventDefault();
-      } else {
-        // Tap - show detail
-        if (touchCard) {
-          showCardDetail(touchCard);
-        }
-        e.preventDefault();
-      }
-
-      setTimeout(() => { isDragging = false; }, 100);
-      touchDragElement = null;
-      touchCardIndex = null;
-      touchCard = null;
-      touchMoved = false;
     }
 
     // Toggle card selection for stabilization discard
@@ -820,9 +759,9 @@
             };
             actionOptions.appendChild(discardBtn);
 
-            // Mobile bar - show tap to play message
+            // Mobile bar - show drag to play message
             mobileActionBar.innerHTML = `
-              <span class="action-msg">Tap a card to play</span>
+              <span class="action-msg">Drag card to trait pile</span>
               <button class="secondary" onclick="window.doDiscardAll()">Redraw</button>
             `;
           }
@@ -889,6 +828,59 @@
       ageAnnounceOverlay.style.display = 'none';
     };
 
+    // Show card detail view
+    function showCardDetail(card) {
+      let typeText = '';
+      let showStar = false;
+      if (card.dominant) {
+        typeText = 'DOMINANT';
+        showStar = true;
+      } else if (card.action) {
+        typeText = 'ACTION';
+      } else if (card.drops) {
+        typeText = 'DROP';
+      } else if (card.gene_pool) {
+        typeText = 'GENE POOL';
+      } else if (card.worlds_end) {
+        typeText = "WORLD'S END";
+      } else if (card.effectless) {
+        typeText = 'TRAIT';
+      } else {
+        typeText = 'TRAIT';
+      }
+
+      let effectText = getCardEffectText(card);
+      if (!effectText && card.effect) effectText = card.effect;
+
+      const colorClass = getColorClass(card.color);
+
+      cardDetailContent.className = `card-detail-card ${colorClass}`;
+      cardDetailContent.innerHTML = `
+        <div class="card-detail-type-badge">${typeText}</div>
+        ${showStar ? '<div class="card-detail-star">★</div>' : ''}
+        <div class="card-detail-name-banner">
+          <span class="card-detail-name">${card.trait}</span>
+        </div>
+        <div class="card-detail-artwork">
+          <span class="artwork-placeholder">Artwork Coming Soon</span>
+        </div>
+        <div class="card-detail-effect">${effectText || 'No special effect'}</div>
+        <div class="card-detail-face">${formatFace(card.face)}</div>
+      `;
+
+      cardDetailOverlay.style.display = 'flex';
+    }
+
+    // Close card detail view
+    cardDetailClose.addEventListener('click', () => {
+      cardDetailOverlay.style.display = 'none';
+    });
+
+    // Close on backdrop click
+    cardDetailOverlay.querySelector('.card-detail-backdrop').addEventListener('click', () => {
+      cardDetailOverlay.style.display = 'none';
+    });
+
     // Render action log
     function renderLog() {
       actionLog.innerHTML = '';
@@ -907,102 +899,6 @@
       if (!result.success && result.error) {
         alert(result.error);
       }
-    }
-
-    // Show card detail view
-    function showCardDetail(card) {
-      let typeText = '';
-      let typeClass = '';
-      if (card.dominant) { typeText = 'DOMINANT'; typeClass = 'dominant'; }
-      else if (card.action) { typeText = 'ACTION'; typeClass = 'action'; }
-      else if (card.drops) { typeText = 'DROP'; typeClass = 'drop'; }
-      else if (card.gene_pool) { typeText = 'GENE POOL'; typeClass = 'gene-pool'; }
-      else if (card.worlds_end) { typeText = "WORLD'S END"; typeClass = 'worlds-end'; }
-      else { typeText = 'TRAIT'; typeClass = 'trait'; }
-
-      let effectText = getDetailedEffectText(card);
-      const colorClass = getColorClass(card.color);
-      const colorValue = getColorValue(card.color);
-
-      cardDetailContent.className = `card-detail-card ${colorClass}`;
-      cardDetailContent.innerHTML = `
-        <div class="detail-card-inner">
-          <div class="detail-type-badge ${typeClass}">${typeText}</div>
-          ${card.dominant ? '<div class="detail-star">&#9733;</div>' : ''}
-          <div class="detail-card-frame">
-            <div class="detail-card-title">
-              <span class="detail-card-name">${card.trait}</span>
-            </div>
-            <div class="detail-flavor-text">${card.flavor || ''}</div>
-            <div class="detail-artwork">
-              <div class="detail-artwork-placeholder" style="background: ${colorValue};">
-                <div class="detail-creature-icon">?</div>
-              </div>
-            </div>
-            <div class="detail-effect-box">
-              <div class="detail-effect-text">${effectText}</div>
-            </div>
-          </div>
-          <div class="detail-face-value">${formatFace(card.face)}</div>
-          <div class="detail-color-indicator" style="background: ${colorValue};"></div>
-        </div>
-      `;
-      cardDetailOverlay.style.display = 'flex';
-    }
-
-    cardDetailClose.addEventListener('click', hideCardDetail);
-    document.querySelector('.card-detail-backdrop').addEventListener('click', hideCardDetail);
-
-    function hideCardDetail() {
-      cardDetailOverlay.style.display = 'none';
-    }
-
-    function getDetailedEffectText(card) {
-      if (card.effectless) return 'No special effect.';
-      let effects = [];
-      if (card.drop_effect) effects.push(formatDetailedDropEffect(card.drop_effect));
-      if (card.action && card.action_effect) effects.push(formatActionEffect(card.action_effect));
-      else if (card.action) effects.push('Perform an action when played.');
-      if (card.gene_pool_effect) effects.push(`Gene Pool: ${card.gene_pool_effect}`);
-      if (card.trait_effect) effects.push(card.trait_effect);
-      if (card.worlds_end_task) effects.push(`World's End: ${card.worlds_end_task}`);
-      if (card.persistent) effects.push('Persistent effect.');
-      if (card.requirement) effects.push(`Requires: ${card.requirement}`);
-      return effects.join(' ') || 'No special effect.';
-    }
-
-    function formatDetailedDropEffect(effect) {
-      if (!effect) return '';
-      const parts = effect.split(' ');
-      if (parts.length < 3) return effect;
-      const value = parts[0];
-      const condition = parts[2] || '';
-      const conditionMap = {
-        'n_hand': 'for each card in your hand',
-        'n_traits': 'for each trait in your trait pile',
-        'n_red': 'for each Red trait', 'n_blue': 'for each Blue trait',
-        'n_green': 'for each Green trait', 'n_purple': 'for each Purple trait',
-        'n_colorless': 'for each Colorless trait', 'n_colors': 'for each unique color',
-        'if_most_traits': 'if you have the most traits',
-        'if_least_traits': 'if you have the fewest traits',
-        'n_negative': 'for each trait with a negative face value',
-        'if_negative': 'for each trait with a negative face value in your trait pile'
-      };
-      const text = conditionMap[condition] || condition.replace(/_/g, ' ');
-      const sign = value > 0 ? '+' : '';
-      return `${sign}${value} ${text}.`;
-    }
-
-    function formatActionEffect(effect) {
-      if (!effect) return '';
-      const actionMap = {
-        'draw 1': 'Draw 1 card.', 'draw 2': 'Draw 2 cards.', 'draw 3': 'Draw 3 cards.',
-        'steal_random': 'Steal a random card from an opponent.',
-        'steal_trait': 'Steal a trait from an opponent.',
-        'discard_hand': 'Discard your hand and draw new cards.',
-        'view_hand': "Look at an opponent's hand."
-      };
-      return actionMap[effect] || effect.replace(/_/g, ' ');
     }
 
     // Handle pending action

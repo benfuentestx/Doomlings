@@ -81,48 +81,6 @@ export class PeerManager {
     });
   }
 
-  // Restore host for lobby page (fresh state, no game backup needed)
-  async restoreLobbyHost(gameId, playerId, playerName) {
-    return new Promise((resolve, reject) => {
-      this.gameId = gameId;
-      this.isHost = true;
-      this.myPlayerId = playerId;
-      this.myPlayerName = playerName;
-
-      // Create peer with game ID as peer ID
-      this.peer = new Peer(this.gameId, { debug: 1 });
-
-      this.peer.on('open', (id) => {
-        console.log('Host peer restored for lobby with ID:', id);
-
-        // Create fresh game state for lobby
-        this.gameState = new GameState(this.gameId);
-        this.gameState.addPlayer(this.myPlayerId, playerName, true);
-
-        // Listen for incoming connections
-        this.peer.on('connection', (conn) => this.handleIncomingConnection(conn));
-
-        resolve({ success: true });
-      });
-
-      this.peer.on('error', (err) => {
-        console.error('Peer restore error:', err);
-        if (err.type === 'unavailable-id') {
-          reject({ success: false, error: 'Game ID conflict. Try creating a new game.' });
-        } else {
-          reject({ success: false, error: err.message || 'Connection failed' });
-        }
-      });
-    });
-  }
-
-  // Save game state for page navigation
-  saveGameState() {
-    if (this.gameState) {
-      sessionStorage.setItem('gameStateBackup', this.gameState.serialize());
-    }
-  }
-
   // Create a new game as host
   async createGame(playerName) {
     return new Promise((resolve, reject) => {

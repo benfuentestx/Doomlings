@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <div id="loading" class="message-overlay">
+  <div id="loading" class="message-overlay" style="display: none;">
     <div class="spinner"></div>
     <p>Connecting...</p>
   </div>
@@ -62,8 +62,6 @@
       // Set up callbacks
       peerManager.onGameStateUpdate = (state) => {
         if (state.state === 'playing') {
-          // Save state before navigating
-          peerManager.saveGameState();
           window.location.href = 'game.html';
         } else {
           updateFromState(state);
@@ -75,31 +73,68 @@
       };
 
       peerManager.onDisconnected = () => {
-        alert('Disconnected from host');
-        window.location.href = 'index.html';
+        console.log('Disconnected from host, will retry...');
+        // Don't immediately redirect - host may be navigating to game page
+        // Wait and retry connection
+        setTimeout(() => {
+          retryConnection();
+        }, 1500);
       };
 
-      // Initialize connection based on role
-      initializeLobby();
-    }
+      let retryCount = 0;
+      const maxRetries = 3;
 
-    async function initializeLobby() {
-      try {
-        if (isHost) {
-          // Host needs to restore their peer connection
-          await peerManager.restoreLobbyHost(playerData.gameId, playerData.playerId, playerData.playerName);
-        } else {
-          // Client needs to rejoin
+      async function retryConnection() {
+        if (retryCount >= maxRetries) {
+          alert('Lost connection to host');
+          window.location.href = 'index.html';
+          return;
+        }
+        retryCount++;
+        console.log(`Retry attempt ${retryCount}/${maxRetries}`);
+        try {
+          // Preserve playerId for reconnection
           if (playerData.playerId) {
             peerManager.myPlayerId = playerData.playerId;
           }
-          await peerManager.joinGame(playerData.gameId, playerData.playerName);
+          const result = await peerManager.joinGame(playerData.gameId, playerData.playerName);
+          if (result.success) {
+            playerData.playerId = result.playerId;
+            sessionStorage.setItem('playerData', JSON.stringify(playerData));
+            retryCount = 0;
+          }
+        } catch (err) {
+          setTimeout(retryConnection, 1500);
         }
-        loadingOverlay.style.display = 'none';
-        updateUI();
+      }
+
+      // Restore connection based on host/client status
+      initializeConnection();
+    }
+
+    async function initializeConnection() {
+      try {
+        if (isHost) {
+          // Host needs to restore their peer connection
+          await peerManager.restoreHost(playerData.gameId, playerData.playerId, playerData.playerName);
+          loadingOverlay.style.display = 'none';
+          updateUI();
+        } else {
+          // Client needs to join the game
+          // Preserve existing playerId if we have one (for reconnection scenarios)
+          if (playerData.playerId) {
+            peerManager.myPlayerId = playerData.playerId;
+          }
+          const result = await peerManager.joinGame(playerData.gameId, playerData.playerName);
+          loadingOverlay.style.display = 'none';
+          if (result.success) {
+            playerData.playerId = result.playerId;
+            sessionStorage.setItem('playerData', JSON.stringify(playerData));
+          }
+        }
       } catch (err) {
         loadingOverlay.style.display = 'none';
-        alert(err.error || 'Failed to connect to game');
+        alert(err.error || 'Failed to connect. Please try again.');
         window.location.href = 'index.html';
       }
     }
@@ -208,6 +243,7 @@
       peerManager.disconnect();
       sessionStorage.removeItem('playerData');
       sessionStorage.removeItem('isHost');
+      sessionStorage.removeItem('gameStateBackup');
       window.location.href = 'index.html';
     };
 
