@@ -355,13 +355,15 @@
     let touchDragElement = null;
     let touchStartPos = { x: 0, y: 0 };
     let touchCardIndex = null;
+    let touchStartTime = 0;
+    let touchMoved = false;
 
     function handleTouchStart(e, index) {
       const touch = e.touches[0];
       touchStartPos = { x: touch.clientX, y: touch.clientY };
       touchCardIndex = index;
-
-      // Long press to start drag
+      touchStartTime = Date.now();
+      touchMoved = false;
       touchDragElement = e.target.closest('.card');
     }
 
@@ -372,8 +374,9 @@
       const deltaX = Math.abs(touch.clientX - touchStartPos.x);
       const deltaY = Math.abs(touch.clientY - touchStartPos.y);
 
-      // If moved enough, start dragging
-      if (deltaX > 10 || deltaY > 10) {
+      // If moved enough, start dragging (increased threshold for better tap detection)
+      if (deltaX > 20 || deltaY > 20) {
+        touchMoved = true;
         isDragging = true;
         e.preventDefault();
 
@@ -417,19 +420,30 @@
       touchDragElement.style.zIndex = '';
       touchDragElement.style.pointerEvents = '';
 
-      // Check if dropped on trait pile
-      if (isDragging) {
+      const card = gameState.myHand[touchCardIndex];
+      const wasDragging = isDragging && touchMoved;
+
+      // If it was a drag operation, check if dropped on trait pile
+      if (wasDragging) {
         const touch = e.changedTouches[0];
         const rect = dropZone.getBoundingClientRect();
         if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
             touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
           playCard(touchCardIndex);
         }
+        e.preventDefault(); // Prevent click event after drag
+      } else {
+        // It was a tap - show detail view
+        if (card) {
+          showCardDetail(card);
+        }
+        e.preventDefault(); // Prevent click event after tap (we handled it)
       }
 
       setTimeout(() => { isDragging = false; }, 100);
       touchDragElement = null;
       touchCardIndex = null;
+      touchMoved = false;
     }
 
     // Create a card element
