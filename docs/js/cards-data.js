@@ -3061,89 +3061,124 @@ export const birthOfLife = {
   id: 'birth_of_life',
   type: 'birth',
   name: 'Birth of Life',
-  draw: 2,
-  effect: 'The world begins! Each player draws 2 cards.'
+  draw: 0,
+  effect: 'The world begins! All players have Gene Pool 5.'
 };
 
-// Age card templates
-const ageCardTemplates = [
-  { draw: 1, count: 4 },
-  { draw: 2, count: 8 },
-  { draw: 3, count: 8 },
-  { draw: 4, count: 4 },
-  { draw: 5, count: 2 },
-  { draw: 6, count: 2 },
-];
+// Age cards with various effects
+export const ageCards = [
+  // Draw 1 Ages (4)
+  { id: 'age_1', type: 'age', name: 'Northern Winds', draw: 1, oneTimeEffect: 'draw_discard_1', effect: 'Draw 1. You must discard 1 extra when stabilizing.' },
+  { id: 'age_2', type: 'age', name: 'Lunar Retreat', draw: 1, ruleEffect: 'no_purple', ruleEffectText: 'Cannot play Purple traits', effect: 'Draw 1. No Purple traits may be played.' },
+  { id: 'age_3', type: 'age', name: 'Drought', draw: 1, ruleEffect: 'no_blue', ruleEffectText: 'Cannot play Blue traits', effect: 'Draw 1. No Blue traits may be played.' },
+  { id: 'age_4', type: 'age', name: 'Famine', draw: 1, effect: 'Draw 1.' },
 
-const ageNames = [
-  'Microbes', 'Algae', 'Jellyfish', 'Worms',
-  'Fish', 'Amphibians', 'Reptiles', 'Insects',
-  'Ferns', 'Flowers', 'Trees', 'Coral',
-  'Crustaceans', 'Mollusks', 'Arachnids', 'Mammals',
-  'Birds', 'Primates', 'Predators', 'Giants',
-  'Ice', 'Fire', 'Stone', 'Bronze',
-  'Iron', 'Steam', 'Electricity', 'Silicon'
-];
+  // Draw 2 Ages (8)
+  { id: 'age_5', type: 'age', name: 'Age of Microbes', draw: 2, effect: 'Draw 2.' },
+  { id: 'age_6', type: 'age', name: 'Age of Algae', draw: 2, effect: 'Draw 2.' },
+  { id: 'age_7', type: 'age', name: 'Reforestation', draw: 2, ruleEffect: 'protect_traits', ruleEffectText: 'Traits cannot be stolen/discarded', effect: 'Draw 2. Traits cannot be stolen, swapped, or discarded.' },
+  { id: 'age_8', type: 'age', name: 'High Tides', draw: 2, ruleEffect: 'double_effectless', ruleEffectText: 'Play 2 effectless traits', effect: 'Draw 2. If you play an effectless trait, you may play another.' },
+  { id: 'age_9', type: 'age', name: 'Age of Fish', draw: 2, effect: 'Draw 2.' },
+  { id: 'age_10', type: 'age', name: 'Age of Amphibians', draw: 2, effect: 'Draw 2.' },
+  { id: 'age_11', type: 'age', name: 'Prosperity', draw: 2, ruleEffect: 'skip_stabilize', ruleEffectText: 'May skip stabilization', effect: 'Draw 2. You may choose not to stabilize.' },
+  { id: 'age_12', type: 'age', name: 'Age of Reptiles', draw: 2, effect: 'Draw 2.' },
 
-export const ageCards = [];
-let ageId = 1;
-for (const template of ageCardTemplates) {
-  for (let i = 0; i < template.count; i++) {
-    ageCards.push({
-      id: `age_${ageId}`,
-      type: 'age',
-      name: `Age of ${ageNames[(ageId - 1) % ageNames.length]}`,
-      draw: template.draw,
-      effect: `Each player draws ${template.draw} card${template.draw > 1 ? 's' : ''}.`
-    });
-    ageId++;
-  }
-}
+  // Draw 3 Ages (8)
+  { id: 'age_13', type: 'age', name: 'Age of Insects', draw: 3, effect: 'Draw 3.' },
+  { id: 'age_14', type: 'age', name: 'Age of Ferns', draw: 3, effect: 'Draw 3.' },
+  { id: 'age_15', type: 'age', name: 'Blazing Sun', draw: 3, ruleEffect: 'no_red', ruleEffectText: 'Cannot play Red traits', effect: 'Draw 3. No Red traits may be played.' },
+  { id: 'age_16', type: 'age', name: 'Age of Flowers', draw: 3, effect: 'Draw 3.' },
+  { id: 'age_17', type: 'age', name: 'Age of Trees', draw: 3, effect: 'Draw 3.' },
+  { id: 'age_18', type: 'age', name: 'Stillness', draw: 3, ruleEffect: 'no_green', ruleEffectText: 'Cannot play Green traits', effect: 'Draw 3. No Green traits may be played.' },
+  { id: 'age_19', type: 'age', name: 'Age of Coral', draw: 3, effect: 'Draw 3.' },
+  { id: 'age_20', type: 'age', name: 'Age of Crustaceans', draw: 3, effect: 'Draw 3.' },
+
+  // Draw 4 Ages (4)
+  { id: 'age_21', type: 'age', name: 'Age of Mammals', draw: 4, effect: 'Draw 4.' },
+  { id: 'age_22', type: 'age', name: 'Age of Birds', draw: 4, effect: 'Draw 4.' },
+  { id: 'age_23', type: 'age', name: 'Age of Primates', draw: 4, effect: 'Draw 4.' },
+  { id: 'age_24', type: 'age', name: 'Age of Predators', draw: 4, effect: 'Draw 4.' },
+
+  // Draw 5 Ages (2)
+  { id: 'age_25', type: 'age', name: 'Age of Giants', draw: 5, effect: 'Draw 5.' },
+  { id: 'age_26', type: 'age', name: 'Golden Age', draw: 5, effect: 'Draw 5.' },
+
+  // Draw 6 Ages (2)
+  { id: 'age_27', type: 'age', name: 'Renaissance', draw: 6, effect: 'Draw 6.' },
+  { id: 'age_28', type: 'age', name: 'Age of Enlightenment', draw: 6, effect: 'Draw 6.' }
+];
 
 export const catastrophes = [
   {
     id: 'catastrophe_asteroid',
     type: 'catastrophe',
     name: 'Asteroid Impact',
-    effect: 'A massive asteroid strikes! Each player must discard 1 trait from their trait pile (if able).',
-    action: 'discard_trait'
+    genePoolEffect: -1,
+    effect: 'Gene Pool -1. Discard 1 random trait.',
+    action: 'discard_trait',
+    worldsEndEffect: 'most_cards_loses_5',
+    worldsEndText: 'Player with most cards in hand loses 5 points.'
   },
   {
     id: 'catastrophe_ice_age',
     type: 'catastrophe',
     name: 'Ice Age',
-    effect: 'The world freezes over! Each player must discard down to 5 cards in hand.',
-    action: 'discard_to_hand_limit',
-    limit: 5
+    genePoolEffect: -1,
+    effect: 'Gene Pool -1. Discard your lowest-value trait.',
+    action: 'discard_lowest',
+    worldsEndEffect: 'discard_all_colorless',
+    worldsEndText: 'All Colorless traits are discarded.'
   },
   {
     id: 'catastrophe_volcanic',
     type: 'catastrophe',
     name: 'Volcanic Winter',
-    effect: 'Volcanoes erupt worldwide! Each player discards all Colorless traits from their trait pile.',
-    action: 'discard_colorless'
+    genePoolEffect: -1,
+    effect: 'Gene Pool -1. Discard all Colorless traits.',
+    action: 'discard_colorless',
+    worldsEndEffect: null,
+    worldsEndText: 'No additional effect.'
   },
   {
     id: 'catastrophe_plague',
     type: 'catastrophe',
     name: 'The Great Plague',
-    effect: 'Disease spreads! Each player must discard their lowest-value trait (if able).',
-    action: 'discard_lowest'
+    genePoolEffect: -2,
+    effect: 'Gene Pool -2. Discard your lowest-value trait.',
+    action: 'discard_lowest',
+    worldsEndEffect: null,
+    worldsEndText: 'No additional effect.'
   },
   {
     id: 'catastrophe_flood',
     type: 'catastrophe',
     name: 'The Great Flood',
-    effect: 'Waters rise! Pass 2 cards from your hand to the player on your left.',
+    genePoolEffect: 1,
+    effect: 'Gene Pool +1. Pass 2 cards to the left.',
     action: 'pass_cards',
-    count: 2
+    count: 2,
+    worldsEndEffect: null,
+    worldsEndText: 'No additional effect.'
   },
   {
     id: 'catastrophe_drought',
     type: 'catastrophe',
     name: 'Endless Drought',
-    effect: 'Water becomes scarce! Each player discards 1 Green trait from their trait pile (if able).',
+    genePoolEffect: -1,
+    effect: 'Gene Pool -1. Discard 1 Green trait.',
     action: 'discard_color',
-    color: 'Green'
+    color: 'Green',
+    worldsEndEffect: null,
+    worldsEndText: 'No additional effect.'
+  },
+  {
+    id: 'catastrophe_solar_flare',
+    type: 'catastrophe',
+    name: 'Solar Flare',
+    genePoolEffect: 0,
+    effect: 'All hands are shuffled together and redistributed.',
+    action: 'shuffle_hands',
+    worldsEndEffect: null,
+    worldsEndText: 'No additional effect.'
   }
 ];

@@ -272,13 +272,40 @@ export class Scoring {
   }
 
   static calculateGenePoolBonus(gameState, player) {
-    let bonus = 0;
-    for (const card of player.traitPile) {
-      if (!card.gene_pool) continue;
-      const effect = card.gene_pool_effect || 0;
-      bonus += effect;
+    // This is called during scoring - gene pool end-game bonus
+    // The player with the most genes gets +3 points
+    // Calculate this player's gene count
+    const myGenes = this.getPlayerGeneCount(player);
+
+    // Find the max gene count among all players
+    let maxGenes = 0;
+    let playersWithMax = 0;
+    for (const p of gameState.players) {
+      const genes = this.getPlayerGeneCount(p);
+      if (genes > maxGenes) {
+        maxGenes = genes;
+        playersWithMax = 1;
+      } else if (genes === maxGenes) {
+        playersWithMax++;
+      }
     }
-    return bonus;
+
+    // Award bonus if this player has the most genes (and it's positive)
+    if (myGenes > 0 && myGenes === maxGenes && playersWithMax === 1) {
+      return 3; // Sole leader gets +3 points
+    }
+
+    return 0;
+  }
+
+  static getPlayerGeneCount(player) {
+    let genes = 0;
+    for (const card of player.traitPile) {
+      if (card.gene_pool) {
+        genes += card.gene_pool_effect || 0;
+      }
+    }
+    return genes;
   }
 }
 
@@ -639,6 +666,7 @@ export class GameState {
     this.state = 'lobby';
     this.players = [];
     this.currentPlayerIndex = 0;
+    this.firstPlayerIndex = 0; // Tracks first player (changes on catastrophe)
     this.round = 0;
     this.catastropheCount = 0;
     this.ageDeck = [];
@@ -647,15 +675,41 @@ export class GameState {
     this.currentAge = null;
     this.actionLog = [];
     this.pendingAction = null;
-    this.turnPhase = 'waiting';
+    this.turnPhase = 'waiting'; // 'waiting', 'play', 'stabilize', 'action'
     this.playersPlayedThisRound = new Set();
+    this.ageEffect = null; // Current age's rule effect
   }
 
   addPlayer(id, name, isHost) {
     if (this.players.length >= 6) return null;
-    const player = { id, name, isHost, ready: isHost, hand: [], traitPile: [], score: 0, connected: true };
+    const player = {
+      id,
+      name,
+      isHost,
+      ready: isHost,
+      hand: [],
+      traitPile: [],
+      score: 0,
+      genePool: 5, // Starting gene pool size
+      connected: true,
+      needsStabilize: false
+    };
     this.players.push(player);
     return player;
+  }
+
+  // Count dominant traits in player's trait pile
+  countDominants(player) {
+    return player.traitPile.filter(c => c.dominant).length;
+  }
+
+  // Check if a trait can be removed from player's pile
+  canRemoveTrait(player, card) {
+    // Dominant traits cannot be removed
+    if (card.dominant) return false;
+    // Check for age effects that protect traits
+    if (this.ageEffect === 'protect_traits') return false;
+    return true;
   }
 
   removePlayer(id) {
@@ -672,11 +726,15 @@ export class GameState {
     this.ageDeck = DeckManager.createAgeDeck();
     this.traitDeck = DeckManager.createTraitDeck();
 
+    // Each player starts with their gene pool size worth of cards (5)
     for (const player of this.players) {
-      player.hand = this.drawCards(7);
+      player.hand = this.drawCards(player.genePool);
+      player.genePool = 5;
     }
 
-    this.currentPlayerIndex = Math.floor(Math.random() * this.players.length);
+    // Random first player
+    this.firstPlayerIndex = Math.floor(Math.random() * this.players.length);
+    this.currentPlayerIndex = this.firstPlayerIndex;
     this.startNewRound();
     this.log(`Game started with ${this.players.length} players!`);
   }
@@ -684,6 +742,10 @@ export class GameState {
   startNewRound() {
     this.round++;
     this.playersPlayedThisRound.clear();
+    this.ageEffect = null;
+
+    // Start from first player
+    this.currentPlayerIndex = this.firstPlayerIndex;
 
     if (this.ageDeck.length > 0) {
       this.currentAge = this.ageDeck.shift();
@@ -691,34 +753,95 @@ export class GameState {
       if (this.currentAge.type === 'catastrophe') {
         this.handleCatastrophe();
       } else {
-        this.log(`${this.currentAge.name} - Draw ${this.currentAge.draw} cards`);
-        this.handleDrawPhase();
+        this.log(`Age: ${this.currentAge.name}`);
+        this.handleAgeEffect();
       }
     }
   }
 
-  handleDrawPhase() {
-    const drawCount = this.currentAge.draw || 2;
-    for (const player of this.players) {
-      player.hand.push(...this.drawCards(drawCount));
+  handleAgeEffect() {
+    const age = this.currentAge;
+
+    // Apply one-time effects first
+    if (age.oneTimeEffect) {
+      this.applyOneTimeEffect(age.oneTimeEffect);
     }
-    this.log(`All players drew ${drawCount} card${drawCount !== 1 ? 's' : ''}`);
+
+    // Store persistent rule effects for the round
+    if (age.ruleEffect) {
+      this.ageEffect = age.ruleEffect;
+      this.log(`Round effect: ${age.ruleEffectText || age.ruleEffect}`);
+    }
+
+    // Draw phase - all players draw based on age
+    const drawCount = age.draw || 0;
+    if (drawCount > 0) {
+      for (const player of this.players) {
+        player.hand.push(...this.drawCards(drawCount));
+      }
+      this.log(`All players drew ${drawCount} card${drawCount !== 1 ? 's' : ''}`);
+    }
+
     this.turnPhase = 'play';
+  }
+
+  applyOneTimeEffect(effect) {
+    switch (effect) {
+      case 'draw_discard_1':
+        // All players draw 1, discard 1
+        for (const player of this.players) {
+          player.hand.push(...this.drawCards(1));
+        }
+        this.log('All players drew 1 card (discard 1 when you stabilize)');
+        break;
+      case 'shuffle_hands':
+        // Collect all hands and redistribute
+        const allCards = [];
+        for (const player of this.players) {
+          allCards.push(...player.hand);
+          player.hand = [];
+        }
+        const shuffled = DeckManager.shuffle(allCards);
+        const perPlayer = Math.floor(shuffled.length / this.players.length);
+        for (let i = 0; i < this.players.length; i++) {
+          this.players[i].hand = shuffled.splice(0, perPlayer);
+        }
+        // Remaining cards go to first player
+        if (shuffled.length > 0) {
+          this.players[this.firstPlayerIndex].hand.push(...shuffled);
+        }
+        this.log('All hands were shuffled and redistributed!');
+        break;
+    }
   }
 
   handleCatastrophe() {
     this.catastropheCount++;
     this.log(`CATASTROPHE ${this.catastropheCount}/3: ${this.currentAge.name}!`);
 
+    // First player rotates left on catastrophe
+    this.firstPlayerIndex = (this.firstPlayerIndex + 1) % this.players.length;
+
+    // Apply Gene Pool effect (permanent)
+    if (this.currentAge.genePoolEffect) {
+      const effect = this.currentAge.genePoolEffect;
+      for (const player of this.players) {
+        player.genePool = Math.max(1, Math.min(10, player.genePool + effect));
+      }
+      this.log(`All Gene Pools ${effect > 0 ? '+' : ''}${effect}`);
+    }
+
+    // Check for game end (3rd catastrophe)
     if (this.catastropheCount >= 3) {
       this.endGame();
       return;
     }
 
+    // Apply catastrophic effect (immediate, this round only)
     const action = this.currentAge.action;
     if (action === 'pass_cards') {
       CardEffects.handlePassCards(this, this.currentAge.count);
-    } else {
+    } else if (action) {
       for (const player of this.players) {
         CardEffects.applyCatastropheEffect(this, player, this.currentAge);
       }
@@ -742,6 +865,35 @@ export class GameState {
     return cards;
   }
 
+  // Check if a card can be played based on current age rules
+  canPlayCard(player, card) {
+    // Check age rule effects
+    if (this.ageEffect === 'no_green' && DeckManager.isColor(card, 'Green')) {
+      return { canPlay: false, reason: 'Cannot play Green traits this age' };
+    }
+    if (this.ageEffect === 'no_purple' && DeckManager.isColor(card, 'Purple')) {
+      return { canPlay: false, reason: 'Cannot play Purple traits this age' };
+    }
+    if (this.ageEffect === 'no_red' && DeckManager.isColor(card, 'Red')) {
+      return { canPlay: false, reason: 'Cannot play Red traits this age' };
+    }
+    if (this.ageEffect === 'no_blue' && DeckManager.isColor(card, 'Blue')) {
+      return { canPlay: false, reason: 'Cannot play Blue traits this age' };
+    }
+
+    // Check dominant limit (max 2)
+    if (card.dominant && this.countDominants(player) >= 2) {
+      return { canPlay: false, reason: 'Already have 2 dominant traits' };
+    }
+
+    return { canPlay: true };
+  }
+
+  // Check if player has any playable cards
+  hasPlayableCards(player) {
+    return player.hand.some(card => this.canPlayCard(player, card).canPlay);
+  }
+
   playCard(playerId, cardIndex) {
     if (this.state !== 'playing') return { success: false, error: 'Game not in progress' };
     if (this.turnPhase !== 'play') return { success: false, error: 'Not play phase' };
@@ -755,24 +907,138 @@ export class GameState {
     if (this.playersPlayedThisRound.has(playerId)) return { success: false, error: 'Already played' };
     if (cardIndex < 0 || cardIndex >= player.hand.length) return { success: false, error: 'Invalid card' };
 
-    const card = player.hand.splice(cardIndex, 1)[0];
+    const card = player.hand[cardIndex];
+
+    // Check if card can be played
+    const canPlay = this.canPlayCard(player, card);
+    if (!canPlay.canPlay) {
+      return { success: false, error: canPlay.reason };
+    }
+
+    // Remove card from hand and add to trait pile
+    player.hand.splice(cardIndex, 1);
     player.traitPile.push(card);
     this.log(`${player.name} played ${card.trait}`);
     this.playersPlayedThisRound.add(playerId);
 
+    // Apply gene pool effect from trait if any
+    if (card.gene_pool && card.gene_pool_effect) {
+      player.genePool = Math.max(1, Math.min(10, player.genePool + card.gene_pool_effect));
+      this.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
+    }
+
+    // Handle action effects
     if (card.action) {
       const effectResult = CardEffects.handleAction(this, player, card);
       if (effectResult.needsInput) {
         this.pendingAction = { type: 'action', card, player: playerId, ...effectResult };
+        player.needsStabilize = true;
         return { success: true, needsInput: true, inputType: effectResult.inputType };
       }
     }
 
+    // Mark player needs to stabilize and move to stabilize phase
+    player.needsStabilize = true;
+    this.turnPhase = 'stabilize';
+    return { success: true, needsStabilize: true };
+  }
+
+  // Skip turn - used when player can't play any cards
+  skipTurn(playerId) {
+    const player = this.getPlayer(playerId);
+    if (!player) return { success: false, error: 'Player not found' };
+
+    const currentPlayer = this.players[this.currentPlayerIndex];
+    if (currentPlayer.id !== playerId) return { success: false, error: 'Not your turn' };
+    if (this.playersPlayedThisRound.has(playerId)) return { success: false, error: 'Already played' };
+
+    // Can only skip if no playable cards or hand is empty
+    if (player.hand.length > 0 && this.hasPlayableCards(player)) {
+      return { success: false, error: 'You have playable cards' };
+    }
+
+    // Draw 3 cards when skipping
+    player.hand.push(...this.drawCards(3));
+    this.log(`${player.name} couldn't play and drew 3 cards`);
+    this.playersPlayedThisRound.add(playerId);
+
+    // Skip stabilization when skipping turn
+    this.advanceTurn();
+    return { success: true };
+  }
+
+  // Discard entire hand and draw 3 (optional action)
+  discardAndDraw(playerId) {
+    const player = this.getPlayer(playerId);
+    if (!player) return { success: false, error: 'Player not found' };
+
+    const currentPlayer = this.players[this.currentPlayerIndex];
+    if (currentPlayer.id !== playerId) return { success: false, error: 'Not your turn' };
+    if (this.playersPlayedThisRound.has(playerId)) return { success: false, error: 'Already played' };
+
+    // Discard entire hand
+    this.discardPile.push(...player.hand);
+    const discardCount = player.hand.length;
+    player.hand = [];
+
+    // Draw 3 cards
+    player.hand.push(...this.drawCards(3));
+    this.log(`${player.name} discarded ${discardCount} cards and drew 3`);
+    this.playersPlayedThisRound.add(playerId);
+
+    // Skip stabilization when using this action
+    this.advanceTurn();
+    return { success: true };
+  }
+
+  // Stabilize - draw or discard to match gene pool
+  stabilize(playerId, discardIndices = []) {
+    const player = this.getPlayer(playerId);
+    if (!player) return { success: false, error: 'Player not found' };
+
+    const currentPlayer = this.players[this.currentPlayerIndex];
+    if (currentPlayer.id !== playerId) return { success: false, error: 'Not your turn' };
+    if (this.turnPhase !== 'stabilize') return { success: false, error: 'Not stabilize phase' };
+
+    const handSize = player.hand.length;
+    const targetSize = player.genePool;
+
+    if (handSize < targetSize) {
+      // Draw up to gene pool
+      const drawCount = targetSize - handSize;
+      player.hand.push(...this.drawCards(drawCount));
+      this.log(`${player.name} stabilized (drew ${drawCount})`);
+    } else if (handSize > targetSize) {
+      // Must discard down to gene pool
+      const discardCount = handSize - targetSize;
+      if (discardIndices.length !== discardCount) {
+        return {
+          success: false,
+          error: `Must discard ${discardCount} card(s)`,
+          needsDiscard: true,
+          discardCount
+        };
+      }
+      // Discard selected cards (sort indices descending to remove correctly)
+      discardIndices.sort((a, b) => b - a);
+      for (const idx of discardIndices) {
+        if (idx >= 0 && idx < player.hand.length) {
+          this.discardPile.push(player.hand.splice(idx, 1)[0]);
+        }
+      }
+      this.log(`${player.name} stabilized (discarded ${discardCount})`);
+    } else {
+      this.log(`${player.name} stabilized`);
+    }
+
+    player.needsStabilize = false;
     this.advanceTurn();
     return { success: true };
   }
 
   advanceTurn() {
+    this.turnPhase = 'play';
+
     if (this.playersPlayedThisRound.size >= this.players.length) {
       this.startNewRound();
       return;
@@ -790,7 +1056,8 @@ export class GameState {
 
     if (result.success && !result.viewHand) {
       this.pendingAction = null;
-      this.advanceTurn();
+      // Move to stabilize phase instead of advancing turn directly
+      this.turnPhase = 'stabilize';
     }
 
     return result;
@@ -806,7 +1073,8 @@ export class GameState {
 
     if (result.success) {
       this.pendingAction = null;
-      this.advanceTurn();
+      // Move to stabilize phase instead of advancing turn directly
+      this.turnPhase = 'stabilize';
     }
 
     return result;
@@ -822,7 +1090,8 @@ export class GameState {
 
     this.log(`${this.getPlayer(playerId).name} skipped action`);
     this.pendingAction = null;
-    this.advanceTurn();
+    // Move to stabilize phase instead of advancing turn directly
+    this.turnPhase = 'stabilize';
     return { success: true };
   }
 
@@ -830,12 +1099,99 @@ export class GameState {
     this.state = 'finished';
     this.turnPhase = 'finished';
 
+    // Apply final catastrophe's gene pool effect
+    if (this.currentAge.genePoolEffect) {
+      const effect = this.currentAge.genePoolEffect;
+      for (const player of this.players) {
+        player.genePool = Math.max(1, Math.min(10, player.genePool + effect));
+      }
+    }
+
+    // Apply World's End effects from traits (in turn order starting from first player)
+    this.log("Resolving World's End effects...");
+    for (let i = 0; i < this.players.length; i++) {
+      const playerIdx = (this.firstPlayerIndex + i) % this.players.length;
+      const player = this.players[playerIdx];
+
+      for (const card of player.traitPile) {
+        if (card.worlds_end && card.worlds_end_task) {
+          this.applyWorldsEndEffect(player, card);
+        }
+      }
+    }
+
+    // Apply final catastrophe's World's End effect
+    if (this.currentAge.worldsEndEffect) {
+      this.log(`Final Catastrophe: ${this.currentAge.worldsEndText || 'Special effect'}`);
+      this.applyFinalCatastropheEffect(this.currentAge);
+    }
+
+    // Calculate final scores
     for (const player of this.players) {
       player.score = Scoring.calculateScore(this, player);
     }
 
     const winner = [...this.players].sort((a, b) => b.score - a.score)[0];
     this.log(`GAME OVER! Winner: ${winner.name} with ${winner.score} points!`);
+  }
+
+  applyWorldsEndEffect(player, card) {
+    const effect = card.worlds_end_task;
+    switch (effect) {
+      case 'draw_2':
+        player.hand.push(...this.drawCards(2));
+        this.log(`${player.name}: ${card.trait} - Drew 2 cards`);
+        break;
+      case 'discard_1':
+        if (player.hand.length > 0) {
+          this.discardPile.push(player.hand.pop());
+          this.log(`${player.name}: ${card.trait} - Discarded 1 card`);
+        }
+        break;
+      case 'gene_pool_plus_1':
+        player.genePool = Math.min(10, player.genePool + 1);
+        this.log(`${player.name}: ${card.trait} - Gene Pool +1`);
+        break;
+      case 'gene_pool_minus_1':
+        player.genePool = Math.max(1, player.genePool - 1);
+        this.log(`${player.name}: ${card.trait} - Gene Pool -1`);
+        break;
+    }
+  }
+
+  applyFinalCatastropheEffect(catastrophe) {
+    switch (catastrophe.worldsEndEffect) {
+      case 'most_cards_loses_5':
+        // Player with most cards in hand loses 5 points
+        let maxCards = 0;
+        let maxPlayer = null;
+        for (const p of this.players) {
+          if (p.hand.length > maxCards) {
+            maxCards = p.hand.length;
+            maxPlayer = p;
+          }
+        }
+        if (maxPlayer) {
+          maxPlayer.score = (maxPlayer.score || 0) - 5;
+          this.log(`${maxPlayer.name} loses 5 points (most cards in hand)`);
+        }
+        break;
+      case 'discard_all_colorless':
+        for (const player of this.players) {
+          const colorless = player.traitPile.filter(c => c.color === 'Colorless' && !c.dominant);
+          for (const card of colorless) {
+            const idx = player.traitPile.indexOf(card);
+            if (idx !== -1) {
+              player.traitPile.splice(idx, 1);
+              this.discardPile.push(card);
+            }
+          }
+          if (colorless.length > 0) {
+            this.log(`${player.name} lost ${colorless.length} Colorless traits`);
+          }
+        }
+        break;
+    }
   }
 
   log(message) {
@@ -852,6 +1208,8 @@ export class GameState {
       currentAge: this.currentAge,
       turnPhase: this.turnPhase,
       currentPlayerIndex: this.currentPlayerIndex,
+      firstPlayerIndex: this.firstPlayerIndex,
+      ageEffect: this.ageEffect,
       players: this.players.map(p => ({
         id: p.id,
         name: p.name,
@@ -860,7 +1218,10 @@ export class GameState {
         hand: p.hand,
         traitPile: p.traitPile,
         score: Scoring.calculateScore(this, p),
-        hasPlayedThisRound: this.playersPlayedThisRound.has(p.id)
+        genePool: p.genePool, // Player's target hand size
+        geneCount: Scoring.getPlayerGeneCount(p), // Genes from gene pool cards
+        hasPlayedThisRound: this.playersPlayedThisRound.has(p.id),
+        needsStabilize: p.needsStabilize || false
       })),
       pendingAction: this.pendingAction,
       deckSize: this.traitDeck.length,
@@ -874,13 +1235,27 @@ export class GameState {
     const fullState = this.getFullState();
     const player = this.getPlayer(playerId);
 
+    // Check if player can play any cards
+    const canPlayAny = player ? this.hasPlayableCards(player) : false;
+
+    // Calculate stabilization info
+    const handSize = player ? player.hand.length : 0;
+    const genePoolSize = player ? player.genePool : 5;
+    const needsDiscard = handSize > genePoolSize ? handSize - genePoolSize : 0;
+    const willDraw = handSize < genePoolSize ? genePoolSize - handSize : 0;
+
     return {
       ...fullState,
       myHand: player ? player.hand : [],
       myTraitPile: player ? player.traitPile : [],
       myScore: player ? Scoring.calculateScore(this, player) : 0,
+      myGenePool: player ? player.genePool : 5, // Target hand size
+      myGeneCount: player ? Scoring.getPlayerGeneCount(player) : 0, // Genes from cards
       isMyTurn: this.players[this.currentPlayerIndex]?.id === playerId,
       currentPlayerId: this.players[this.currentPlayerIndex]?.id,
+      canPlayAny,
+      needsDiscard,
+      willDraw,
       players: fullState.players.map(p => ({
         ...p,
         hand: undefined, // Hide other players' hands
@@ -905,6 +1280,7 @@ export class GameState {
       state: this.state,
       players: this.players,
       currentPlayerIndex: this.currentPlayerIndex,
+      firstPlayerIndex: this.firstPlayerIndex,
       round: this.round,
       catastropheCount: this.catastropheCount,
       ageDeck: this.ageDeck,
@@ -914,6 +1290,7 @@ export class GameState {
       actionLog: this.actionLog,
       pendingAction: this.pendingAction,
       turnPhase: this.turnPhase,
+      ageEffect: this.ageEffect,
       playersPlayedThisRound: [...this.playersPlayedThisRound]
     });
   }
@@ -924,6 +1301,8 @@ export class GameState {
     const game = new GameState(parsed.gameId);
     Object.assign(game, parsed);
     game.playersPlayedThisRound = new Set(parsed.playersPlayedThisRound || []);
+    game.firstPlayerIndex = parsed.firstPlayerIndex || 0;
+    game.ageEffect = parsed.ageEffect || null;
     return game;
   }
 }

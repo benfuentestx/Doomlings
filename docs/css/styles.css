@@ -299,6 +299,17 @@ input:focus {
   background: linear-gradient(135deg, var(--bg-light), #3d1a1a);
 }
 
+.age-rule-effect {
+  background: var(--warning);
+  color: var(--bg-dark);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 6px;
+  text-align: center;
+}
+
 .catastrophe-counter {
   display: flex;
   gap: 8px;
@@ -673,36 +684,693 @@ input:focus {
   to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+/* Gene Pool Display */
+.gene-pool-display {
+  background: var(--bg-light);
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gene-pool-label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.gene-pool-value {
+  font-weight: 700;
+  color: var(--success);
+  font-size: 1.1rem;
+}
+
+.gene-pool-value.negative {
+  color: var(--danger);
+}
+
+/* Responsive - Tablet */
 @media (max-width: 1024px) {
   .game-container {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .game-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px 15px;
+  }
+
+  .game-stats {
+    gap: 10px;
+    font-size: 0.8rem;
   }
 
   .opponents-panel {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 10px;
   }
 
   .opponent-card {
-    width: 200px;
+    width: calc(50% - 10px);
+    min-width: 150px;
+    max-width: 200px;
+    padding: 10px;
+  }
+
+  .my-hand-area {
+    padding: 15px;
+  }
+
+  .card {
+    width: 100px;
+    min-height: 140px;
   }
 }
 
+/* ==========================================
+   MOBILE-FIRST REDESIGN (max-width: 600px)
+   ========================================== */
 @media (max-width: 600px) {
+  /* Prevent body scroll bounce */
+  html, body {
+    overscroll-behavior: none;
+  }
+
+  /* Landing page */
   .landing-options {
     flex-direction: column;
     align-items: center;
+    gap: 20px;
   }
 
   .game-title {
     font-size: 2.5rem;
   }
 
-  .card {
-    width: 100px;
-    min-height: 140px;
+  .option-card {
+    width: 100%;
+    max-width: 320px;
+    padding: 20px;
+  }
+
+  /* ========== GAME CONTAINER - MOBILE LAYOUT ========== */
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
+    padding: 0;
+    gap: 0;
+  }
+
+  /* ========== HEADER - COMPACT TOP BAR ========== */
+  .game-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 0;
+    background: var(--bg-medium);
+    border-bottom: 2px solid var(--bg-light);
+  }
+
+  .age-display {
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .age-card {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-width: 2px;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .age-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .age-effect {
+    display: none; /* Hide effect text on mobile - shown in modal */
+  }
+
+  .age-rule-effect {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+    margin-top: 2px;
+  }
+
+  .catastrophe-counter {
+    gap: 4px;
+  }
+
+  .catastrophe-dot {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+  }
+
+  /* Turn indicator - compact */
+  #turn-indicator {
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .turn-indicator {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+  }
+
+  /* Hide stats on mobile - shown via tap */
+  .game-stats {
+    display: none;
+  }
+
+  /* Gene pool - compact pill */
+  .gene-pool-display {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .gene-pool-label {
+    font-size: 0.65rem;
+  }
+
+  .gene-pool-value {
+    font-size: 0.85rem;
+  }
+
+  /* ========== OPPONENTS - COLLAPSIBLE COMPACT ROW ========== */
+  .opponents-panel {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 6px 8px;
+    background: var(--bg-dark);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .opponents-panel::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide second opponents panel on mobile */
+  #opponents-right {
+    display: none;
+  }
+
+  .opponent-card {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 100px;
+    max-width: 140px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border-width: 2px;
+  }
+
+  .opponent-header {
+    margin-bottom: 0;
+    gap: 8px;
+  }
+
+  .opponent-name {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70px;
+  }
+
+  .opponent-score {
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+  }
+
+  .opponent-info {
+    font-size: 0.65rem;
+    white-space: nowrap;
+  }
+
+  /* Hide traits on opponent cards - too small */
+  .opponent-traits {
+    display: none;
+  }
+
+  /* ========== PLAY AREA - SCROLLABLE MIDDLE ========== */
+  .play-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ========== ACTION AREA - PROMINENT & FIXED ========== */
+  .action-area {
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    padding: 12px;
+    min-height: auto;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(to top, var(--bg-medium) 90%, transparent);
+    margin: 0 -8px -8px -8px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+  }
+
+  .action-message {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .action-options {
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .action-options button {
+    min-height: 48px; /* Touch target */
+    padding: 12px 20px;
+    font-size: 1rem;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  /* ========== MY TRAITS - COMPACT ========== */
+  .my-traits {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .my-traits h3 {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  .my-traits h3 span:first-child {
+    flex: 1;
+  }
+
+  .my-score {
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .trait-pile {
+    gap: 6px;
+    min-height: 50px;
+    justify-content: flex-start;
+  }
+
+  /* Trait pile cards - smaller */
+  .trait-pile .card {
+    width: 50px;
+    min-height: 70px;
+    padding: 4px;
+  }
+
+  .trait-pile .card .card-name {
+    font-size: 0.45rem;
+  }
+
+  .trait-pile .card .card-face {
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    top: 2px;
+    right: 2px;
+  }
+
+  .trait-pile .card .card-type,
+  .trait-pile .card .card-effect {
+    display: none;
+  }
+
+  /* ========== LOG - HIDDEN BY DEFAULT ========== */
+  .log-panel {
+    display: none; /* Hide log on mobile - not essential */
+  }
+
+  /* ========== MY HAND - BOTTOM FIXED AREA ========== */
+  .my-hand-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--bg-medium);
+    border-radius: 16px 16px 0 0;
+    padding: 10px;
+    padding-bottom: 0; /* Action bar handles safe area */
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+    /* Use flexbox column for reliable layout */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 55vh;
+    overflow: hidden; /* Prevent content overflow */
+  }
+
+  .hand-header {
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto; /* Never shrink */
+  }
+
+  .hand-header h3 {
+    font-size: 0.85rem;
+    margin: 0;
+    flex: 1;
+  }
+
+  #play-instruction {
+    font-size: 0.75rem;
+    color: var(--warning);
+    font-weight: 600;
+  }
+
+  .my-hand {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 4px 0;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    min-height: 115px;
+    max-height: 125px;
+    flex: 1 1 auto; /* Can grow/shrink within available space */
+    min-width: 0; /* Prevent flex item from overflowing */
+  }
+
+  .my-hand::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .my-hand::-webkit-scrollbar-thumb {
+    background: var(--bg-light);
+    border-radius: 2px;
+  }
+
+  /* ========== HAND CARDS - LARGER FOR MOBILE ========== */
+  .my-hand .card {
+    flex: 0 0 auto;
+    width: 85px;
+    min-height: 115px;
+    height: 115px; /* Fixed height to prevent layout issues */
+    padding: 6px;
+    border-radius: 10px;
+    scroll-snap-align: center;
+    touch-action: manipulation;
+  }
+
+  .my-hand .card .card-name {
+    font-size: 0.7rem;
+    margin-bottom: 4px;
+    margin-top: 24px;
+  }
+
+  .my-hand .card .card-face {
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    font-size: 0.85rem;
+  }
+
+  .my-hand .card .card-color {
+    top: 6px;
+    left: 6px;
+    width: 10px;
+    height: 10px;
+  }
+
+  .my-hand .card .card-type {
+    font-size: 0.55rem;
+    padding-top: 4px;
+  }
+
+  .my-hand .card .card-effect {
+    font-size: 0.55rem;
+    margin-top: 4px;
+  }
+
+  /* Card interactions */
+  .my-hand .card:hover {
+    transform: none; /* Disable hover on mobile */
+  }
+
+  .my-hand .card:active {
+    transform: scale(0.95);
+  }
+
+  .my-hand .card.playable {
+    border-color: var(--success);
+    box-shadow: 0 0 12px rgba(39, 174, 96, 0.3);
+  }
+
+  .my-hand .card.selected {
+    transform: translateY(-12px);
+    border-color: var(--warning);
+    box-shadow: 0 4px 20px rgba(243, 156, 18, 0.5);
+  }
+
+  /* ========== MOBILE ACTION BAR ========== */
+  .mobile-action-bar {
+    display: flex !important; /* Force display */
+    flex: 0 0 auto; /* Never shrink */
+    gap: 8px;
+    padding: 8px 4px;
+    border-top: 2px solid var(--accent);
+    min-height: 48px;
+    align-items: center;
+    background: var(--bg-dark); /* Darker for visibility */
+    border-radius: 0 0 0 0;
+    margin: 0 -10px -10px -10px; /* Extend to container edges */
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0));
+  }
+
+  /* Only hide if truly empty (no JS content set yet) */
+  .mobile-action-bar:empty {
+    min-height: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .mobile-action-bar button {
+    flex: 1;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+  }
+
+  .mobile-action-bar .action-msg {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    padding: 0 8px;
+  }
+
+  /* Hide desktop action area on mobile - use mobile bar instead */
+  .action-area {
+    display: none;
+  }
+
+  /* ========== MODAL - FULL SCREEN ON MOBILE ========== */
+  .modal-overlay {
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
+  }
+
+  .modal-content h2 {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+  }
+
+  .modal-cards {
+    gap: 10px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 4px;
+  }
+
+  .modal-cards .card {
+    width: 85px;
+    min-height: 120px;
+  }
+
+  .modal-actions {
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .modal-actions button {
+    min-height: 48px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    flex: 1;
+    min-width: 100px;
+  }
+
+  /* ========== LOBBY - MOBILE ========== */
+  .lobby-container {
+    padding: 20px 16px;
+  }
+
+  .game-id-display {
+    padding: 16px;
+  }
+
+  .game-id-code {
+    font-size: 2rem;
+    letter-spacing: 0.25rem;
+  }
+
+  .players-list {
+    padding: 16px;
+  }
+
+  .player-item {
+    padding: 12px 14px;
+  }
+
+  .player-name {
+    font-size: 0.95rem;
+  }
+
+  .lobby-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .lobby-actions button {
+    width: 100%;
+    min-height: 52px;
+    font-size: 1.1rem;
+  }
+
+  /* ========== GAME OVER - MOBILE ========== */
+  .game-over-content {
+    padding: 24px 20px;
+    max-width: 95%;
+    border-radius: 16px;
+  }
+
+  .game-over-content h1 {
+    font-size: 1.6rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .score-row {
+    padding: 12px 16px;
+    font-size: 1rem;
+    border-radius: 10px;
+  }
+
+  .game-over-content button {
+    min-height: 52px;
+    width: 100%;
+    font-size: 1.1rem;
+    margin-top: 8px;
+  }
+
+  /* ========== LOADING - MOBILE ========== */
+  .message-overlay {
+    width: 90%;
+    max-width: 300px;
+    padding: 24px;
+  }
+
+  /* Add padding to body for fixed hand area */
+  .game-container {
+    padding-bottom: 180px; /* Space for fixed hand */
+  }
+}
+
+/* ==========================================
+   VERY SMALL SCREENS (max-width: 380px)
+   ========================================== */
+@media (max-width: 380px) {
+  .my-hand .card {
+    width: 80px;
+    min-height: 115px;
+  }
+
+  .my-hand .card .card-name {
+    font-size: 0.6rem;
+  }
+
+  .my-hand .card .card-face {
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+  }
+
+  .game-id-code {
+    font-size: 1.6rem;
+  }
+
+  .action-options button {
+    min-width: 90px;
+    padding: 10px 14px;
+  }
+
+  .opponent-card {
+    min-width: 85px;
+    max-width: 110px;
+  }
+
+  .opponent-name {
+    max-width: 55px;
   }
 }
 
@@ -761,4 +1429,350 @@ input:focus {
   display: flex;
   gap: 15px;
   justify-content: center;
+}
+
+/* Mobile Action Bar - Hidden on desktop only */
+@media (min-width: 601px) {
+  .mobile-action-bar {
+    display: none;
+  }
+}
+
+/* ==========================================
+   AGE ANNOUNCEMENT MODAL
+   ========================================== */
+.age-announce-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 600;
+  animation: fadeIn 0.3s ease;
+  padding: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.age-announce-card {
+  background: linear-gradient(135deg, var(--bg-medium) 0%, var(--bg-dark) 100%);
+  border: 4px solid var(--accent);
+  border-radius: 20px;
+  padding: 30px 40px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(52, 152, 219, 0.4), 0 20px 40px rgba(0, 0, 0, 0.5);
+  animation: cardSlideIn 0.4s ease;
+}
+
+.age-announce-card.catastrophe {
+  border-color: var(--danger);
+  box-shadow: 0 0 60px rgba(231, 76, 60, 0.5), 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.age-announce-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.age-announce-card.catastrophe .age-announce-label {
+  color: var(--danger);
+}
+
+.age-announce-name {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.age-announce-effect {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 30px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border-left: 4px solid var(--accent);
+}
+
+.age-announce-card.catastrophe .age-announce-effect {
+  border-left-color: var(--danger);
+}
+
+.age-announce-btn {
+  min-width: 150px;
+  padding: 14px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  background: var(--accent);
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.age-announce-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.age-announce-card.catastrophe .age-announce-btn {
+  background: var(--danger);
+}
+
+.age-announce-card.catastrophe .age-announce-btn:hover {
+  background: #c0392b;
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+  .age-announce-card {
+    padding: 24px 20px;
+    border-radius: 16px;
+    max-width: 95%;
+  }
+
+  .age-announce-name {
+    font-size: 1.6rem;
+  }
+
+  .age-announce-effect {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .age-announce-btn {
+    width: 100%;
+    min-height: 52px;
+  }
+}
+
+/* ==========================================
+   DRAG AND DROP STYLES
+   ========================================== */
+.card.dragging {
+  opacity: 0.7;
+  transform: scale(1.05) rotate(3deg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.my-traits.drop-target {
+  border: 3px dashed var(--success);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.my-traits.drop-hover {
+  border-color: var(--warning);
+  background: rgba(243, 156, 18, 0.15);
+  box-shadow: inset 0 0 20px rgba(243, 156, 18, 0.2);
+}
+
+/* ==========================================
+   CARD DETAIL VIEW
+   ========================================== */
+.card-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.card-detail-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.card-detail-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.card-detail-card {
+  width: 280px;
+  min-height: 400px;
+  border-radius: 16px;
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: cardSlideIn 0.3s ease;
+  overflow: hidden;
+}
+
+.card-detail-card.red { background: linear-gradient(145deg, #c0392b, #e74c3c); }
+.card-detail-card.blue { background: linear-gradient(145deg, #2980b9, #3498db); }
+.card-detail-card.green { background: linear-gradient(145deg, #1e8449, #27ae60); }
+.card-detail-card.purple { background: linear-gradient(145deg, #7d3c98, #9b59b6); }
+.card-detail-card.colorless { background: linear-gradient(145deg, #7f8c8d, #95a5a6); }
+.card-detail-card.multi { background: var(--color-multi); }
+
+.card-detail-type-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.card-detail-star {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 2rem;
+  color: gold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.card-detail-name-banner {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 50px 16px 12px;
+  text-align: center;
+}
+
+.card-detail-name {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.card-detail-artwork {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  background: rgba(0, 0, 0, 0.2);
+  margin: 0;
+}
+
+.artwork-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.card-detail-effect {
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 1rem;
+  text-align: center;
+  line-height: 1.5;
+  min-height: 60px;
+}
+
+.card-detail-face {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.card-detail-close {
+  background: var(--bg-light);
+  color: var(--text-secondary);
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-detail-close:hover {
+  background: var(--bg-medium);
+  color: white;
+}
+
+/* Mobile adjustments for card detail */
+@media (max-width: 600px) {
+  .card-detail-card {
+    width: 260px;
+    min-height: 360px;
+  }
+
+  .card-detail-name {
+    font-size: 1.2rem;
+  }
+
+  .card-detail-effect {
+    font-size: 0.95rem;
+    padding: 12px 16px;
+  }
+
+  .card-detail-face {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .card-detail-close {
+    width: 80%;
+    min-height: 48px;
+    font-size: 1.1rem;
+  }
 }

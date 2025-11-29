@@ -32,6 +32,55 @@ export class PeerManager {
     return id;
   }
 
+  // Restore host state after page navigation
+  async restoreHost(gameId, playerId, playerName) {
+    return new Promise((resolve, reject) => {
+      this.gameId = gameId;
+      this.isHost = true;
+      this.myPlayerId = playerId;
+      this.myPlayerName = playerName;
+
+      // Check for saved game state from previous page
+      const savedState = sessionStorage.getItem('gameStateBackup');
+
+      // Create peer with game ID as peer ID
+      this.peer = new Peer(this.gameId, { debug: 1 });
+
+      this.peer.on('open', (id) => {
+        console.log('Host peer restored with ID:', id);
+
+        // Restore game state if we have a backup, otherwise create fresh
+        if (savedState) {
+          try {
+            this.gameState = GameState.deserialize(savedState);
+            console.log('Restored game state from backup, state:', this.gameState.state);
+          } catch (e) {
+            console.error('Failed to restore game state:', e);
+            this.gameState = new GameState(this.gameId);
+            this.gameState.addPlayer(this.myPlayerId, playerName, true);
+          }
+        } else {
+          this.gameState = new GameState(this.gameId);
+          this.gameState.addPlayer(this.myPlayerId, playerName, true);
+        }
+
+        // Listen for incoming connections
+        this.peer.on('connection', (conn) => this.handleIncomingConnection(conn));
+
+        resolve({ success: true });
+      });
+
+      this.peer.on('error', (err) => {
+        console.error('Peer restore error:', err);
+        if (err.type === 'unavailable-id') {
+          reject({ success: false, error: 'Game ID conflict. Try creating a new game.' });
+        } else {
+          reject({ success: false, error: err.message || 'Connection failed' });
+        }
+      });
+    });
+  }
+
   // Create a new game as host
   async createGame(playerName) {
     return new Promise((resolve, reject) => {
@@ -83,10 +132,23 @@ export class PeerManager {
   // Join an existing game
   async joinGame(gameId, playerName) {
     return new Promise((resolve, reject) => {
+      // Clean up any existing connection first
+      if (this.peer) {
+        try {
+          this.peer.destroy();
+        } catch (e) {
+          console.log('Error destroying old peer:', e);
+        }
+      }
+      this.hostConnection = null;
+
       this.gameId = gameId.toUpperCase();
       this.isHost = false;
       this.myPlayerName = playerName;
-      this.myPlayerId = `player_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+      // Keep existing playerId if we have one (for reconnection)
+      if (!this.myPlayerId) {
+        this.myPlayerId = `player_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+      }
 
       // Create peer with random ID
       this.peer = new Peer({
@@ -177,7 +239,32 @@ export class PeerManager {
 
     switch (data.type) {
       case 'join':
-        // Add player to game
+        // Check if this player is reconnecting (already in the game)
+        const existingPlayer = this.gameState.getPlayer(data.playerId);
+
+        if (existingPlayer) {
+          // Player is reconnecting - allow them back in
+          console.log('Player reconnecting:', data.playerName);
+          conn.metadata = { playerName: data.playerName, playerId: data.playerId };
+          this.connections.set(conn.peer, conn);
+
+          // Mark player as connected
+          existingPlayer.connected = true;
+
+          // Send join confirmation
+          conn.send({
+            type: 'joined',
+            playerId: data.playerId,
+            playerName: data.playerName,
+            gameId: this.gameId
+          });
+
+          // Send current game state
+          conn.send({ type: 'gameState', state: this.gameState.serialize() });
+          return;
+        }
+
+        // New player joining - only allow in lobby
         if (this.gameState.state !== 'lobby') {
           conn.send({ type: 'error', error: 'Game already started' });
           return;
@@ -237,6 +324,24 @@ export class PeerManager {
       case 'skipAction':
         const skipResult = this.gameState.skipAction(data.playerId);
         conn.send({ type: 'actionResult', ...skipResult });
+        this.broadcastState();
+        break;
+
+      case 'stabilize':
+        const stabilizeResult = this.gameState.stabilize(data.playerId, data.discardIndices || []);
+        conn.send({ type: 'actionResult', ...stabilizeResult });
+        this.broadcastState();
+        break;
+
+      case 'skipTurn':
+        const skipTurnResult = this.gameState.skipTurn(data.playerId);
+        conn.send({ type: 'actionResult', ...skipTurnResult });
+        this.broadcastState();
+        break;
+
+      case 'discardAndDraw':
+        const discardResult = this.gameState.discardAndDraw(data.playerId);
+        conn.send({ type: 'actionResult', ...discardResult });
         this.broadcastState();
         break;
     }
@@ -337,6 +442,10 @@ export class PeerManager {
     }
 
     this.gameState.startGame();
+
+    // Save game state to sessionStorage so it persists across page navigation
+    sessionStorage.setItem('gameStateBackup', this.gameState.serialize());
+
     this.broadcastState();
 
     return { success: true };
@@ -409,6 +518,61 @@ export class PeerManager {
       if (this.hostConnection && this.hostConnection.open) {
         this.hostConnection.send({
           type: 'skipAction',
+          playerId: this.myPlayerId
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Stabilize - draw or discard to match gene pool
+  stabilize(discardIndices = []) {
+    if (this.isHost) {
+      const result = this.gameState.stabilize(this.myPlayerId, discardIndices);
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'stabilize',
+          playerId: this.myPlayerId,
+          discardIndices
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Skip turn (when can't play any cards)
+  skipTurn() {
+    if (this.isHost) {
+      const result = this.gameState.skipTurn(this.myPlayerId);
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'skipTurn',
+          playerId: this.myPlayerId
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Discard entire hand and draw 3
+  discardAndDraw() {
+    if (this.isHost) {
+      const result = this.gameState.discardAndDraw(this.myPlayerId);
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'discardAndDraw',
           playerId: this.myPlayerId
         });
         return { success: true, pending: true };
