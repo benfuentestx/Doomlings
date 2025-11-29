@@ -46,8 +46,6 @@
   </div>
 
   <script type="module">
-    import { peerManager } from './js/peer-manager.js';
-
     // DOM Elements
     const createNameInput = document.getElementById('create-name');
     const createBtn = document.getElementById('create-btn');
@@ -56,41 +54,45 @@
     const joinBtn = document.getElementById('join-btn');
     const errorMessage = document.getElementById('error-message');
     const errorText = document.getElementById('error-text');
-    const loadingMessage = document.getElementById('loading-message');
-    const loadingText = document.getElementById('loading-text');
 
-    // Create Game
-    createBtn.addEventListener('click', async () => {
+    // Generate a game ID
+    function generateGameId() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let id = '';
+      for (let i = 0; i < 6; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return id;
+    }
+
+    // Create Game - just prepare data, actual connection happens in lobby
+    createBtn.addEventListener('click', () => {
       const name = createNameInput.value.trim();
       if (!name) {
         showError('Please enter your name');
         return;
       }
 
-      createBtn.disabled = true;
-      showLoading('Creating game...');
+      const gameId = generateGameId();
+      const playerId = `host_${Date.now()}`;
 
-      try {
-        const result = await peerManager.createGame(name);
-        hideLoading();
+      // Clear any old game state from previous games
+      sessionStorage.removeItem('gameStateBackup');
 
-        if (result.success) {
-          sessionStorage.setItem('playerData', JSON.stringify(result));
-          sessionStorage.setItem('isHost', 'true');
-          window.location.href = 'lobby.html';
-        } else {
-          showError(result.error || 'Failed to create game');
-        }
-      } catch (err) {
-        hideLoading();
-        showError(err.error || 'Failed to create game');
-      }
+      const playerData = {
+        gameId: gameId,
+        playerId: playerId,
+        playerName: name,
+        isHost: true
+      };
 
-      createBtn.disabled = false;
+      sessionStorage.setItem('playerData', JSON.stringify(playerData));
+      sessionStorage.setItem('isHost', 'true');
+      window.location.href = 'lobby.html';
     });
 
-    // Join Game
-    joinBtn.addEventListener('click', async () => {
+    // Join Game - just prepare data, actual connection happens in lobby
+    joinBtn.addEventListener('click', () => {
       const name = joinNameInput.value.trim();
       const code = joinCodeInput.value.trim().toUpperCase();
 
@@ -103,26 +105,19 @@
         return;
       }
 
-      joinBtn.disabled = true;
-      showLoading('Joining game...');
+      // Clear any old game state from previous games
+      sessionStorage.removeItem('gameStateBackup');
 
-      try {
-        const result = await peerManager.joinGame(code, name);
-        hideLoading();
+      const playerData = {
+        gameId: code,
+        playerId: null, // Will be assigned when connecting
+        playerName: name,
+        isHost: false
+      };
 
-        if (result.success) {
-          sessionStorage.setItem('playerData', JSON.stringify(result));
-          sessionStorage.setItem('isHost', 'false');
-          window.location.href = 'lobby.html';
-        } else {
-          showError(result.error || 'Failed to join game');
-        }
-      } catch (err) {
-        hideLoading();
-        showError(err.error || 'Failed to join game');
-      }
-
-      joinBtn.disabled = false;
+      sessionStorage.setItem('playerData', JSON.stringify(playerData));
+      sessionStorage.setItem('isHost', 'false');
+      window.location.href = 'lobby.html';
     });
 
     // Enter key support
@@ -139,7 +134,7 @@
       joinCodeInput.value = joinCodeInput.value.toUpperCase();
     });
 
-    // Error/Loading handling
+    // Error handling
     function showError(message) {
       errorText.textContent = message;
       errorMessage.style.display = 'block';
@@ -148,15 +143,6 @@
     window.hideError = function() {
       errorMessage.style.display = 'none';
     };
-
-    function showLoading(message) {
-      loadingText.textContent = message;
-      loadingMessage.style.display = 'block';
-    }
-
-    function hideLoading() {
-      loadingMessage.style.display = 'none';
-    }
   </script>
 </body>
 </html>
