@@ -115,11 +115,17 @@
   <div class="card-detail-overlay" id="card-detail" style="display: none;">
     <div class="card-detail-backdrop"></div>
     <div class="card-detail-container">
+      <button class="card-detail-nav card-detail-prev" id="card-detail-prev">‹</button>
       <div class="card-detail-card" id="card-detail-content">
         <!-- Card content injected here -->
       </div>
-      <button class="card-detail-close" id="card-detail-close">Tap to close</button>
+      <button class="card-detail-nav card-detail-next" id="card-detail-next">›</button>
     </div>
+    <div class="card-detail-actions">
+      <button class="card-detail-play" id="card-detail-play" style="display: none;">Play Card</button>
+      <button class="card-detail-close" id="card-detail-close">Close</button>
+    </div>
+    <div class="card-detail-counter" id="card-detail-counter">1 / 5</div>
   </div>
 
   <!-- Loading -->
@@ -173,8 +179,18 @@
     const cardDetailOverlay = document.getElementById('card-detail');
     const cardDetailContent = document.getElementById('card-detail-content');
     const cardDetailClose = document.getElementById('card-detail-close');
+    const cardDetailPrev = document.getElementById('card-detail-prev');
+    const cardDetailNext = document.getElementById('card-detail-next');
+    const cardDetailPlay = document.getElementById('card-detail-play');
+    const cardDetailCounter = document.getElementById('card-detail-counter');
 
     let lastShownAgeName = null; // Track which age we've shown
+
+    // Card detail navigation state
+    let cardDetailCards = [];      // Array of cards being viewed
+    let cardDetailIndex = 0;       // Current index in array
+    let cardDetailSource = null;   // 'hand', 'traitPile', or 'opponent'
+    let cardDetailPlayable = false; // Whether current card can be played
 
     // Drag-and-drop state
     let draggedCardIndex = null;
@@ -471,8 +487,8 @@
       container.innerHTML = '';
       cards.forEach((card, index) => {
         const cardEl = createCardElement(card, false, index);
-        // Tap to show card detail
-        cardEl.addEventListener('click', () => showCardDetail(card));
+        // Tap to show card detail - pass full array for navigation
+        cardEl.addEventListener('click', () => showCardDetail(card, cards, index, 'traitPile'));
         container.appendChild(cardEl);
       });
     }
@@ -566,8 +582,8 @@
             myTraitPile.classList.remove('drop-hover');
 
             if (!touchMoved) {
-              // Tap - show card detail
-              showCardDetail(card);
+              // Tap - show card detail with hand array for navigation
+              showCardDetail(card, gameState.myHand, index, 'hand');
             } else if (isDragging && draggedCardIndex !== null) {
               // Check if dropped on trait pile
               const touch = e.changedTouches[0];
@@ -589,8 +605,8 @@
             cardEl.classList.add('selected');
           }
         } else {
-          // Not playable - just show detail on tap
-          cardEl.addEventListener('click', () => showCardDetail(card));
+          // Not playable - just show detail on tap with hand array for navigation
+          cardEl.addEventListener('click', () => showCardDetail(card, gameState.myHand, index, 'hand'));
         }
 
         myHand.appendChild(cardEl);
@@ -912,8 +928,21 @@
       ageAnnounceOverlay.style.display = 'none';
     };
 
-    // Show card detail view
-    function showCardDetail(card) {
+    // Show card detail view with navigation support
+    function showCardDetail(card, cardsArray = [card], index = 0, source = 'single') {
+      cardDetailCards = cardsArray;
+      cardDetailIndex = index;
+      cardDetailSource = source;
+
+      renderCardDetail();
+      cardDetailOverlay.style.display = 'flex';
+    }
+
+    // Render the current card in detail view
+    function renderCardDetail() {
+      const card = cardDetailCards[cardDetailIndex];
+      if (!card) return;
+
       let typeText = '';
       let showStar = false;
       if (card.dominant) {
@@ -957,31 +986,100 @@
       // Clean up card name - remove suffixes like (g), (1), (~), (r), etc.
       let displayName = card.trait.replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
 
+      // Try to get real card image
+      const imageName = displayName.charAt(0) + displayName.slice(1).toLowerCase();
+      const imageUrl = `source-data/cards/images/${imageName}.png`;
+
       cardDetailContent.className = `card-detail-card ${colorClass}`;
       cardDetailContent.innerHTML = `
-        <div class="card-detail-type-badge">${typeText}</div>
-        ${showStar ? '<div class="card-detail-star">★</div>' : ''}
-        <div class="card-detail-name-banner">
-          <span class="card-detail-name">${displayName}</span>
+        <div class="card-detail-image-container">
+          <img class="card-detail-image" src="${imageUrl}" alt="${displayName}"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-detail-fallback" style="display: none;">
+            <div class="card-detail-type-badge">${typeText}</div>
+            ${showStar ? '<div class="card-detail-star">★</div>' : ''}
+            <div class="card-detail-name-banner">
+              <span class="card-detail-name">${displayName}</span>
+            </div>
+            <div class="card-detail-artwork">
+              <span class="artwork-placeholder">Image Not Found</span>
+            </div>
+            <div class="card-detail-effect">${effectText || 'No special effect'}</div>
+            <div class="card-detail-face">${formatFace(card.face)}</div>
+          </div>
         </div>
-        <div class="card-detail-artwork">
-          <span class="artwork-placeholder">Artwork Coming Soon</span>
-        </div>
-        <div class="card-detail-effect">${effectText || 'No special effect'}</div>
-        <div class="card-detail-face">${formatFace(card.face)}</div>
       `;
 
-      cardDetailOverlay.style.display = 'flex';
+      // Update navigation visibility
+      cardDetailPrev.style.display = cardDetailCards.length > 1 ? 'flex' : 'none';
+      cardDetailNext.style.display = cardDetailCards.length > 1 ? 'flex' : 'none';
+
+      // Update counter
+      cardDetailCounter.textContent = `${cardDetailIndex + 1} / ${cardDetailCards.length}`;
+      cardDetailCounter.style.display = cardDetailCards.length > 1 ? 'block' : 'none';
+
+      // Show play button only if viewing hand and it's player's turn to play
+      const canPlay = cardDetailSource === 'hand' &&
+                      gameState &&
+                      gameState.isMyTurn &&
+                      gameState.turnPhase === 'play' &&
+                      !gameState.pendingAction;
+      cardDetailPlay.style.display = canPlay ? 'inline-block' : 'none';
+      cardDetailPlayable = canPlay;
     }
 
-    // Close card detail view
+    // Navigate to previous card
+    function showPrevCard() {
+      if (cardDetailCards.length <= 1) return;
+      cardDetailIndex = (cardDetailIndex - 1 + cardDetailCards.length) % cardDetailCards.length;
+      renderCardDetail();
+    }
+
+    // Navigate to next card
+    function showNextCard() {
+      if (cardDetailCards.length <= 1) return;
+      cardDetailIndex = (cardDetailIndex + 1) % cardDetailCards.length;
+      renderCardDetail();
+    }
+
+    // Play card from detail view
+    function playFromDetail() {
+      if (!cardDetailPlayable || cardDetailSource !== 'hand') return;
+      const cardIndex = cardDetailIndex;
+      cardDetailOverlay.style.display = 'none';
+      playCard(cardIndex);
+    }
+
+    // Event listeners for card detail
     cardDetailClose.addEventListener('click', () => {
       cardDetailOverlay.style.display = 'none';
     });
 
-    // Close on backdrop click
     cardDetailOverlay.querySelector('.card-detail-backdrop').addEventListener('click', () => {
       cardDetailOverlay.style.display = 'none';
+    });
+
+    cardDetailPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showPrevCard();
+    });
+
+    cardDetailNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showNextCard();
+    });
+
+    cardDetailPlay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playFromDetail();
+    });
+
+    // Keyboard navigation for card detail
+    document.addEventListener('keydown', (e) => {
+      if (cardDetailOverlay.style.display !== 'flex') return;
+      if (e.key === 'ArrowLeft') showPrevCard();
+      else if (e.key === 'ArrowRight') showNextCard();
+      else if (e.key === 'Escape') cardDetailOverlay.style.display = 'none';
     });
 
     // Render action log

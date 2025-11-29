@@ -1607,8 +1607,10 @@ input:focus {
   bottom: 0;
   z-index: 700;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 20px;
   animation: fadeIn 0.2s ease;
 }
 
@@ -1625,15 +1627,18 @@ input:focus {
   position: relative;
   z-index: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: 20px;
   padding: 20px;
+  width: 100%;
+  max-width: 500px;
 }
 
 .card-detail-card {
-  width: 280px;
-  min-height: 400px;
+  width: 320px;
+  min-height: 450px;
   border-radius: 16px;
   padding: 0;
   position: relative;
@@ -1746,11 +1751,110 @@ input:focus {
   color: white;
 }
 
+/* Card detail navigation arrows */
+.card-detail-nav {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.card-detail-nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
+/* Card detail actions container */
+.card-detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Play button in card detail */
+.card-detail-play {
+  background: var(--success);
+  color: white;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-detail-play:hover {
+  background: #2ecc71;
+  transform: translateY(-2px);
+}
+
+/* Card counter */
+.card-detail-counter {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+/* Card image container */
+.card-detail-image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-detail-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.card-detail-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Update card-detail-card for image mode */
+.card-detail-card {
+  width: 320px;
+  min-height: 450px;
+  border-radius: 16px;
+  padding: 0;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
 /* Mobile adjustments for card detail */
 @media (max-width: 600px) {
   .card-detail-card {
-    width: 260px;
-    min-height: 360px;
+    width: 280px;
+    min-height: 400px;
   }
 
   .card-detail-name {
@@ -1771,8 +1875,28 @@ input:focus {
   }
 
   .card-detail-close {
-    width: 80%;
     min-height: 48px;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    padding: 12px 24px;
+  }
+
+  .card-detail-nav {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+  }
+
+  .card-detail-actions {
+    flex-direction: column;
+    width: 80%;
+  }
+
+  .card-detail-play,
+  .card-detail-close {
+    width: 100%;
+  }
+
+  .card-detail-counter {
+    bottom: 100px;
   }
 }
