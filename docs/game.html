@@ -23,6 +23,11 @@
         </div>
       </div>
       <div id="turn-indicator"></div>
+      <div class="gene-pool-display">
+        <span class="gene-pool-label">GP:</span>
+        <span class="gene-pool-value" id="gene-pool-value">5</span>
+        <span class="gene-pool-value" id="gene-count-value" style="margin-left:4px">+0</span>
+      </div>
       <div class="game-stats">
         <span>Round: <strong id="round-num">1</strong></span>
         <span>Deck: <strong id="deck-size">0</strong></span>
@@ -63,10 +68,14 @@
     <!-- My Hand -->
     <div class="my-hand-area">
       <div class="hand-header">
-        <h3>Your Hand (<span id="hand-count">0</span> cards)</h3>
+        <h3>Your Hand (<span id="hand-count">0</span>)</h3>
         <span id="play-instruction"></span>
       </div>
       <div class="my-hand" id="my-hand"></div>
+      <!-- Mobile Action Bar (inside hand area for mobile) -->
+      <div class="mobile-action-bar" id="mobile-action-bar">
+        <span class="action-msg">Loading...</span>
+      </div>
     </div>
   </div>
 
@@ -83,6 +92,25 @@
     </div>
   </div>
 
+  <!-- Game Over Overlay -->
+  <div class="game-over-overlay" id="game-over" style="display: none;">
+    <div class="game-over-content">
+      <h1>Game Over!</h1>
+      <div class="final-scores" id="final-scores"></div>
+      <button onclick="location.href='index.html'">Back to Home</button>
+    </div>
+  </div>
+
+  <!-- Age Announcement Modal -->
+  <div class="age-announce-overlay" id="age-announce" style="display: none;">
+    <div class="age-announce-card" id="age-announce-card">
+      <div class="age-announce-label">NEW AGE</div>
+      <h2 class="age-announce-name" id="age-announce-name">Age Name</h2>
+      <div class="age-announce-effect" id="age-announce-effect">Effect description</div>
+      <button class="age-announce-btn" onclick="window.dismissAgeAnnounce()">Continue</button>
+    </div>
+  </div>
+
   <!-- Card Detail View -->
   <div class="card-detail-overlay" id="card-detail" style="display: none;">
     <div class="card-detail-backdrop"></div>
@@ -91,15 +119,6 @@
         <!-- Card content will be injected here -->
       </div>
       <button class="card-detail-close" id="card-detail-close">Tap to close</button>
-    </div>
-  </div>
-
-  <!-- Game Over Overlay -->
-  <div class="game-over-overlay" id="game-over" style="display: none;">
-    <div class="game-over-content">
-      <h1>Game Over!</h1>
-      <div class="final-scores" id="final-scores"></div>
-      <button onclick="location.href='index.html'">Back to Home</button>
     </div>
   </div>
 
@@ -125,6 +144,9 @@
     const roundNum = document.getElementById('round-num');
     const deckSize = document.getElementById('deck-size');
     const discardSize = document.getElementById('discard-size');
+    const genePoolValue = document.getElementById('gene-pool-value');
+    const geneCountValue = document.getElementById('gene-count-value');
+    let stabilizeDiscards = []; // Selected cards for stabilization discard
     const actionMessage = document.getElementById('action-message');
     const actionOptions = document.getElementById('action-options');
     const myTraitPile = document.getElementById('my-trait-pile');
@@ -143,14 +165,22 @@
     const modalClose = document.getElementById('modal-close');
     const gameOverOverlay = document.getElementById('game-over');
     const finalScores = document.getElementById('final-scores');
+    const mobileActionBar = document.getElementById('mobile-action-bar');
+    const ageAnnounceOverlay = document.getElementById('age-announce');
+    const ageAnnounceCard = document.getElementById('age-announce-card');
+    const ageAnnounceName = document.getElementById('age-announce-name');
+    const ageAnnounceEffect = document.getElementById('age-announce-effect');
     const cardDetailOverlay = document.getElementById('card-detail');
     const cardDetailContent = document.getElementById('card-detail-content');
     const cardDetailClose = document.getElementById('card-detail-close');
-    const traitPileArea = document.getElementById('my-trait-pile');
+
+    let lastShownAgeName = null; // Track which age we've shown
 
     // Drag state
     let draggedCardIndex = null;
     let isDragging = false;
+
+    const isHost = sessionStorage.getItem('isHost') === 'true';
 
     // Check session
     if (!playerData) {
@@ -168,27 +198,105 @@
       };
 
       peerManager.onDisconnected = () => {
-        alert('Disconnected from game');
-        window.location.href = 'index.html';
+        console.log('Disconnected from host, will retry...');
+        // Don't immediately redirect - host may be navigating
+        setTimeout(() => {
+          retryGameConnection();
+        }, 1500);
       };
 
-      // Initial render
-      const initialState = peerManager.getMyState();
-      if (initialState) {
-        loadingOverlay.style.display = 'none';
-        gameState = initialState;
-        renderGame();
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      async function retryGameConnection() {
+        if (retryCount >= maxRetries) {
+          alert('Lost connection to game');
+          window.location.href = 'index.html';
+          return;
+        }
+        retryCount++;
+        console.log(`Retry attempt ${retryCount}/${maxRetries}`);
+        try {
+          // Preserve playerId for reconnection
+          if (playerData.playerId) {
+            peerManager.myPlayerId = playerData.playerId;
+          }
+          await peerManager.joinGame(playerData.gameId, playerData.playerName);
+          retryCount = 0;
+        } catch (err) {
+          setTimeout(retryGameConnection, 1500);
+        }
       }
 
-      // Periodic refresh for host
-      if (sessionStorage.getItem('isHost') === 'true') {
-        setInterval(() => {
+      // Initialize connection
+      initializeGame();
+    }
+
+    async function initializeGame() {
+      try {
+        if (isHost) {
+          // Host needs to restore their peer connection and game state
+          await peerManager.restoreHost(playerData.gameId, playerData.playerId, playerData.playerName);
+
+          // Verify game state was restored properly
           const state = peerManager.getMyState();
+          if (!state || state.round === 0) {
+            console.error('Game state not properly restored');
+            // Try to get state from sessionStorage directly as backup
+            const backup = sessionStorage.getItem('gameStateBackup');
+            if (backup) {
+              console.log('Attempting direct restore from backup');
+            }
+          }
+
+          loadingOverlay.style.display = 'none';
+
+          // Initial render
           if (state) {
             gameState = state;
             renderGame();
           }
-        }, 200);
+
+          // Periodic refresh for host
+          setInterval(() => {
+            const newState = peerManager.getMyState();
+            if (newState) {
+              gameState = newState;
+              renderGame();
+            }
+          }, 200);
+
+        } else {
+          // Client needs to rejoin the game
+          // Restore playerId so we're recognized as the same player
+          if (playerData.playerId) {
+            peerManager.myPlayerId = playerData.playerId;
+          }
+
+          // Use a retry loop since host may still be setting up
+          let connected = false;
+          for (let attempt = 0; attempt < 5 && !connected; attempt++) {
+            try {
+              if (attempt > 0) {
+                await new Promise(r => setTimeout(r, 1000)); // Wait between attempts
+              }
+              await peerManager.joinGame(playerData.gameId, playerData.playerName);
+              connected = true;
+            } catch (err) {
+              console.log(`Join attempt ${attempt + 1} failed:`, err);
+            }
+          }
+
+          if (!connected) {
+            throw { error: 'Failed to connect to game after multiple attempts' };
+          }
+
+          loadingOverlay.style.display = 'none';
+        }
+      } catch (err) {
+        loadingOverlay.style.display = 'none';
+        alert(err.error || 'Failed to connect to game');
+        window.location.href = 'index.html';
       }
     }
 
@@ -205,16 +313,35 @@
       if (gameState.currentAge) {
         const isCatastrophe = gameState.currentAge.type === 'catastrophe';
         ageCard.className = 'age-card' + (isCatastrophe ? ' catastrophe' : '');
+
+        // Show active rule effect if any
+        let ruleEffectHtml = '';
+        if (gameState.ageEffect && gameState.currentAge.ruleEffectText) {
+          ruleEffectHtml = `<div class="age-rule-effect">${gameState.currentAge.ruleEffectText}</div>`;
+        }
+
         ageCard.innerHTML = `
           <div class="age-name">${gameState.currentAge.name}</div>
           <div class="age-effect">${gameState.currentAge.effect || ''}</div>
+          ${ruleEffectHtml}
         `;
+
+        // Show age announcement if this is a new age
+        if (gameState.currentAge.name !== lastShownAgeName) {
+          showAgeAnnouncement(gameState.currentAge);
+        }
       }
 
       // Update stats
       roundNum.textContent = gameState.round;
       deckSize.textContent = gameState.deckSize;
       discardSize.textContent = gameState.discardSize;
+
+      // Update gene pool (hand size target) and gene count (from cards)
+      genePoolValue.textContent = gameState.myGenePool || 5;
+      const geneCount = gameState.myGeneCount || 0;
+      geneCountValue.textContent = geneCount >= 0 ? `+${geneCount}` : geneCount;
+      geneCountValue.className = 'gene-pool-value' + (geneCount < 0 ? ' negative' : '');
 
       // Update turn indicator
       if (gameState.state === 'finished') {
@@ -260,6 +387,7 @@
       container.innerHTML = '';
       cards.forEach((card, index) => {
         const cardEl = createCardElement(card, false, index);
+        // Click to view card detail
         cardEl.addEventListener('click', (e) => {
           if (!isDragging) {
             e.stopPropagation();
@@ -276,37 +404,50 @@
       handCount.textContent = gameState.myHand.length;
 
       const canPlay = gameState.isMyTurn && gameState.turnPhase === 'play' && !gameState.pendingAction;
+      const isStabilizing = gameState.isMyTurn && gameState.turnPhase === 'stabilize';
+      const needsDiscard = gameState.needsDiscard || 0;
 
       gameState.myHand.forEach((card, index) => {
-        const cardEl = createCardElement(card, canPlay, index);
+        const cardEl = createCardElement(card, canPlay || isStabilizing, index);
 
-        // Add click to view detail (only if not dragging)
+        // Click to view card detail (when not playing or stabilizing)
         cardEl.addEventListener('click', (e) => {
-          if (!isDragging) {
+          if (!isDragging && !canPlay && !(isStabilizing && needsDiscard > 0)) {
             e.stopPropagation();
             showCardDetail(card);
           }
         });
 
-        // Add drag functionality if can play
         if (canPlay) {
+          // Drag to play
           cardEl.draggable = true;
           cardEl.addEventListener('dragstart', (e) => handleDragStart(e, index));
           cardEl.addEventListener('dragend', handleDragEnd);
 
-          // Touch events for mobile
-          cardEl.addEventListener('touchstart', (e) => handleTouchStart(e, index), { passive: false });
+          // Touch events for mobile drag
+          cardEl.addEventListener('touchstart', (e) => handleTouchStart(e, index, card), { passive: false });
           cardEl.addEventListener('touchmove', handleTouchMove, { passive: false });
           cardEl.addEventListener('touchend', handleTouchEnd);
+        } else if (isStabilizing && needsDiscard > 0) {
+          // In stabilize mode - can select cards to discard
+          cardEl.addEventListener('click', () => toggleStabilizeDiscard(index, cardEl, needsDiscard));
+          if (stabilizeDiscards.includes(index)) {
+            cardEl.classList.add('selected');
+          }
         }
-
         myHand.appendChild(cardEl);
       });
 
-      playInstruction.textContent = canPlay ? 'Drag a card to your trait pile to play it' : '';
-
-      // Set up drop zone on trait pile
-      setupDropZone();
+      if (canPlay) {
+        playInstruction.textContent = 'Drag a card to your trait pile to play it';
+        setupDropZone();
+      } else if (isStabilizing && needsDiscard > 0) {
+        playInstruction.textContent = `Select ${needsDiscard} card(s) to discard, then click Stabilize`;
+      } else if (isStabilizing) {
+        playInstruction.textContent = gameState.willDraw > 0 ? `You will draw ${gameState.willDraw} card(s)` : '';
+      } else {
+        playInstruction.textContent = '';
+      }
     }
 
     // Drag and drop handlers
@@ -316,8 +457,6 @@
       e.target.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', index);
-
-      // Highlight drop zone
       document.querySelector('.my-traits').classList.add('drop-target');
     }
 
@@ -330,20 +469,23 @@
 
     function setupDropZone() {
       const dropZone = document.querySelector('.my-traits');
+      // Remove old listeners by cloning
+      const newDropZone = dropZone.cloneNode(true);
+      dropZone.parentNode.replaceChild(newDropZone, dropZone);
 
-      dropZone.addEventListener('dragover', (e) => {
+      newDropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        dropZone.classList.add('drop-hover');
+        newDropZone.classList.add('drop-hover');
       });
 
-      dropZone.addEventListener('dragleave', (e) => {
-        dropZone.classList.remove('drop-hover');
+      newDropZone.addEventListener('dragleave', () => {
+        newDropZone.classList.remove('drop-hover');
       });
 
-      dropZone.addEventListener('drop', (e) => {
+      newDropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        dropZone.classList.remove('drop-hover', 'drop-target');
+        newDropZone.classList.remove('drop-hover', 'drop-target');
         const index = parseInt(e.dataTransfer.getData('text/plain'));
         if (!isNaN(index)) {
           playCard(index);
@@ -355,14 +497,14 @@
     let touchDragElement = null;
     let touchStartPos = { x: 0, y: 0 };
     let touchCardIndex = null;
-    let touchStartTime = 0;
+    let touchCard = null;
     let touchMoved = false;
 
-    function handleTouchStart(e, index) {
+    function handleTouchStart(e, index, card) {
       const touch = e.touches[0];
       touchStartPos = { x: touch.clientX, y: touch.clientY };
       touchCardIndex = index;
-      touchStartTime = Date.now();
+      touchCard = card;
       touchMoved = false;
       touchDragElement = e.target.closest('.card');
     }
@@ -374,7 +516,6 @@
       const deltaX = Math.abs(touch.clientX - touchStartPos.x);
       const deltaY = Math.abs(touch.clientY - touchStartPos.y);
 
-      // If moved enough, start dragging (increased threshold for better tap detection)
       if (deltaX > 20 || deltaY > 20) {
         touchMoved = true;
         isDragging = true;
@@ -383,14 +524,12 @@
         touchDragElement.classList.add('dragging');
         document.querySelector('.my-traits').classList.add('drop-target');
 
-        // Move the visual element
         touchDragElement.style.position = 'fixed';
         touchDragElement.style.left = (touch.clientX - 60) + 'px';
         touchDragElement.style.top = (touch.clientY - 85) + 'px';
         touchDragElement.style.zIndex = '1000';
         touchDragElement.style.pointerEvents = 'none';
 
-        // Check if over drop zone
         const dropZone = document.querySelector('.my-traits');
         const rect = dropZone.getBoundingClientRect();
         if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
@@ -406,13 +545,13 @@
       if (!touchDragElement || touchCardIndex === null) {
         touchDragElement = null;
         touchCardIndex = null;
+        touchCard = null;
         return;
       }
 
       const dropZone = document.querySelector('.my-traits');
       dropZone.classList.remove('drop-target', 'drop-hover');
 
-      // Reset element styles
       touchDragElement.classList.remove('dragging');
       touchDragElement.style.position = '';
       touchDragElement.style.left = '';
@@ -420,10 +559,8 @@
       touchDragElement.style.zIndex = '';
       touchDragElement.style.pointerEvents = '';
 
-      const card = gameState.myHand[touchCardIndex];
       const wasDragging = isDragging && touchMoved;
 
-      // If it was a drag operation, check if dropped on trait pile
       if (wasDragging) {
         const touch = e.changedTouches[0];
         const rect = dropZone.getBoundingClientRect();
@@ -431,19 +568,36 @@
             touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
           playCard(touchCardIndex);
         }
-        e.preventDefault(); // Prevent click event after drag
+        e.preventDefault();
       } else {
-        // It was a tap - show detail view
-        if (card) {
-          showCardDetail(card);
+        // Tap - show detail
+        if (touchCard) {
+          showCardDetail(touchCard);
         }
-        e.preventDefault(); // Prevent click event after tap (we handled it)
+        e.preventDefault();
       }
 
       setTimeout(() => { isDragging = false; }, 100);
       touchDragElement = null;
       touchCardIndex = null;
+      touchCard = null;
       touchMoved = false;
+    }
+
+    // Toggle card selection for stabilization discard
+    function toggleStabilizeDiscard(index, cardEl, maxDiscards) {
+      const idx = stabilizeDiscards.indexOf(index);
+      if (idx === -1) {
+        if (stabilizeDiscards.length < maxDiscards) {
+          stabilizeDiscards.push(index);
+          cardEl.classList.add('selected');
+        }
+      } else {
+        stabilizeDiscards.splice(idx, 1);
+        cardEl.classList.remove('selected');
+      }
+      // Update action area to reflect current selection count
+      updateActionArea();
     }
 
     // Create a card element
@@ -502,6 +656,10 @@
       if (card.drop_effect) return formatDropEffect(card.drop_effect);
       if (card.action) return 'Action effect';
       if (card.dominant) return 'Dominant';
+      if (card.gene_pool) {
+        const effect = card.gene_pool_effect || 0;
+        return `Genes: ${effect >= 0 ? '+' : ''}${effect}`;
+      }
       return '';
     }
 
@@ -555,28 +713,181 @@
       });
     }
 
-    // Update action area
+    // Update action area (both desktop and mobile)
     function updateActionArea() {
       actionOptions.innerHTML = '';
+      mobileActionBar.innerHTML = '';
 
       if (gameState.state === 'finished') {
         actionMessage.textContent = 'Game Over!';
+        mobileActionBar.innerHTML = '<span class="action-msg">Game Over!</span>';
         return;
       }
 
       if (gameState.pendingAction) {
         actionMessage.textContent = gameState.pendingAction.message || 'Action required';
+        mobileActionBar.innerHTML = `<span class="action-msg">${gameState.pendingAction.message || 'Action required'}</span>`;
         return;
       }
 
       if (gameState.isMyTurn) {
-        actionMessage.textContent = gameState.turnPhase === 'play' ?
-          'Play a trait from your hand' : 'Waiting for next phase...';
+        if (gameState.turnPhase === 'stabilize') {
+          // Stabilization phase
+          const needsDiscard = gameState.needsDiscard || 0;
+          const willDraw = gameState.willDraw || 0;
+
+          if (needsDiscard > 0) {
+            actionMessage.textContent = `Stabilize: Select ${needsDiscard} card(s) to discard`;
+
+            // Desktop button
+            const stabilizeBtn = document.createElement('button');
+            stabilizeBtn.textContent = `Discard ${stabilizeDiscards.length}/${needsDiscard} & Stabilize`;
+            stabilizeBtn.disabled = stabilizeDiscards.length !== needsDiscard;
+            stabilizeBtn.onclick = () => {
+              if (stabilizeDiscards.length === needsDiscard) {
+                peerManager.stabilize(stabilizeDiscards);
+                stabilizeDiscards = [];
+              }
+            };
+            actionOptions.appendChild(stabilizeBtn);
+
+            // Mobile bar
+            mobileActionBar.innerHTML = `
+              <span class="action-msg">Select ${needsDiscard - stabilizeDiscards.length} more</span>
+              <button ${stabilizeDiscards.length !== needsDiscard ? 'disabled' : ''}
+                      onclick="window.doStabilize()">Stabilize</button>
+            `;
+          } else if (willDraw > 0) {
+            actionMessage.textContent = `Stabilize: You will draw ${willDraw} card(s)`;
+
+            const stabilizeBtn = document.createElement('button');
+            stabilizeBtn.textContent = `Draw ${willDraw} & Stabilize`;
+            stabilizeBtn.onclick = () => {
+              peerManager.stabilize([]);
+              stabilizeDiscards = [];
+            };
+            actionOptions.appendChild(stabilizeBtn);
+
+            // Mobile bar
+            mobileActionBar.innerHTML = `
+              <span class="action-msg">Draw ${willDraw} cards</span>
+              <button onclick="window.doStabilize()">Stabilize</button>
+            `;
+          } else {
+            actionMessage.textContent = 'Hand size matches Gene Pool';
+
+            const stabilizeBtn = document.createElement('button');
+            stabilizeBtn.textContent = 'Continue';
+            stabilizeBtn.onclick = () => {
+              peerManager.stabilize([]);
+              stabilizeDiscards = [];
+            };
+            actionOptions.appendChild(stabilizeBtn);
+
+            // Mobile bar
+            mobileActionBar.innerHTML = `
+              <span class="action-msg">Hand OK</span>
+              <button onclick="window.doStabilize()">Continue</button>
+            `;
+          }
+        } else if (gameState.turnPhase === 'play') {
+          // Play phase
+          if (!gameState.canPlayAny) {
+            // Can't play any cards - must skip turn
+            actionMessage.textContent = "You can't play any cards this turn";
+
+            const skipBtn = document.createElement('button');
+            skipBtn.textContent = 'Draw 3 & Skip Turn';
+            skipBtn.onclick = () => peerManager.skipTurn();
+            actionOptions.appendChild(skipBtn);
+
+            // Mobile bar
+            mobileActionBar.innerHTML = `
+              <span class="action-msg">Can't play</span>
+              <button onclick="window.doSkipTurn()">Skip (+3 cards)</button>
+            `;
+          } else {
+            actionMessage.textContent = 'Play a trait from your hand';
+
+            // Optional discard all and draw 3
+            const discardBtn = document.createElement('button');
+            discardBtn.className = 'secondary';
+            discardBtn.textContent = 'Discard All & Draw 3';
+            discardBtn.onclick = () => {
+              if (confirm('Discard your entire hand and draw 3 new cards?')) {
+                peerManager.discardAndDraw();
+              }
+            };
+            actionOptions.appendChild(discardBtn);
+
+            // Mobile bar - show tap to play message
+            mobileActionBar.innerHTML = `
+              <span class="action-msg">Tap a card to play</span>
+              <button class="secondary" onclick="window.doDiscardAll()">Redraw</button>
+            `;
+          }
+        } else {
+          actionMessage.textContent = 'Waiting...';
+          mobileActionBar.innerHTML = '<span class="action-msg">Waiting...</span>';
+        }
       } else {
         const currentPlayer = gameState.players.find(p => p.isCurrentPlayer);
-        actionMessage.textContent = `Waiting for ${currentPlayer?.name || 'opponent'}...`;
+        const name = currentPlayer?.name || 'opponent';
+        actionMessage.textContent = `Waiting for ${name}...`;
+        mobileActionBar.innerHTML = `<span class="action-msg">${name}'s turn</span>`;
       }
     }
+
+    // Global functions for mobile button handlers
+    window.doStabilize = function() {
+      const needsDiscard = gameState.needsDiscard || 0;
+      if (needsDiscard > 0 && stabilizeDiscards.length !== needsDiscard) return;
+      peerManager.stabilize(stabilizeDiscards);
+      stabilizeDiscards = [];
+    };
+
+    window.doSkipTurn = function() {
+      peerManager.skipTurn();
+    };
+
+    window.doDiscardAll = function() {
+      if (confirm('Discard your entire hand and draw 3 new cards?')) {
+        peerManager.discardAndDraw();
+      }
+    };
+
+    // Show age announcement modal
+    function showAgeAnnouncement(age) {
+      if (!age || !age.name) return;
+
+      const isCatastrophe = age.type === 'catastrophe';
+
+      // Update modal content
+      ageAnnounceCard.className = 'age-announce-card' + (isCatastrophe ? ' catastrophe' : '');
+      document.querySelector('.age-announce-label').textContent = isCatastrophe ? 'CATASTROPHE' : 'NEW AGE';
+      ageAnnounceName.textContent = age.name;
+
+      // Build effect description
+      let effectText = age.effect || '';
+      if (age.ruleEffectText) {
+        effectText += (effectText ? '<br><br>' : '') + age.ruleEffectText;
+      }
+      if (age.genePoolEffect) {
+        const gp = age.genePoolEffect;
+        effectText += (effectText ? '<br><br>' : '') + `Gene Pool: ${gp > 0 ? '+' : ''}${gp}`;
+      }
+      if (!effectText) {
+        effectText = isCatastrophe ? 'A catastrophic event affects all players!' : 'A new age begins...';
+      }
+
+      ageAnnounceEffect.innerHTML = effectText;
+      ageAnnounceOverlay.style.display = 'flex';
+      lastShownAgeName = age.name;
+    }
+
+    window.dismissAgeAnnounce = function() {
+      ageAnnounceOverlay.style.display = 'none';
+    };
 
     // Render action log
     function renderLog() {
@@ -600,7 +911,6 @@
 
     // Show card detail view
     function showCardDetail(card) {
-      // Determine card type
       let typeText = '';
       let typeClass = '';
       if (card.dominant) { typeText = 'DOMINANT'; typeClass = 'dominant'; }
@@ -610,47 +920,36 @@
       else if (card.worlds_end) { typeText = "WORLD'S END"; typeClass = 'worlds-end'; }
       else { typeText = 'TRAIT'; typeClass = 'trait'; }
 
-      // Get effect text
       let effectText = getDetailedEffectText(card);
-
-      // Get color class
       const colorClass = getColorClass(card.color);
       const colorValue = getColorValue(card.color);
 
-      // Build the card detail HTML (matching the reference image style)
       cardDetailContent.className = `card-detail-card ${colorClass}`;
       cardDetailContent.innerHTML = `
         <div class="detail-card-inner">
           <div class="detail-type-badge ${typeClass}">${typeText}</div>
           ${card.dominant ? '<div class="detail-star">&#9733;</div>' : ''}
-
           <div class="detail-card-frame">
             <div class="detail-card-title">
               <span class="detail-card-name">${card.trait}</span>
             </div>
-
             <div class="detail-flavor-text">${card.flavor || ''}</div>
-
             <div class="detail-artwork">
               <div class="detail-artwork-placeholder" style="background: ${colorValue};">
                 <div class="detail-creature-icon">?</div>
               </div>
             </div>
-
             <div class="detail-effect-box">
               <div class="detail-effect-text">${effectText}</div>
             </div>
           </div>
-
           <div class="detail-face-value">${formatFace(card.face)}</div>
           <div class="detail-color-indicator" style="background: ${colorValue};"></div>
         </div>
       `;
-
       cardDetailOverlay.style.display = 'flex';
     }
 
-    // Close card detail on backdrop click or close button
     cardDetailClose.addEventListener('click', hideCardDetail);
     document.querySelector('.card-detail-backdrop').addEventListener('click', hideCardDetail);
 
@@ -658,45 +957,17 @@
       cardDetailOverlay.style.display = 'none';
     }
 
-    // Get detailed effect text for card detail view
     function getDetailedEffectText(card) {
       if (card.effectless) return 'No special effect.';
-
       let effects = [];
-
-      if (card.drop_effect) {
-        effects.push(formatDetailedDropEffect(card.drop_effect));
-      }
-
-      if (card.action) {
-        // Try to get action effect description
-        if (card.action_effect) {
-          effects.push(formatActionEffect(card.action_effect));
-        } else {
-          effects.push('Perform an action when played.');
-        }
-      }
-
-      if (card.gene_pool_effect) {
-        effects.push(`Gene Pool: ${card.gene_pool_effect}`);
-      }
-
-      if (card.trait_effect) {
-        effects.push(card.trait_effect);
-      }
-
-      if (card.worlds_end_task) {
-        effects.push(`World's End: ${card.worlds_end_task}`);
-      }
-
-      if (card.persistent) {
-        effects.push('Persistent effect.');
-      }
-
-      if (card.requirement) {
-        effects.push(`Requires: ${card.requirement}`);
-      }
-
+      if (card.drop_effect) effects.push(formatDetailedDropEffect(card.drop_effect));
+      if (card.action && card.action_effect) effects.push(formatActionEffect(card.action_effect));
+      else if (card.action) effects.push('Perform an action when played.');
+      if (card.gene_pool_effect) effects.push(`Gene Pool: ${card.gene_pool_effect}`);
+      if (card.trait_effect) effects.push(card.trait_effect);
+      if (card.worlds_end_task) effects.push(`World's End: ${card.worlds_end_task}`);
+      if (card.persistent) effects.push('Persistent effect.');
+      if (card.requirement) effects.push(`Requires: ${card.requirement}`);
       return effects.join(' ') || 'No special effect.';
     }
 
@@ -704,26 +975,19 @@
       if (!effect) return '';
       const parts = effect.split(' ');
       if (parts.length < 3) return effect;
-
       const value = parts[0];
-      const target = parts[1];
       const condition = parts[2] || '';
-
       const conditionMap = {
         'n_hand': 'for each card in your hand',
         'n_traits': 'for each trait in your trait pile',
-        'n_red': 'for each Red trait',
-        'n_blue': 'for each Blue trait',
-        'n_green': 'for each Green trait',
-        'n_purple': 'for each Purple trait',
-        'n_colorless': 'for each Colorless trait',
-        'n_colors': 'for each unique color',
+        'n_red': 'for each Red trait', 'n_blue': 'for each Blue trait',
+        'n_green': 'for each Green trait', 'n_purple': 'for each Purple trait',
+        'n_colorless': 'for each Colorless trait', 'n_colors': 'for each unique color',
         'if_most_traits': 'if you have the most traits',
         'if_least_traits': 'if you have the fewest traits',
         'n_negative': 'for each trait with a negative face value',
         'if_negative': 'for each trait with a negative face value in your trait pile'
       };
-
       const text = conditionMap[condition] || condition.replace(/_/g, ' ');
       const sign = value > 0 ? '+' : '';
       return `${sign}${value} ${text}.`;
@@ -732,9 +996,7 @@
     function formatActionEffect(effect) {
       if (!effect) return '';
       const actionMap = {
-        'draw 1': 'Draw 1 card.',
-        'draw 2': 'Draw 2 cards.',
-        'draw 3': 'Draw 3 cards.',
+        'draw 1': 'Draw 1 card.', 'draw 2': 'Draw 2 cards.', 'draw 3': 'Draw 3 cards.',
         'steal_random': 'Steal a random card from an opponent.',
         'steal_trait': 'Steal a trait from an opponent.',
         'discard_hand': 'Discard your hand and draw new cards.',
