@@ -263,7 +263,7 @@ input:focus {
 /* Game Board */
 .game-container {
   display: grid;
-  grid-template-columns: 250px 1fr 250px;
+  grid-template-columns: 300px 1fr;
   grid-template-rows: auto 1fr auto;
   gap: 15px;
   min-height: 100vh;
@@ -335,56 +335,101 @@ input:focus {
   font-size: 0.9rem;
 }
 
-/* Side Panels (Opponents) */
+/* Opponents Panel */
 .opponents-panel {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  padding-right: 5px;
 }
 
 .opponent-card {
   background: var(--bg-medium);
   border-radius: 12px;
-  padding: 15px;
+  padding: 12px;
   border: 2px solid transparent;
   transition: border-color 0.2s ease;
 }
 
 .opponent-card.current-turn {
   border-color: var(--warning);
+  box-shadow: 0 0 15px rgba(243, 156, 18, 0.3);
+}
+
+.opponent-card.current-turn .opponent-traits {
+  border-color: var(--warning);
+  border-width: 3px;
 }
 
 .opponent-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+.opponent-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.turn-order-badge {
+  background: var(--bg-light);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  min-width: 24px;
+  text-align: center;
 }
 
 .opponent-name {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .opponent-score {
   background: var(--accent);
-  padding: 4px 10px;
+  padding: 3px 8px;
   border-radius: 4px;
   font-weight: 700;
+  font-size: 0.85rem;
 }
 
 .opponent-info {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  margin-bottom: 8px;
 }
 
 .opponent-traits {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 6px;
   margin-top: 8px;
+  padding: 8px;
+  border: 2px solid var(--bg-light);
+  border-radius: 8px;
 }
 
+.opponent-trait-card {
+  flex: 0 0 auto;
+  width: 60px !important;
+  height: 84px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.opponent-trait-card:hover {
+  transform: scale(1.1) translateY(-4px);
+  z-index: 10;
+}
+
+/* Legacy mini-trait for backwards compatibility */
 .mini-trait {
   width: 20px;
   height: 28px;
@@ -430,6 +475,7 @@ input:focus {
   background: var(--bg-medium);
   border-radius: 12px;
   padding: 20px;
+  border: 3px solid var(--success);
 }
 
 .my-traits h3 {
@@ -467,39 +513,63 @@ input:focus {
   position: relative;
 }
 
-.hand-view-toggle {
-  position: absolute;
-  right: 0;
-  top: 0;
-  background: rgba(52, 152, 219, 0.2);
-  border: 2px solid rgba(52, 152, 219, 0.5);
+.hand-gene-pool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-light);
+  padding: 6px 12px;
   border-radius: 8px;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.2s ease;
-  z-index: 10;
+  font-size: 0.9rem;
 }
 
-.hand-view-toggle:hover {
-  background: rgba(52, 152, 219, 0.4);
-  border-color: rgba(52, 152, 219, 0.8);
-  transform: scale(1.05);
+.gp-label {
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
-.hand-view-toggle:active {
-  transform: scale(0.95);
+.gp-value {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.gp-count {
+  color: var(--success);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.gp-count.negative {
+  color: var(--danger);
 }
 
 .my-hand {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.my-hand::-webkit-scrollbar {
+  height: 8px;
+}
+
+.my-hand::-webkit-scrollbar-thumb {
+  background: var(--bg-light);
+  border-radius: 4px;
+}
+
+.my-hand::-webkit-scrollbar-track {
+  background: var(--bg-dark);
 }
 
 /* Hand card image view */
 .hand-card-image {
+  flex: 0 0 auto;
   width: 80px;
   height: 112px;
   border-radius: 8px;
@@ -509,6 +579,7 @@ input:focus {
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  scroll-snap-align: start;
 }
 
 .hand-card-image img {
@@ -568,6 +639,7 @@ input:focus {
 
 /* Cards */
 .card {
+  flex: 0 0 auto;
   width: 120px;
   min-height: 170px;
   border-radius: 10px;
@@ -578,6 +650,7 @@ input:focus {
   transition: all 0.2s ease;
   position: relative;
   border: 3px solid transparent;
+  scroll-snap-align: start;
 }
 
 .card:hover {
@@ -777,29 +850,9 @@ input:focus {
   to { transform: rotate(360deg); }
 }
 
-/* Gene Pool Display */
+/* Gene pool - hidden in header (now shown in hand area) */
 .gene-pool-display {
-  background: var(--bg-light);
-  padding: 8px 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.gene-pool-label {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.gene-pool-value {
-  font-weight: 700;
-  color: var(--success);
-  font-size: 1.1rem;
-}
-
-.gene-pool-value.negative {
-  color: var(--danger);
+  display: none;
 }
 
 /* Responsive - Tablet */
@@ -828,6 +881,7 @@ input:focus {
     flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
+    max-height: none;
   }
 
   .opponent-card {
@@ -835,6 +889,11 @@ input:focus {
     min-width: 150px;
     max-width: 200px;
     padding: 10px;
+  }
+
+  .opponent-trait-card {
+    width: 50px !important;
+    height: 70px !important;
   }
 
   .my-hand-area {
@@ -991,32 +1050,37 @@ input:focus {
     display: none;
   }
 
-  /* Hide second opponents panel on mobile */
-  #opponents-right {
-    display: none;
-  }
-
   .opponent-card {
     flex: 0 0 auto;
     width: auto;
-    min-width: 100px;
-    max-width: 140px;
-    padding: 6px 10px;
+    min-width: 120px;
+    max-width: 160px;
+    padding: 8px;
     border-radius: 8px;
     border-width: 2px;
   }
 
   .opponent-header {
-    margin-bottom: 0;
-    gap: 8px;
+    margin-bottom: 4px;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .opponent-title {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .turn-order-badge {
+    font-size: 0.7rem;
+    padding: 2px 4px;
   }
 
   .opponent-name {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 70px;
   }
 
   .opponent-score {
@@ -1028,11 +1092,18 @@ input:focus {
   .opponent-info {
     font-size: 0.65rem;
     white-space: nowrap;
+    margin-bottom: 4px;
   }
 
-  /* Hide traits on opponent cards - too small */
+  /* Show traits but smaller on mobile */
   .opponent-traits {
-    display: none;
+    display: flex;
+    gap: 3px;
+  }
+
+  .opponent-trait-card {
+    width: 40px !important;
+    height: 56px !important;
   }
 
   /* ========== PLAY AREA - SCROLLABLE MIDDLE ========== */
@@ -1603,6 +1674,24 @@ input:focus {
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+.age-announce-image-container {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.age-announce-image {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  display: block;
+  transition: transform 0.2s ease;
+}
+
 .age-announce-effect {
   font-size: 1.1rem;
   line-height: 1.6;
@@ -1654,6 +1743,11 @@ input:focus {
 
   .age-announce-name {
     font-size: 1.6rem;
+  }
+
+  .age-announce-image-container {
+    max-width: 200px;
+    margin-bottom: 20px;
   }
 
   .age-announce-effect {
@@ -1731,7 +1825,7 @@ input:focus {
 
 .card-detail-card {
   width: 320px;
-  min-height: 450px;
+  height: 448px; /* Maintain 5:7 aspect ratio (320 * 1.4 = 448) */
   border-radius: 16px;
   padding: 0;
   position: relative;
@@ -1740,16 +1834,18 @@ input:focus {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: cardSlideIn 0.3s ease;
   overflow: hidden;
+  background: transparent; /* Default transparent - backgrounds only for fallback */
 }
 
-.card-detail-card.red { background: linear-gradient(145deg, #c0392b, #e74c3c); }
-.card-detail-card.blue { background: linear-gradient(145deg, #2980b9, #3498db); }
-.card-detail-card.green { background: linear-gradient(145deg, #1e8449, #27ae60); }
-.card-detail-card.purple { background: linear-gradient(145deg, #7d3c98, #9b59b6); }
-.card-detail-card.colorless { background: linear-gradient(145deg, #7f8c8d, #95a5a6); }
-.card-detail-card.multi { background: var(--color-multi); }
-.card-detail-card.age-card-detail { background: linear-gradient(145deg, #34495e, #5d6d7e); }
-.card-detail-card.catastrophe-card { background: linear-gradient(145deg, #641e16, #943126); }
+/* Fallback backgrounds only shown when image fails to load */
+.card-detail-fallback.red { background: linear-gradient(145deg, #c0392b, #e74c3c); }
+.card-detail-fallback.blue { background: linear-gradient(145deg, #2980b9, #3498db); }
+.card-detail-fallback.green { background: linear-gradient(145deg, #1e8449, #27ae60); }
+.card-detail-fallback.purple { background: linear-gradient(145deg, #7d3c98, #9b59b6); }
+.card-detail-fallback.colorless { background: linear-gradient(145deg, #7f8c8d, #95a5a6); }
+.card-detail-fallback.multi { background: var(--color-multi); }
+.card-detail-fallback.age-card-detail { background: linear-gradient(145deg, #34495e, #5d6d7e); }
+.card-detail-fallback.catastrophe-card { background: linear-gradient(145deg, #641e16, #943126); }
 
 .card-detail-type-badge {
   position: absolute;
@@ -1913,13 +2009,15 @@ input:focus {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .card-detail-image {
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Maintain aspect ratio while filling container */
+  border-radius: 16px;
+  display: block;
 }
 
 .card-detail-fallback {
@@ -1930,26 +2028,11 @@ input:focus {
   position: relative;
 }
 
-/* Update card-detail-card for image mode */
-.card-detail-card {
-  width: 320px;
-  min-height: 450px;
-  border-radius: 16px;
-  padding: 0;
-  position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-}
-
 /* Mobile adjustments for card detail */
 @media (max-width: 600px) {
   .card-detail-card {
     width: 280px;
-    min-height: 400px;
+    height: 392px; /* Maintain 5:7 aspect ratio (280 * 1.4 = 392) */
   }
 
   .card-detail-name {

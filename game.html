@@ -35,8 +35,8 @@
       </div>
     </div>
 
-    <!-- Left Panel - Opponents -->
-    <div class="opponents-panel" id="opponents-left"></div>
+    <!-- Opponents Panel -->
+    <div class="opponents-panel" id="opponents-panel"></div>
 
     <!-- Main Play Area -->
     <div class="play-area">
@@ -62,17 +62,15 @@
       </div>
     </div>
 
-    <!-- Right Panel - More Opponents -->
-    <div class="opponents-panel" id="opponents-right"></div>
-
     <!-- My Hand -->
     <div class="my-hand-area">
       <div class="hand-header">
         <h3>Your Hand (<span id="hand-count">0</span>)</h3>
-        <button id="hand-view-toggle" class="hand-view-toggle" title="Toggle card view">
-          <span class="toggle-icon">🖼️</span>
-        </button>
-        <span id="play-instruction"></span>
+        <div class="hand-gene-pool">
+          <span class="gp-label">GP:</span>
+          <span class="gp-value" id="hand-gene-pool-value">5</span>
+          <span class="gp-count" id="hand-gene-count-value">+0</span>
+        </div>
       </div>
       <div class="my-hand" id="my-hand"></div>
       <!-- Mobile Action Bar (inside hand area for mobile) -->
@@ -109,6 +107,9 @@
     <div class="age-announce-card" id="age-announce-card">
       <div class="age-announce-label">NEW AGE</div>
       <h2 class="age-announce-name" id="age-announce-name">Age Name</h2>
+      <div class="age-announce-image-container">
+        <img class="age-announce-image" id="age-announce-image" src="" alt="Age Card">
+      </div>
       <div class="age-announce-effect" id="age-announce-effect">Effect description</div>
       <button class="age-announce-btn" onclick="window.dismissAgeAnnounce()">Continue</button>
     </div>
@@ -173,11 +174,10 @@
     const myHand = document.getElementById('my-hand');
     const myScore = document.getElementById('my-score');
     const handCount = document.getElementById('hand-count');
-    const playInstruction = document.getElementById('play-instruction');
-    const handViewToggle = document.getElementById('hand-view-toggle');
+    const handGenePoolValue = document.getElementById('hand-gene-pool-value');
+    const handGeneCountValue = document.getElementById('hand-gene-count-value');
     const actionLog = document.getElementById('action-log');
-    const opponentsLeft = document.getElementById('opponents-left');
-    const opponentsRight = document.getElementById('opponents-right');
+    const opponentsPanel = document.getElementById('opponents-panel');
     const modal = document.getElementById('modal');
     const modalTitle = document.getElementById('modal-title');
     const modalCards = document.getElementById('modal-cards');
@@ -190,6 +190,7 @@
     const ageAnnounceOverlay = document.getElementById('age-announce');
     const ageAnnounceCard = document.getElementById('age-announce-card');
     const ageAnnounceName = document.getElementById('age-announce-name');
+    const ageAnnounceImage = document.getElementById('age-announce-image');
     const ageAnnounceEffect = document.getElementById('age-announce-effect');
     const cardDetailOverlay = document.getElementById('card-detail');
     const cardDetailContent = document.getElementById('card-detail-content');
@@ -211,9 +212,6 @@
     // Drag-and-drop state
     let draggedCardIndex = null;
     let isDragging = false;
-
-    // Hand view mode: 'text' or 'image'
-    let handViewMode = 'text';
 
     // Image name mapping for cards that don't have direct name matches
     // Maps trait name (without suffixes) to actual image file name
@@ -480,6 +478,11 @@
       geneCountValue.textContent = geneCount >= 0 ? `+${geneCount}` : geneCount;
       geneCountValue.className = 'gene-pool-value' + (geneCount < 0 ? ' negative' : '');
 
+      // Also update gene pool in hand area
+      handGenePoolValue.textContent = gameState.myGenePool || 5;
+      handGeneCountValue.textContent = geneCount >= 0 ? `+${geneCount}` : geneCount;
+      handGeneCountValue.className = 'gp-count' + (geneCount < 0 ? ' negative' : '');
+
       // Update turn indicator
       if (gameState.state === 'finished') {
         turnIndicator.innerHTML = '<span class="turn-indicator" style="background: var(--success);">Game Over</span>';
@@ -648,16 +651,6 @@
 
         myHand.appendChild(cardEl);
       });
-
-      if (canPlay) {
-        playInstruction.textContent = 'Drag card to trait pile to play';
-      } else if (isStabilizing && needsDiscard > 0) {
-        playInstruction.textContent = `Select ${needsDiscard} card(s) to discard, then click Stabilize`;
-      } else if (isStabilizing) {
-        playInstruction.textContent = gameState.willDraw > 0 ? `You will draw ${gameState.willDraw} card(s)` : '';
-      } else {
-        playInstruction.textContent = '';
-      }
     }
 
     // Toggle card selection for stabilization discard
@@ -676,51 +669,27 @@
       updateActionArea();
     }
 
-    // Create a card element
+    // Create a card element (always renders as image)
     function createCardElement(card, playable = false, index = 0) {
       const div = document.createElement('div');
       const colorClass = getColorClass(card.color);
 
-      if (handViewMode === 'image') {
-        // Image mode - show actual card image
-        div.className = `hand-card-image ${colorClass}${playable ? ' playable' : ''}`;
-        div.dataset.index = index;
+      // Always show actual card image
+      div.className = `hand-card-image ${colorClass}${playable ? ' playable' : ''}`;
+      div.dataset.index = index;
 
-        // Get card image path (same logic as card detail view)
-        let displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
-        const imageName = cardImageMapping[displayName] || displayName;
-        const imageUrl = `images/cards/${imageName}.png`;
+      // Get card image path (same logic as card detail view)
+      let displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+      const imageName = cardImageMapping[displayName] || displayName;
+      const imageUrl = `images/cards/${imageName}.png`;
 
-        div.innerHTML = `
-          <img src="${imageUrl}" alt="${card.name}"
-               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="card-image-fallback" style="display: none;">
-            <div class="fallback-name">${card.name}</div>
-          </div>
-        `;
-      } else {
-        // Text mode - show simplified card representation
-        div.className = `card ${colorClass}${playable ? ' playable' : ''}`;
-        div.dataset.index = index;
-
-        let typeText = '';
-        if (card.isDominant) typeText = 'DOMINANT';
-        else if (card.actions && card.actions.length > 0) typeText = 'ACTION';
-        else if (card.bonusPoints) typeText = 'DROP';
-        else if (card.effects && card.effects.some(e => e.name === 'modify_gene_pool')) typeText = 'GENE POOL';
-        else if (card.worldsEnd) typeText = "WORLD'S END";
-        else typeText = 'TRAIT';
-
-        let effectText = getCardEffectText(card);
-
-        div.innerHTML = `
-          <div class="card-color" style="background: ${getColorValue(card.color)}"></div>
-          <div class="card-face">${formatFace(card.faceValue)}</div>
-          <div class="card-name">${card.name}</div>
-          <div class="card-effect">${effectText}</div>
-          <div class="card-type">${typeText}</div>
-        `;
-      }
+      div.innerHTML = `
+        <img src="${imageUrl}" alt="${card.name}"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="card-image-fallback" style="display: none;">
+          <div class="fallback-name">${card.name}</div>
+        </div>
+      `;
 
       return div;
     }
@@ -806,33 +775,52 @@
     // Render opponents
     function renderOpponents() {
       const opponents = gameState.players.filter(p => p.id !== playerData.playerId);
-      opponentsLeft.innerHTML = '';
-      opponentsRight.innerHTML = '';
+      opponentsPanel.innerHTML = '';
 
-      opponents.forEach((opp, i) => {
-        const container = i % 2 === 0 ? opponentsLeft : opponentsRight;
+      // Sort opponents by turn order if available, otherwise by index
+      const sortedOpponents = opponents.sort((a, b) => {
+        const aOrder = a.turnOrder !== undefined ? a.turnOrder : gameState.players.indexOf(a);
+        const bOrder = b.turnOrder !== undefined ? b.turnOrder : gameState.players.indexOf(b);
+        return aOrder - bOrder;
+      });
+
+      sortedOpponents.forEach((opp, index) => {
         const div = document.createElement('div');
         div.className = `opponent-card${opp.isCurrentPlayer ? ' current-turn' : ''}`;
 
-        div.innerHTML = `
-          <div class="opponent-header">
+        // Create header
+        const header = document.createElement('div');
+        header.className = 'opponent-header';
+        header.innerHTML = `
+          <div class="opponent-title">
             <span class="opponent-name">${opp.name}</span>
-            <span class="opponent-score">${opp.score}</span>
           </div>
-          <div class="opponent-info">
-            Hand: ${opp.handSize} | Traits: ${opp.traitPile.length}
-            ${opp.hasPlayedThisRound ? ' | Played' : ''}
-          </div>
-          <div class="opponent-traits">
-            ${opp.traitPile.map(t => `
-              <div class="mini-trait ${getColorClass(t.color)}" title="${t.name} (${t.faceValue})">
-                ${formatFace(t.faceValue)}
-              </div>
-            `).join('')}
-          </div>
+          <span class="opponent-score">${opp.score} pts</span>
         `;
 
-        container.appendChild(div);
+        // Create info row
+        const info = document.createElement('div');
+        info.className = 'opponent-info';
+        info.textContent = `Hand: ${opp.handSize} | Traits: ${opp.traitPile.length}${opp.hasPlayedThisRound ? ' | Played' : ''}`;
+
+        // Create trait pile with actual cards
+        const traitPile = document.createElement('div');
+        traitPile.className = 'opponent-traits';
+
+        opp.traitPile.forEach((card, cardIndex) => {
+          const cardEl = createCardElement(card, false, cardIndex);
+          cardEl.classList.add('opponent-trait-card');
+          // Make clickable to show in detail view
+          cardEl.addEventListener('click', () => {
+            showCardDetail(card, opp.traitPile, cardIndex, 'opponent');
+          });
+          traitPile.appendChild(cardEl);
+        });
+
+        div.appendChild(header);
+        div.appendChild(info);
+        div.appendChild(traitPile);
+        opponentsPanel.appendChild(div);
       });
     }
 
@@ -990,20 +978,30 @@
       document.querySelector('.age-announce-label').textContent = isCatastrophe ? 'CATASTROPHE' : 'NEW AGE';
       ageAnnounceName.textContent = age.name;
 
-      // Build effect description
-      let effectText = age.effect || '';
+      // Set age card image
+      const ageName = age.name.toUpperCase();
+      const ageImageUrl = `images/cards/${ageName}.png`;
+      ageAnnounceImage.src = ageImageUrl;
+      ageAnnounceImage.alt = age.name;
+
+      // Build effect description - only show if there's actual meaningful effect text
+      let effectText = '';
       if (age.ruleEffectText) {
-        effectText += (effectText ? '<br><br>' : '') + age.ruleEffectText;
+        effectText = age.ruleEffectText;
       }
       if (age.genePoolEffect) {
         const gp = age.genePoolEffect;
-        effectText += (effectText ? '<br><br>' : '') + `Gene Pool: ${gp > 0 ? '+' : ''}${gp}`;
-      }
-      if (!effectText) {
-        effectText = isCatastrophe ? 'A catastrophic event affects all players!' : 'A new age begins...';
+        const gpText = `Gene Pool: ${gp > 0 ? '+' : ''}${gp}`;
+        effectText += (effectText ? '<br><br>' : '') + gpText;
       }
 
-      ageAnnounceEffect.innerHTML = effectText;
+      // Only show effect container if there's actual effect text, otherwise hide it
+      if (effectText) {
+        ageAnnounceEffect.innerHTML = effectText;
+        ageAnnounceEffect.style.display = 'block';
+      } else {
+        ageAnnounceEffect.style.display = 'none';
+      }
       ageAnnounceOverlay.style.display = 'flex';
       lastShownAgeName = age.name;
     }
@@ -1093,12 +1091,12 @@
       const imageName = cardImageMapping[displayName] || displayName;
       const imageUrl = `images/cards/${imageName}.png`;
 
-      cardDetailContent.className = `card-detail-card ${colorClass}`;
+      cardDetailContent.className = 'card-detail-card';
       cardDetailContent.innerHTML = `
         <div class="card-detail-image-container">
           <img class="card-detail-image" src="${imageUrl}" alt="${displayName}"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="card-detail-fallback" style="display: none;">
+          <div class="card-detail-fallback ${colorClass}" style="display: none;">
             <div class="card-detail-type-badge">${typeText}</div>
             ${showStar ? '<div class="card-detail-star">★</div>' : ''}
             <div class="card-detail-name-banner">
@@ -1417,13 +1415,6 @@
       reconnectManager.clearSession(); // Clear session when game ends
       gameOverOverlay.style.display = 'flex';
     }
-
-    // Hand view toggle
-    handViewToggle.onclick = () => {
-      handViewMode = handViewMode === 'text' ? 'image' : 'text';
-      handViewToggle.querySelector('.toggle-icon').textContent = handViewMode === 'image' ? '📝' : '🖼️';
-      renderHand();
-    };
   </script>
 </body>
 </html>
