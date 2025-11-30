@@ -1,0 +1,556 @@
+<div role="list" class="collection-list w-dyn-items"><div wfu-lightbox-group="northern-winds" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="northern-winds"></div><a href="/cards/northern-winds" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="NORTHERN WINDS" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c0dcf4c479f44b2e708de_6172e8aa325bfb64fc6fae6a_Northern%20Winds.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="age-of-wonder" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="age-of-wonder"></div><a href="/cards/age-of-wonder" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="AGE OF WONDER" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c24b6ee244908c91f9f4c_6171e140be0ebf491a062d6c_Age%20of%20Wonder.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="alien-terraform" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="alien-terraform"></div><a href="/cards/alien-terraform" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="ALIEN TERRAFORM" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c24d4f211f8374e27ab82_6171e1900fa45934353c41f6_Alien%20Terraform.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="awakening" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="awakening"></div><a href="/cards/awakening" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="AWAKENING" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c25f7b5f66930182054f0_6171e205dcc644006a70b58e_Awakening.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="galactic-drift" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="galactic-drift"></div><a href="/cards/galactic-drift" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="GALACTIC DRIFT" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c2609727aad325c76a861_6172dac71f8ed555b907a78c_Galactic%20Drift.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="birth-of-a-hero" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="birth-of-a-hero"></div><a href="/cards/birth-of-a-hero" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="BIRTH OF A HERO" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c262df211f83c1f27be28_6171e2948540a0e12f4ca40f_Birth%20of%20a%20Hero.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="coastal-formations" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="coastal-formations"></div><a href="/cards/coastal-formations" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="COASTAL FORMATIONS" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c263cf418543f9662ebd4_6171e4606eafca25be82427e_Coastal%20Formations.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="flourish" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="flourish"></div><a href="/cards/flourish" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="FLOURISH" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c264962d44966791701f9_6172da8378503f230ed4c58f_Flourish.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="natural-harmony" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="natural-harmony"></div><a href="/cards/natural-harmony" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="NATURAL HARMONY" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c26681e3ed1f6f999cde4_6172e8855554442014f98b4e_Natural%20Harmony.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="prosperity" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="prosperity"></div><a href="/cards/prosperity" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="PROSPERITY" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c267cc9a1f126fb6644ae_622bb9502d5effb9d347368c_Prosperity_Retail-p-500.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="reforestation" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="reforestation"></div><a href="/cards/reforestation" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="REFORESTATION" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c268d3abc3b3822a30813_6172efb4592a8814fca6691c_Reforestation.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="tectonic-shift" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="tectonic-shift"></div><a href="/cards/tectonic-shift" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="TECTONIC SHIFT" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a1126f6b6280e9e4984ee9_Tectonic-Shift.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="tropical-lands" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="tropical-lands"></div><a href="/cards/tropical-lands" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="TROPICAL LANDS" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c26b135063c7c22b910f0_6172f1cf27cea16d9d36b420_Tropical%20Lands.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="age-of-dracula" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="age-of-dracula"></div><a href="/cards/age-of-dracula" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="AGE OF DRACULA" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c26caed20a659fd5a1d55_6171e10a8540a0eec24b3720_Age%20of%20Dracula.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="age-of-nietzsche" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="age-of-nietzsche"></div><a href="/cards/age-of-nietzsche" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="AGE OF NIETZSCHE" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c26f5dc68053ded9f81b9_6171e122babe167fdbc4ff89_Age%20of%20Nietzsche.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="eclipse" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="eclipse"></div><a href="/cards/eclipse" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="ECLIPSE" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c27622959d044151df24d_6171ef51cd461a245ed1a304_Eclipse.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="enlightenment" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="enlightenment"></div><a href="/cards/enlightenment" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="ENLIGHTENMENT" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a10edd0962510dd57afa03_Enlightenment.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="age-of-reason" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="age-of-reason"></div><a href="/cards/age-of-reason" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="AGE OF REASON" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c27b445c0fe0e097b1cce_6171e13144cd333265a1e2b1_Age%20of%20Reason.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="arid-lands" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="arid-lands"></div><a href="/cards/arid-lands" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="ARID LANDS" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a083b53c2d580d8c9c5673_Arid-Lands.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="comet-showers" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="comet-showers"></div><a href="/cards/comet-showers" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="COMET SHOWERS" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c27def096fc91d66cf5ff_6171e47dbabe16cee5c5e3b4_Comet%20Showers.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="the-messiah" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="the-messiah"></div><a href="/cards/the-messiah" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="THE MESSIAH" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c27f0eb777c1f2fc409d6_6172f1579a5d49e1db011431_The%20Messiah.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="the-big-one" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="the-big-one"></div><a href="/cards/the-big-one" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="THE BIG ONE" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c283949f3c3fa54cce4f3_6172f0e59daf67a6c7d4596d_The%20Big%20One.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="deus-ex-machina" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="deus-ex-machina"></div><a href="/cards/deus-ex-machina" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="DEUS EX MACHINA" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a10e270c5c8ed5b96fc03b_Deus-Ex-Machina.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="overpopulation" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="overpopulation"></div><a href="/cards/overpopulation" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="OVERPOPULATION" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c285efd6fcbd06bcabc23_6172e927567b37e165c0fbab_Overpopulation.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="glacial-meltdown" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="glacial-meltdown"></div><a href="/cards/glacial-meltdown" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="GLACIAL MELTDOWN" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a10f48d6b229a8554999d9_Glacial-Meltdown.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="ice-age" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="ice-age"></div><a href="/cards/ice-age" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="ICE AGE" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c2882727aad70fc76c75f_6172dc119346d75b3d51830c_Ice%20Age.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="mega-tsunami" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="mega-tsunami"></div><a href="/cards/mega-tsunami" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="MEGA TSUNAMI" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a110cbae0225c7adde2a0a_Mega-Tsunami.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="the-four-horsemen" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="the-four-horsemen"></div><a href="/cards/the-four-horsemen" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="THE FOUR HORSEMEN" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c28bb3ba0333a3d67e908_6172f11a346461a6ca5cabc7_The%20Four%20Horsemen.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="grey-goo" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="grey-goo"></div><a href="/cards/grey-goo" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="GREY GOO" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c28d4eb777cef18c40da0_6172db0b0507d95c5f905296_Grey%20Goo.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="mass-extinction" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="mass-extinction"></div><a href="/cards/mass-extinction" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="MASS EXTINCTION" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c292262d4497c14172569_6172e821f27b364a7b0eb882_Mass%20Extinction.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="nuclear-winter" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="nuclear-winter"></div><a href="/cards/nuclear-winter" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="NUCLEAR WINTER" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a111090c5c8e65636ff442_Nuclear-Winter.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="solar-flare" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="solar-flare"></div><a href="/cards/solar-flare" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="SOLAR FLARE" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c29464a0db90092ca724c_6172f04ca67ad31d0c4a0321_Solar%20Flare.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="super-volcano" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="super-volcano"></div><a href="/cards/super-volcano" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="SUPER VOLCANO" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c295462d4494a6f1726ca_6172f07a9cba39736f6f27a2_Super%20Volcano.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="ai-takeover" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="ai-takeover"></div><a href="/cards/ai-takeover" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="AI TAKEOVER" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/63a08329d532a8ae5e2ac8c9_AI-Takeover.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="pulse-event" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="pulse-event"></div><a href="/cards/pulse-event" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="PULSE EVENT" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c2994c470ae31527168f7_6172ef73a9783b10d161261e_Pulse%20Event.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="retrovirus" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="retrovirus"></div><a href="/cards/retrovirus" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="RETROVIRUS" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c29a6f418543c0b631214_6172efcc9cba39360a6ee18d_Retrovirus.png" width="100" class="card-main"></a></div><div wfu-lightbox-group="the-birth-of-life" role="listitem" class="collection-item-5 w-dyn-item"><a href="#" class="lightbox-alt-art-1 alt-art-homepage alt-art-homepage-button w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><a href="#" class="lightbox-alt-art-1 alt-art-homepage w-inline-block w-dyn-bind-empty w-lightbox" aria-label="open lightbox" aria-haspopup="dialog"><script type="application/json" class="w-json">{
+  "items": [],
+  "group": ""
+}</script></a><div class="html-embed-3 w-embed"><input type="hidden" class="jetboost-list-item" value="the-birth-of-life"></div><a href="/cards/the-birth-of-life" class="link-block w-inline-block"><div class="alt-art-icon-wrapper secondary-button w-condition-invisible"><img src="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png" loading="lazy" sizes="100vw" srcset="https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-500.png 500w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main-p-800.png 800w, https://cdn.prod.website-files.com/612d407a6dfd3c1f0df39809/65f89e8b6d96de60f6b656fd_Alt%20Art%20Main.png 1061w" alt="" class="alt-art-icon alt-art-icon-2"></div><img alt="THE BIRTH OF LIFE" src="https://cdn.prod.website-files.com/61494314e1322b4a29b5462a/626c29bcf57bdf3b920ad268_6172f41331cdeb5b68ac4b76_The%20Birth%20of%20Life.png" width="100" class="card-main"></a></div></div>
