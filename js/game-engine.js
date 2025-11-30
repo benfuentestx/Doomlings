@@ -750,7 +750,7 @@ export class CardEffects {
           if (stolenTrait.effects) {
             for (const effect of stolenTrait.effects) {
               if (effect.name === 'modify_gene_pool' && effect.params.affected_players === 'self') {
-                player.genePool = Math.max(1, Math.min(10, player.genePool + effect.params.value));
+                player.genePool = Math.max(1, Math.min(8, player.genePool + effect.params.value));
                 gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
               }
             }
@@ -767,7 +767,7 @@ export class CardEffects {
         if (copiedTrait.effects) {
           for (const effect of copiedTrait.effects) {
             if (effect.name === 'modify_gene_pool' && effect.params.affected_players === 'self') {
-              player.genePool = Math.max(1, Math.min(10, player.genePool + effect.params.value));
+              player.genePool = Math.max(1, Math.min(8, player.genePool + effect.params.value));
               gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
             }
           }
@@ -1157,7 +1157,7 @@ export class GameState {
                          params.affected_players === 'self' ? [this.players[this.currentPlayerIndex]] :
                          this.players;
           for (const player of targets) {
-            player.genePool = Math.max(1, Math.min(10, player.genePool + params.value));
+            player.genePool = Math.max(1, Math.min(8, player.genePool + params.value));
           }
           this.log(`Gene Pools modified by ${params.value > 0 ? '+' : ''}${params.value}`);
           break;
@@ -1257,7 +1257,7 @@ export class GameState {
     if (this.currentAge.genePoolEffect) {
       const effect = this.currentAge.genePoolEffect;
       for (const player of this.players) {
-        player.genePool = Math.max(1, Math.min(10, player.genePool + effect));
+        player.genePool = Math.max(1, Math.min(8, player.genePool + effect));
       }
       this.log(`All Gene Pools ${effect > 0 ? '+' : ''}${effect}`);
     }
@@ -1376,17 +1376,17 @@ export class GameState {
           const { affected_players, value } = effect.params;
 
           if (affected_players === 'self') {
-            player.genePool = Math.max(1, Math.min(10, player.genePool + value));
+            player.genePool = Math.max(1, Math.min(8, player.genePool + value));
             this.log(`${player.name}'s Gene Pool changed to ${player.genePool} (${card.name} removed)`);
           } else if (affected_players === 'all') {
             for (const p of this.players) {
-              p.genePool = Math.max(1, Math.min(10, p.genePool + value));
+              p.genePool = Math.max(1, Math.min(8, p.genePool + value));
             }
             this.log(`All Gene Pools adjusted (${card.name} removed)`);
           } else if (affected_players === 'opponents') {
             for (const p of this.players) {
               if (p.id !== player.id) {
-                p.genePool = Math.max(1, Math.min(10, p.genePool + value));
+                p.genePool = Math.max(1, Math.min(8, p.genePool + value));
               }
             }
             this.log(`Opponents' Gene Pools adjusted (${card.name} removed)`);
@@ -1448,17 +1448,17 @@ export class GameState {
         if (effect.name === 'modify_gene_pool') {
           const { affected_players, value } = effect.params;
           if (affected_players === 'self') {
-            player.genePool = Math.max(1, Math.min(10, player.genePool + value));
+            player.genePool = Math.max(1, Math.min(8, player.genePool + value));
             this.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
           } else if (affected_players === 'all') {
             for (const p of this.players) {
-              p.genePool = Math.max(1, Math.min(10, p.genePool + value));
+              p.genePool = Math.max(1, Math.min(8, p.genePool + value));
             }
             this.log(`All Gene Pools modified by ${value > 0 ? '+' : ''}${value}`);
           } else if (affected_players === 'opponents') {
             for (const p of this.players) {
               if (p.id !== player.id) {
-                p.genePool = Math.max(1, Math.min(10, p.genePool + value));
+                p.genePool = Math.max(1, Math.min(8, p.genePool + value));
               }
             }
             this.log(`Opponents' Gene Pools modified by ${value > 0 ? '+' : ''}${value}`);
@@ -1660,7 +1660,7 @@ export class GameState {
     if (this.currentAge.genePoolEffect) {
       const effect = this.currentAge.genePoolEffect;
       for (const player of this.players) {
-        player.genePool = Math.max(1, Math.min(10, player.genePool + effect));
+        player.genePool = Math.max(1, Math.min(8, player.genePool + effect));
       }
     }
 
