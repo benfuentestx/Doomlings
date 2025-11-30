@@ -494,12 +494,29 @@ input:focus {
 .my-hand {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.my-hand::-webkit-scrollbar {
+  height: 8px;
+}
+
+.my-hand::-webkit-scrollbar-thumb {
+  background: var(--bg-light);
+  border-radius: 4px;
+}
+
+.my-hand::-webkit-scrollbar-track {
+  background: var(--bg-dark);
 }
 
 /* Hand card image view */
 .hand-card-image {
+  flex: 0 0 auto;
   width: 80px;
   height: 112px;
   border-radius: 8px;
@@ -509,6 +526,7 @@ input:focus {
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  scroll-snap-align: start;
 }
 
 .hand-card-image img {
@@ -568,6 +586,7 @@ input:focus {
 
 /* Cards */
 .card {
+  flex: 0 0 auto;
   width: 120px;
   min-height: 170px;
   border-radius: 10px;
@@ -578,6 +597,7 @@ input:focus {
   transition: all 0.2s ease;
   position: relative;
   border: 3px solid transparent;
+  scroll-snap-align: start;
 }
 
 .card:hover {
