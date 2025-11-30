@@ -661,19 +661,19 @@
       div.dataset.index = index;
 
       let typeText = '';
-      if (card.dominant) typeText = 'DOMINANT';
-      else if (card.action) typeText = 'ACTION';
-      else if (card.drops) typeText = 'DROP';
-      else if (card.gene_pool) typeText = 'GENE POOL';
-      else if (card.worlds_end) typeText = "WORLD'S END";
-      else if (card.effectless) typeText = 'TRAIT';
+      if (card.isDominant) typeText = 'DOMINANT';
+      else if (card.actions && card.actions.length > 0) typeText = 'ACTION';
+      else if (card.bonusPoints) typeText = 'DROP';
+      else if (card.effects && card.effects.some(e => e.name === 'modify_gene_pool')) typeText = 'GENE POOL';
+      else if (card.worldsEnd) typeText = "WORLD'S END";
+      else typeText = 'TRAIT';
 
       let effectText = getCardEffectText(card);
 
       div.innerHTML = `
         <div class="card-color" style="background: ${getColorValue(card.color)}"></div>
-        <div class="card-face">${formatFace(card.face)}</div>
-        <div class="card-name">${card.trait}</div>
+        <div class="card-face">${formatFace(card.faceValue)}</div>
+        <div class="card-name">${card.name}</div>
         <div class="card-effect">${effectText}</div>
         <div class="card-type">${typeText}</div>
       `;
@@ -699,20 +699,46 @@
     }
 
     function formatFace(face) {
+      if (face === null || face === undefined) return '?';
       if (face === 'variable') return '?';
       if (face === 'copy_1st_dominant') return '=';
       return face;
     }
 
     function getCardEffectText(card) {
-      if (card.effectless) return '';
-      if (card.drop_effect) return formatDropEffect(card.drop_effect);
-      if (card.action) return 'Action effect';
-      if (card.dominant) return 'Dominant';
-      if (card.gene_pool) {
-        const effect = card.gene_pool_effect || 0;
-        return `Genes: ${effect >= 0 ? '+' : ''}${effect}`;
+      // Check for actionDescription (from new format)
+      if (card.actionDescription) return card.actionDescription;
+
+      // Check for bonus points
+      if (card.bonusPoints) {
+        return card.bonusDescription || 'Bonus points';
       }
+
+      // Check for actions
+      if (card.actions && card.actions.length > 0) {
+        return card.actionDescription || 'Action effect';
+      }
+
+      // Check for dominant
+      if (card.isDominant) {
+        return card.requirementDescription || 'Dominant';
+      }
+
+      // Check for gene pool effects
+      if (card.effects) {
+        for (const effect of card.effects) {
+          if (effect.name === 'modify_gene_pool') {
+            const val = effect.params.value || 0;
+            return `Genes: ${val >= 0 ? '+' : ''}${val}`;
+          }
+        }
+      }
+
+      // Check for world's end
+      if (card.worldsEnd && card.worldsEndDescription) {
+        return card.worldsEndDescription;
+      }
+
       return '';
     }
 
@@ -755,8 +781,8 @@
           </div>
           <div class="opponent-traits">
             ${opp.traitPile.map(t => `
-              <div class="mini-trait ${getColorClass(t.color)}" title="${t.trait} (${t.face})">
-                ${formatFace(t.face)}
+              <div class="mini-trait ${getColorClass(t.color)}" title="${t.name} (${t.faceValue})">
+                ${formatFace(t.faceValue)}
               </div>
             `).join('')}
           </div>
@@ -959,46 +985,55 @@
 
       let typeText = '';
       let showStar = false;
-      if (card.dominant) {
+      if (card.isDominant) {
         typeText = 'DOMINANT';
         showStar = true;
-      } else if (card.action) {
+      } else if (card.actions && card.actions.length > 0) {
         typeText = 'ACTION';
-      } else if (card.drops) {
+      } else if (card.bonusPoints) {
         typeText = 'DROP';
-      } else if (card.gene_pool) {
+      } else if (card.effects && card.effects.some(e => e.name === 'modify_gene_pool')) {
         typeText = 'GENE POOL';
-      } else if (card.worlds_end) {
+      } else if (card.worldsEnd) {
         typeText = "WORLD'S END";
-      } else if (card.effectless) {
-        typeText = 'TRAIT';
       } else {
         typeText = 'TRAIT';
       }
 
-      // For detail view, prioritize the full effect description
-      let effectText = card.effect || '';
+      // For detail view, prioritize description fields from new format
+      let effectText = '';
 
-      // Look up effect description from our comprehensive mapping
-      if (!effectText && cardEffectDescriptions[card.trait]) {
-        effectText = cardEffectDescriptions[card.trait];
+      // Check for actionDescription, bonusDescription, worldsEndDescription
+      if (card.actionDescription) {
+        effectText = card.actionDescription;
+      } else if (card.bonusDescription) {
+        effectText = card.bonusDescription;
+      } else if (card.requirementDescription) {
+        effectText = card.requirementDescription;
+      } else if (card.worldsEndDescription) {
+        effectText = card.worldsEndDescription;
       }
 
-      // For drop cards without a mapped description, parse the drop_effect
-      if (!effectText && card.drop_effect) {
-        effectText = formatDropEffect(card.drop_effect);
+      // Look up effect description from our comprehensive mapping
+      if (!effectText && cardEffectDescriptions[card.name]) {
+        effectText = cardEffectDescriptions[card.name];
       }
 
       // For gene pool cards, show the gene pool effect
-      if (!effectText && card.gene_pool) {
-        const gpEffect = card.gene_pool_effect || 0;
-        effectText = `Gene Pool: ${gpEffect >= 0 ? '+' : ''}${gpEffect}`;
+      if (!effectText && card.effects) {
+        for (const effect of card.effects) {
+          if (effect.name === 'modify_gene_pool') {
+            const val = effect.params.value || 0;
+            effectText = `Gene Pool: ${val >= 0 ? '+' : ''}${val}`;
+            break;
+          }
+        }
       }
 
       const colorClass = getColorClass(card.color);
 
       // Clean up card name - remove suffixes like (g), (1), (~), (r), etc.
-      let displayName = card.trait.replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+      let displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
 
       // Try to get real card image - check mapping first, then use default conversion
       let imageName;
@@ -1027,7 +1062,7 @@
               <span class="artwork-placeholder">Image Not Found</span>
             </div>
             <div class="card-detail-effect">${effectText || 'No special effect'}</div>
-            <div class="card-detail-face">${formatFace(card.face)}</div>
+            <div class="card-detail-face">${formatFace(card.faceValue)}</div>
           </div>
         </div>
       `;
@@ -1214,8 +1249,8 @@
             ${opp.traits.map(t => `
               <div class="card ${getColorClass(t.color)}" style="cursor: pointer;"
                    onclick="window.selectOpponentTrait('${opp.id}', ${t.index})">
-                <div class="card-face">${formatFace(t.face)}</div>
-                <div class="card-name">${t.trait}</div>
+                <div class="card-face">${formatFace(t.faceValue)}</div>
+                <div class="card-name">${t.name}</div>
               </div>
             `).join('')}
           </div>
@@ -1235,8 +1270,8 @@
       const cardsHtml = action.options.map((c, i) => `
         <div class="card ${getColorClass(c.color)}" data-index="${c.index}"
              style="cursor: pointer;" onclick="window.toggleCardSelection(${c.index}, ${count})">
-          <div class="card-face">${formatFace(c.face)}</div>
-          <div class="card-name">${c.trait}</div>
+          <div class="card-face">${formatFace(c.faceValue)}</div>
+          <div class="card-name">${c.name}</div>
         </div>
       `).join('');
       showModal(`Select ${count} card(s)`, cardsHtml, true, action.optional);
@@ -1269,8 +1304,8 @@
       const cardsHtml = action.options.map(t => `
         <div class="card ${getColorClass(t.color)}" style="cursor: pointer;"
              onclick="window.selectOwnTrait(${t.index})">
-          <div class="card-face">${formatFace(t.face)}</div>
-          <div class="card-name">${t.trait}</div>
+          <div class="card-face">${formatFace(t.faceValue)}</div>
+          <div class="card-name">${t.name}</div>
         </div>
       `).join('');
       showModal(action.message || 'Select Trait', cardsHtml, false, action.optional);
@@ -1285,8 +1320,8 @@
       const cardsHtml = action.options.map(c => `
         <div class="card ${getColorClass(c.color)}" style="cursor: pointer;"
              onclick="window.selectFromDiscard(${c.index})">
-          <div class="card-face">${formatFace(c.face)}</div>
-          <div class="card-name">${c.trait}</div>
+          <div class="card-face">${formatFace(c.faceValue)}</div>
+          <div class="card-name">${c.name}</div>
         </div>
       `).join('');
       showModal('Select from Discard', cardsHtml, false, action.optional);
