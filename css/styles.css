@@ -358,6 +358,11 @@ input:focus {
   box-shadow: 0 0 15px rgba(243, 156, 18, 0.3);
 }
 
+.opponent-card.current-turn .opponent-traits {
+  border-color: var(--warning);
+  border-width: 3px;
+}
+
 .opponent-header {
   display: flex;
   justify-content: space-between;
@@ -406,6 +411,9 @@ input:focus {
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 8px;
+  padding: 8px;
+  border: 2px solid var(--bg-light);
+  border-radius: 8px;
 }
 
 .opponent-trait-card {
@@ -467,6 +475,7 @@ input:focus {
   background: var(--bg-medium);
   border-radius: 12px;
   padding: 20px;
+  border: 3px solid var(--success);
 }
 
 .my-traits h3 {
@@ -841,29 +850,9 @@ input:focus {
   to { transform: rotate(360deg); }
 }
 
-/* Gene Pool Display */
+/* Gene pool - hidden in header (now shown in hand area) */
 .gene-pool-display {
-  background: var(--bg-light);
-  padding: 8px 16px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.gene-pool-label {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.gene-pool-value {
-  font-weight: 700;
-  color: var(--success);
-  font-size: 1.1rem;
-}
-
-.gene-pool-value.negative {
-  color: var(--danger);
+  display: none;
 }
 
 /* Responsive - Tablet */
