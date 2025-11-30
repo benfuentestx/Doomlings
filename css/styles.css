@@ -1625,8 +1625,8 @@ input:focus {
 
 .age-announce-image-container {
   width: 100%;
-  max-width: 280px;
-  margin: 0 auto 20px;
+  max-width: 220px;
+  margin: 0 auto 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1635,9 +1635,10 @@ input:focus {
 .age-announce-image {
   width: 100%;
   height: auto;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
   display: block;
+  transition: transform 0.2s ease;
 }
 
 .age-announce-effect {
@@ -1694,8 +1695,8 @@ input:focus {
   }
 
   .age-announce-image-container {
-    max-width: 240px;
-    margin-bottom: 16px;
+    max-width: 200px;
+    margin-bottom: 20px;
   }
 
   .age-announce-effect {

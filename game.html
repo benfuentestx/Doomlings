@@ -1000,20 +1000,24 @@
       ageAnnounceImage.src = ageImageUrl;
       ageAnnounceImage.alt = age.name;
 
-      // Build effect description
-      let effectText = age.effect || '';
+      // Build effect description - only show if there's actual meaningful effect text
+      let effectText = '';
       if (age.ruleEffectText) {
-        effectText += (effectText ? '<br><br>' : '') + age.ruleEffectText;
+        effectText = age.ruleEffectText;
       }
       if (age.genePoolEffect) {
         const gp = age.genePoolEffect;
-        effectText += (effectText ? '<br><br>' : '') + `Gene Pool: ${gp > 0 ? '+' : ''}${gp}`;
-      }
-      if (!effectText) {
-        effectText = isCatastrophe ? 'A catastrophic event affects all players!' : 'A new age begins...';
+        const gpText = `Gene Pool: ${gp > 0 ? '+' : ''}${gp}`;
+        effectText += (effectText ? '<br><br>' : '') + gpText;
       }
 
-      ageAnnounceEffect.innerHTML = effectText;
+      // Only show effect container if there's actual effect text, otherwise hide it
+      if (effectText) {
+        ageAnnounceEffect.innerHTML = effectText;
+        ageAnnounceEffect.style.display = 'block';
+      } else {
+        ageAnnounceEffect.style.display = 'none';
+      }
       ageAnnounceOverlay.style.display = 'flex';
       lastShownAgeName = age.name;
     }
