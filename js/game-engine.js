@@ -1051,7 +1051,7 @@ export class GameState {
       hand: [],
       traitPile: [],
       score: 0,
-      genePool: 5, // Starting gene pool size
+      genePool: 0, // Birth of Life age will set this to 5
       connected: true,
       needsStabilize: false
     };
@@ -1087,11 +1087,7 @@ export class GameState {
     this.ageDeck = DeckManager.createAgeDeck();
     this.traitDeck = DeckManager.createTraitDeck();
 
-    // Each player starts with their gene pool size worth of cards (5)
-    for (const player of this.players) {
-      player.hand = this.drawCards(player.genePool);
-      player.genePool = 5;
-    }
+    // Players will receive their initial cards from Birth of Life age effect
 
     // Random first player
     this.firstPlayerIndex = Math.floor(Math.random() * this.players.length);
@@ -1192,7 +1188,24 @@ export class GameState {
           break;
 
         case 'stabilize_all_players':
-          // This is handled automatically at start
+          // Draw/discard to match gene pool for all players
+          for (const player of this.players) {
+            const target = player.genePool;
+            const current = player.hand.length;
+            if (current < target) {
+              // Draw up to gene pool
+              const drawn = this.drawCards(target - current);
+              player.hand.push(...drawn);
+            } else if (current > target) {
+              // Discard down to gene pool (random for simplicity)
+              const toDiscard = current - target;
+              for (let i = 0; i < toDiscard; i++) {
+                const idx = Math.floor(Math.random() * player.hand.length);
+                this.discardPile.push(player.hand.splice(idx, 1)[0]);
+              }
+            }
+          }
+          this.log('All players stabilized to their gene pool size');
           break;
 
         case 'modify_number_cards_turn':
