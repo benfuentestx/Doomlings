@@ -1655,6 +1655,8 @@ input:focus {
 .card-detail-card.purple { background: linear-gradient(145deg, #7d3c98, #9b59b6); }
 .card-detail-card.colorless { background: linear-gradient(145deg, #7f8c8d, #95a5a6); }
 .card-detail-card.multi { background: var(--color-multi); }
+.card-detail-card.age-card-detail { background: linear-gradient(145deg, #34495e, #5d6d7e); }
+.card-detail-card.catastrophe-card { background: linear-gradient(145deg, #641e16, #943126); }
 
 .card-detail-type-badge {
   position: absolute;

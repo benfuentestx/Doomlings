@@ -186,6 +186,7 @@
     const cardDetailCounter = document.getElementById('card-detail-counter');
 
     let lastShownAgeName = null; // Track which age we've shown
+    let ageHistory = [];           // Track all ages played in order
 
     // Card detail navigation state
     let cardDetailCards = [];      // Array of cards being viewed
@@ -444,6 +445,10 @@
         // Show age announcement if this is a new age
         if (gameState.currentAge.name !== lastShownAgeName) {
           showAgeAnnouncement(gameState.currentAge);
+          // Add to age history if not already there
+          if (!ageHistory.find(age => age.name === gameState.currentAge.name)) {
+            ageHistory.push({...gameState.currentAge});
+          }
         }
       }
 
@@ -984,9 +989,14 @@
       const card = cardDetailCards[cardDetailIndex];
       if (!card) return;
 
+      // Check if this is an age card
+      const isAge = card.type === 'age' || card.type === 'catastrophe';
+
       let typeText = '';
       let showStar = false;
-      if (card.isDominant) {
+      if (isAge) {
+        typeText = card.type === 'catastrophe' ? 'CATASTROPHE' : 'AGE';
+      } else if (card.isDominant) {
         typeText = 'DOMINANT';
         showStar = true;
       } else if (card.actions && card.actions.length > 0) {
@@ -1004,8 +1014,10 @@
       // For detail view, prioritize description fields from new format
       let effectText = '';
 
-      // Check for actionDescription, bonusDescription, worldsEndDescription
-      if (card.actionDescription) {
+      // For ages, use description or effect field
+      if (isAge) {
+        effectText = card.description || card.effect || '';
+      } else if (card.actionDescription) {
         effectText = card.actionDescription;
       } else if (card.bonusDescription) {
         effectText = card.bonusDescription;
@@ -1031,7 +1043,10 @@
         }
       }
 
-      const colorClass = getColorClass(card.color);
+      // For ages, use special color class; for traits use normal color
+      const colorClass = isAge
+        ? (card.type === 'catastrophe' ? 'catastrophe-card' : 'age-card-detail')
+        : getColorClass(card.color);
 
       // Clean up card name - remove suffixes like (g), (1), (~), (r), etc.
       let displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
@@ -1063,7 +1078,7 @@
               <span class="artwork-placeholder">Image Not Found</span>
             </div>
             <div class="card-detail-effect">${effectText || 'No special effect'}</div>
-            <div class="card-detail-face">${formatFace(card.faceValue)}</div>
+            ${!isAge ? `<div class="card-detail-face">${formatFace(card.faceValue)}</div>` : ''}
           </div>
         </div>
       `;
@@ -1076,8 +1091,9 @@
       cardDetailCounter.textContent = `${cardDetailIndex + 1} / ${cardDetailCards.length}`;
       cardDetailCounter.style.display = cardDetailCards.length > 1 ? 'block' : 'none';
 
-      // Show play button only if viewing hand and it's player's turn to play
-      const canPlay = cardDetailSource === 'hand' &&
+      // Show play button only if viewing hand and it's player's turn to play (not for ages)
+      const canPlay = !isAge &&
+                      cardDetailSource === 'hand' &&
                       gameState &&
                       gameState.isMyTurn &&
                       gameState.turnPhase === 'play' &&
@@ -1106,6 +1122,23 @@
       const cardIndex = cardDetailIndex;
       cardDetailOverlay.style.display = 'none';
       playCard(cardIndex);
+    }
+
+    // Show age history in card detail view
+    function showAgeHistory() {
+      if (ageHistory.length === 0) return;
+
+      // Find current age index in history
+      const currentIndex = gameState.currentAge
+        ? ageHistory.findIndex(age => age.name === gameState.currentAge.name)
+        : ageHistory.length - 1;
+
+      showCardDetail(
+        ageHistory[currentIndex >= 0 ? currentIndex : ageHistory.length - 1],
+        ageHistory,
+        currentIndex >= 0 ? currentIndex : ageHistory.length - 1,
+        'ages'
+      );
     }
 
     // Event listeners for card detail
@@ -1139,6 +1172,14 @@
       else if (e.key === 'ArrowRight') showNextCard();
       else if (e.key === 'Escape') cardDetailOverlay.style.display = 'none';
     });
+
+    // Make age card clickable to show history
+    ageCard.addEventListener('click', () => {
+      showAgeHistory();
+    });
+
+    // Add cursor pointer style to age card
+    ageCard.style.cursor = 'pointer';
 
     // Render action log
     function renderLog() {
