@@ -19,9 +19,10 @@ export class DeckManager {
     const ages = this.shuffle([...ageCards]);
     const cats = this.shuffle([...catastrophes]).slice(0, 3);
 
-    const pile1 = ages.slice(0, 9);
-    const pile2 = ages.slice(9, 19);
-    const pile3 = ages.slice(19, 28);
+    // Per rulebook: 3 piles with 3 ages each, plus 1 catastrophe per pile
+    const pile1 = ages.slice(0, 3);
+    const pile2 = ages.slice(3, 6);
+    const pile3 = ages.slice(6, 9);
 
     pile1.push(cats[0]);
     pile2.push(cats[1]);
