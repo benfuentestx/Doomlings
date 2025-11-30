@@ -1093,12 +1093,12 @@
       const imageName = cardImageMapping[displayName] || displayName;
       const imageUrl = `images/cards/${imageName}.png`;
 
-      cardDetailContent.className = `card-detail-card ${colorClass}`;
+      cardDetailContent.className = 'card-detail-card';
       cardDetailContent.innerHTML = `
         <div class="card-detail-image-container">
           <img class="card-detail-image" src="${imageUrl}" alt="${displayName}"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="card-detail-fallback" style="display: none;">
+          <div class="card-detail-fallback ${colorClass}" style="display: none;">
             <div class="card-detail-type-badge">${typeText}</div>
             ${showStar ? '<div class="card-detail-star">★</div>' : ''}
             <div class="card-detail-name-banner">
