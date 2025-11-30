@@ -2,10 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- PORTRAIT MOBILE ONLY: This game is designed exclusively for portrait mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Doomlings - Game</title>
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <style>
+    /* Force portrait orientation - warn users on landscape */
+    @media screen and (orientation: landscape) and (max-height: 600px) {
+      body::before {
+        content: '↻ Please rotate your device to portrait mode';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.95);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        font-size: 1.5rem;
+        text-align: center;
+        padding: 20px;
+      }
+    }
+  </style>
+
 </head>
 <body>
   <div class="game-container" id="game-container">
