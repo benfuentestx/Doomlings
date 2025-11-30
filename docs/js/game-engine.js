@@ -524,21 +524,43 @@ export class CardEffects {
         return { success: true };
 
       case 'steal_trait':
-        const stolenTrait = targetPlayer.traitPile.splice(data.traitIndex, 1)[0];
-        player.traitPile.push(stolenTrait);
-        gameState.log(`${player.name} stole ${stolenTrait.trait} from ${targetPlayer.name}`);
+        // Remove from target (reversing their gene pool effect)
+        const stolenTrait = gameState.removeTraitFromPile(targetPlayer, data.traitIndex);
+        if (stolenTrait) {
+          // Add to player's pile and apply gene pool effect to new owner
+          player.traitPile.push(stolenTrait);
+          if (stolenTrait.gene_pool && stolenTrait.gene_pool_effect) {
+            const target = stolenTrait.gene_pool_target || 'self';
+            if (target === 'self') {
+              player.genePool = Math.max(1, Math.min(10, player.genePool + stolenTrait.gene_pool_effect));
+              gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
+            }
+          }
+          gameState.log(`${player.name} stole ${stolenTrait.trait} from ${targetPlayer.name}`);
+        }
         return { success: true };
 
       case 'copy_trait':
         const copiedTrait = { ...targetPlayer.traitPile[data.traitIndex], instanceId: `copy_${Date.now()}` };
         player.traitPile.push(copiedTrait);
+        // Apply gene pool effect for the copy
+        if (copiedTrait.gene_pool && copiedTrait.gene_pool_effect) {
+          const target = copiedTrait.gene_pool_target || 'self';
+          if (target === 'self') {
+            player.genePool = Math.max(1, Math.min(10, player.genePool + copiedTrait.gene_pool_effect));
+            gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
+          }
+        }
         gameState.log(`${player.name} copied ${copiedTrait.trait}`);
         return { success: true };
 
       case 'discard_opponent_trait':
-        const discardedTrait = targetPlayer.traitPile.splice(data.traitIndex, 1)[0];
-        gameState.discardPile.push(discardedTrait);
-        gameState.log(`${player.name} discarded ${discardedTrait.trait} from ${targetPlayer.name}`);
+        // Remove from target (reversing their gene pool effect)
+        const discardedTrait = gameState.removeTraitFromPile(targetPlayer, data.traitIndex);
+        if (discardedTrait) {
+          gameState.discardPile.push(discardedTrait);
+          gameState.log(`${player.name} discarded ${discardedTrait.trait} from ${targetPlayer.name}`);
+        }
         return { success: true };
 
       default:
@@ -567,9 +589,12 @@ export class CardEffects {
         return { success: true };
 
       case 'return_trait':
-        const returnedTrait = player.traitPile.splice(data.index, 1)[0];
-        player.hand.push(returnedTrait);
-        gameState.log(`${player.name} returned ${returnedTrait.trait} to hand`);
+        // Remove from trait pile (reversing gene pool effect)
+        const returnedTrait = gameState.removeTraitFromPile(player, data.index);
+        if (returnedTrait) {
+          player.hand.push(returnedTrait);
+          gameState.log(`${player.name} returned ${returnedTrait.trait} to hand`);
+        }
         return { success: true };
 
       case 'search_discard':
@@ -602,9 +627,11 @@ export class CardEffects {
       case 'discard_trait':
         if (player.traitPile.length > 0) {
           const idx = Math.floor(Math.random() * player.traitPile.length);
-          const discarded = player.traitPile.splice(idx, 1)[0];
-          gameState.discardPile.push(discarded);
-          gameState.log(`${player.name} lost ${discarded.trait}`);
+          const discarded = gameState.removeTraitFromPile(player, idx);
+          if (discarded) {
+            gameState.discardPile.push(discarded);
+            gameState.log(`${player.name} lost ${discarded.trait}`);
+          }
         }
         break;
 
@@ -616,32 +643,40 @@ export class CardEffects {
             const val = Scoring.getBaseFaceValue(player.traitPile[i], gameState, player);
             if (val < lowestValue) { lowestValue = val; lowestIdx = i; }
           }
-          const discarded = player.traitPile.splice(lowestIdx, 1)[0];
-          gameState.discardPile.push(discarded);
-          gameState.log(`${player.name} lost ${discarded.trait} (lowest)`);
+          const discarded = gameState.removeTraitFromPile(player, lowestIdx);
+          if (discarded) {
+            gameState.discardPile.push(discarded);
+            gameState.log(`${player.name} lost ${discarded.trait} (lowest)`);
+          }
         }
         break;
 
       case 'discard_colorless':
-        const colorless = player.traitPile.filter(c => c.color === 'Colorless');
-        for (const card of colorless) {
-          const idx = player.traitPile.indexOf(card);
-          if (idx !== -1) {
-            player.traitPile.splice(idx, 1);
-            gameState.discardPile.push(card);
+        // Find all colorless traits and remove them (in reverse order to maintain indices)
+        const colorlessIndices = [];
+        for (let i = 0; i < player.traitPile.length; i++) {
+          if (player.traitPile[i].color === 'Colorless' && !player.traitPile[i].dominant) {
+            colorlessIndices.push(i);
           }
         }
-        if (colorless.length > 0) gameState.log(`${player.name} lost ${colorless.length} Colorless trait(s)`);
+        let removedCount = 0;
+        for (let i = colorlessIndices.length - 1; i >= 0; i--) {
+          const discarded = gameState.removeTraitFromPile(player, colorlessIndices[i]);
+          if (discarded) {
+            gameState.discardPile.push(discarded);
+            removedCount++;
+          }
+        }
+        if (removedCount > 0) gameState.log(`${player.name} lost ${removedCount} Colorless trait(s)`);
         break;
 
       case 'discard_color':
-        const colorCards = player.traitPile.filter(c => DeckManager.isColor(c, catastrophe.color));
-        if (colorCards.length > 0) {
-          const idx = player.traitPile.indexOf(colorCards[0]);
-          if (idx !== -1) {
-            player.traitPile.splice(idx, 1);
-            gameState.discardPile.push(colorCards[0]);
-            gameState.log(`${player.name} lost ${colorCards[0].trait}`);
+        const colorIdx = player.traitPile.findIndex(c => DeckManager.isColor(c, catastrophe.color) && !c.dominant);
+        if (colorIdx !== -1) {
+          const discarded = gameState.removeTraitFromPile(player, colorIdx);
+          if (discarded) {
+            gameState.discardPile.push(discarded);
+            gameState.log(`${player.name} lost ${discarded.trait}`);
           }
         }
         break;
@@ -865,7 +900,7 @@ export class GameState {
     return cards;
   }
 
-  // Check if a card can be played based on current age rules
+  // Check if a card can be played based on current age rules and play conditions
   canPlayCard(player, card) {
     // Check age rule effects
     if (this.ageEffect === 'no_green' && DeckManager.isColor(card, 'Green')) {
@@ -886,7 +921,68 @@ export class GameState {
       return { canPlay: false, reason: 'Already have 2 dominant traits' };
     }
 
+    // Check play conditions (e.g., Heroic needs 3 Green, Delicious needs 1 Colorless)
+    const conditionCheck = this.checkPlayConditions(player, card);
+    if (!conditionCheck.canPlay) {
+      return conditionCheck;
+    }
+
     return { canPlay: true };
+  }
+
+  // Check card-specific play conditions
+  checkPlayConditions(player, card) {
+    const traitName = card.trait;
+
+    // Heroic: Requires at least 3 Green traits in trait pile
+    if (traitName === 'Heroic') {
+      const greenCount = player.traitPile.filter(c => DeckManager.isColor(c, 'Green')).length;
+      if (greenCount < 3) {
+        return { canPlay: false, reason: 'Heroic requires 3 Green traits in your trait pile' };
+      }
+    }
+
+    // Delicious: Requires at least 1 Colorless trait in trait pile
+    if (traitName === 'Delicious') {
+      const colorlessCount = player.traitPile.filter(c => c.color === 'Colorless').length;
+      if (colorlessCount < 1) {
+        return { canPlay: false, reason: 'Delicious requires 1 Colorless trait in your trait pile' };
+      }
+    }
+
+    return { canPlay: true };
+  }
+
+  // Remove a trait from a player's pile and apply remove effects (reverse gene pool changes)
+  removeTraitFromPile(player, cardIndex) {
+    if (cardIndex < 0 || cardIndex >= player.traitPile.length) return null;
+
+    const card = player.traitPile.splice(cardIndex, 1)[0];
+
+    // Apply remove effects - reverse gene pool changes
+    if (card.gene_pool && card.gene_pool_effect) {
+      const reverseEffect = -card.gene_pool_effect;
+      const target = card.gene_pool_target || 'self';
+
+      if (target === 'self') {
+        player.genePool = Math.max(1, Math.min(10, player.genePool + reverseEffect));
+        this.log(`${player.name}'s Gene Pool changed to ${player.genePool} (${card.trait} removed)`);
+      } else if (target === 'all') {
+        for (const p of this.players) {
+          p.genePool = Math.max(1, Math.min(10, p.genePool + reverseEffect));
+        }
+        this.log(`All Gene Pools adjusted (${card.trait} removed)`);
+      } else if (target === 'opponents') {
+        for (const p of this.players) {
+          if (p.id !== player.id) {
+            p.genePool = Math.max(1, Math.min(10, p.genePool + reverseEffect));
+          }
+        }
+        this.log(`Opponents' Gene Pools adjusted (${card.trait} removed)`);
+      }
+    }
+
+    return card;
   }
 
   // Check if player has any playable cards
@@ -1178,16 +1274,24 @@ export class GameState {
         break;
       case 'discard_all_colorless':
         for (const player of this.players) {
-          const colorless = player.traitPile.filter(c => c.color === 'Colorless' && !c.dominant);
-          for (const card of colorless) {
-            const idx = player.traitPile.indexOf(card);
-            if (idx !== -1) {
-              player.traitPile.splice(idx, 1);
-              this.discardPile.push(card);
+          // Find all colorless non-dominant traits
+          const colorlessIndices = [];
+          for (let i = 0; i < player.traitPile.length; i++) {
+            if (player.traitPile[i].color === 'Colorless' && !player.traitPile[i].dominant) {
+              colorlessIndices.push(i);
             }
           }
-          if (colorless.length > 0) {
-            this.log(`${player.name} lost ${colorless.length} Colorless traits`);
+          // Remove in reverse order to maintain indices
+          let removedCount = 0;
+          for (let i = colorlessIndices.length - 1; i >= 0; i--) {
+            const discarded = this.removeTraitFromPile(player, colorlessIndices[i]);
+            if (discarded) {
+              this.discardPile.push(discarded);
+              removedCount++;
+            }
+          }
+          if (removedCount > 0) {
+            this.log(`${player.name} lost ${removedCount} Colorless traits`);
           }
         }
         break;

@@ -115,11 +115,17 @@
   <div class="card-detail-overlay" id="card-detail" style="display: none;">
     <div class="card-detail-backdrop"></div>
     <div class="card-detail-container">
+      <button class="card-detail-nav card-detail-prev" id="card-detail-prev">‹</button>
       <div class="card-detail-card" id="card-detail-content">
         <!-- Card content injected here -->
       </div>
-      <button class="card-detail-close" id="card-detail-close">Tap to close</button>
+      <button class="card-detail-nav card-detail-next" id="card-detail-next">›</button>
     </div>
+    <div class="card-detail-actions">
+      <button class="card-detail-play" id="card-detail-play" style="display: none;">Play Card</button>
+      <button class="card-detail-close" id="card-detail-close">Close</button>
+    </div>
+    <div class="card-detail-counter" id="card-detail-counter">1 / 5</div>
   </div>
 
   <!-- Loading -->
@@ -173,12 +179,120 @@
     const cardDetailOverlay = document.getElementById('card-detail');
     const cardDetailContent = document.getElementById('card-detail-content');
     const cardDetailClose = document.getElementById('card-detail-close');
+    const cardDetailPrev = document.getElementById('card-detail-prev');
+    const cardDetailNext = document.getElementById('card-detail-next');
+    const cardDetailPlay = document.getElementById('card-detail-play');
+    const cardDetailCounter = document.getElementById('card-detail-counter');
 
     let lastShownAgeName = null; // Track which age we've shown
+
+    // Card detail navigation state
+    let cardDetailCards = [];      // Array of cards being viewed
+    let cardDetailIndex = 0;       // Current index in array
+    let cardDetailSource = null;   // 'hand', 'traitPile', or 'opponent'
+    let cardDetailPlayable = false; // Whether current card can be played
 
     // Drag-and-drop state
     let draggedCardIndex = null;
     let isDragging = false;
+
+    // Image name mapping for cards that don't have direct name matches
+    // Maps trait name (without suffixes) to actual image file name
+    const cardImageMapping = {
+      // Cards with multiple variants that use the same image
+      'BRAVE': 'Brave',              // Brave (1), Brave (2) -> Brave.png
+      'CAMOUFLAGE': 'Camouflage',    // Camouflage (1), Camouflage (2) -> Camouflage.png
+      'FORTUNATE': 'Fortunate',      // Fortunate (~), Fortunate (1) -> Fortunate.png
+      'BOREDOM': 'Boredom',          // Boredom (1), Boredom (~) -> Boredom.png
+      'SAUDADE': 'Saudade',          // Saudade (1) -> Saudade.png
+      // Cards without images - use placeholders
+      'AUTOMIMICRY': 'Camouflage',   // Automimicry (0) - use Camouflage as placeholder
+      'JUNK DNA': 'Mitochondrion',   // Junk DNA (1), (2) - use Mitochondrion as placeholder
+    };
+
+    // Card effect descriptions (for card detail view)
+    const cardEffectDescriptions = {
+      // Action cards
+      'Automimicry (0)': 'Copy the effect of any trait in an opponent\'s trait pile.',
+      'Cold Blood': 'Draw 1 card.',
+      'Costly Signaling': 'Steal a random card from an opponent\'s hand.',
+      'Flight': 'Return one of your traits to your hand.',
+      'Iridescent Scales': 'Swap 1 card from your hand with 1 card from an opponent\'s hand.',
+      'Painted Shell': 'Look at an opponent\'s hand.',
+      'Scutes': 'Your traits cannot be stolen or discarded this round.',
+      'Selective Memory': 'Take a card from the discard pile.',
+      'Sweat': 'Discard 1 card, then draw 2 cards.',
+      'Tentacles': 'Steal a trait from an opponent\'s trait pile.',
+      'Photosynthesis': 'Draw 1 card.',
+      'Propagation': 'If you have another Green trait, draw 1 card.',
+      'Self-Replicating': 'Draw 1 card at the start of each round.',
+      'Tiny Little Melons': 'Give a card from your hand to another player.',
+      'Trunk': 'Draw 2 cards.',
+      'Clever': 'Look at the top 3 cards of the deck.',
+      'Directly Register': 'Draw 1 card.',
+      'Impatience': 'Draw 2 cards, then discard 1 card.',
+      'Inventive': 'Rearrange your traits in any order.',
+      'Memory': 'Take a card from the discard pile.',
+      'Nosy': 'Look at an opponent\'s hand.',
+      'Persuasive': 'Swap one of your traits with an opponent\'s trait.',
+      'Poisonous': 'Discard a trait from an opponent\'s trait pile.',
+      'Selfish': 'Steal a random card from an opponent\'s hand.',
+      'Telekinetic': 'Move a trait from one player to another.',
+      'Venomous': 'An opponent discards 2 cards from their hand.',
+      'Bad': 'Opponents discard 2 cards from their hand at random.',
+      'Brave (2)': 'Draw 1 card.',
+      'Hot Temper': 'Discard up to 2 cards, then draw that many +1.',
+      'Reckless': 'Discard your hand and draw that many +1.',
+      'Territorial': 'Steal a Red trait from an opponent.',
+      'Voracious': 'Draw 2 cards.',
+      'Boredom (1)': 'Draw 1 card.',
+      'Doting': 'Give 2 cards from your hand to another player.',
+      'Introspective': 'Draw 1 card.',
+      'The Third Eye': 'Look at the next 3 age cards.',
+      // Dominant cards
+      'Apex Predator': '+4 if you have the most traits in your trait pile.',
+      'Camouflage (1)': '+1 for each card in your hand.',
+      'Camouflage (2)': '+1 for each card in your hand.',
+      'Denial': 'Cannot be removed. +2 for each Dominant in your trait pile.',
+      'Echolocation': '+2 for each Blue trait in your trait pile.',
+      'Faith': '+3 for each Colorless trait in your trait pile.',
+      'Heroic': '+2 for each trait with a negative face value in your trait pile.',
+      'Hyper-Intelligence': '+1 for each trait in your trait pile.',
+      'Immunity': '+2 for each trait with a negative face value in your trait pile.',
+      'Optimistic Nihilism': '+3 for each unique color in your trait pile.',
+      'Pack Behavior': '+1 for each pair of same-colored traits in your trait pile.',
+      'Sentience': '+1 for each World\'s End card of different colors in your trait pile.',
+      'Symbiosis': '+2 for the color you have the least of in your trait pile.',
+      'Tiny': '-1 for each trait in your trait pile.',
+      'Vampirism': '+2 for each Red trait in your trait pile.',
+      'Viral': '-1 to each opponent for each World\'s End of the same color.',
+      // Drop cards with effects
+      'Altruistic': 'Value is equal to your Gene Pool.',
+      'Boredom (~)': 'Value is equal to the number of cards with effects in your hand.',
+      'Branches': '+1 for each pair of Green traits in other players\' trait piles.',
+      'Brave (1)': '+2 for each Dominant in your hand.',
+      'Egg Clusters': '+1 for each Blue trait in your trait pile.',
+      'Fortunate (~)': 'Value is equal to the number of cards in your hand.',
+      'Fortunate (1)': '+2 if you have the most Green traits.',
+      'Gratitude': 'Value is equal to the number of unique colors in your trait pile.',
+      'Heat Vision': 'Variable value.',
+      'Kidney (r)': 'Value is equal to the number of Kidney traits in your trait pile.',
+      'Mindful': '+1 for each Colorless trait in your trait pile.',
+      'Overgrowth': '+1 for each Green trait in your trait pile.',
+      'Pollination': '+1 for each trait with face value 1 in your trait pile.',
+      'Random Fertilization': 'Value is equal to your Gene Pool.',
+      'Saudade (1)': '+1 for each unique color in your hand.',
+      'Sticky Secretions': '+1 for each Purple trait in your trait pile.',
+      'Swarm (g)': 'Value is equal to the number of Swarm traits in all trait piles. (Including this one.)',
+      'Bioluminescence': '+1 for each Blue trait in your trait pile.',
+      'Warning Coloration': '+1 for each Red trait in your trait pile.',
+      'Necrosis': '+1 for each Purple trait in your trait pile.',
+      'Mutation': '+1 for each unique color in your trait pile.',
+      'Thick Skin': '+1 for each Colorless trait in your trait pile.',
+      'Junk DNA (1)': '+1 for each card in your hand.',
+      'Junk DNA (2)': '+1 for each card in your hand.',
+      'Opposable Thumbs': '+1 for each trait in your trait pile.'
+    };
 
     const isHost = sessionStorage.getItem('isHost') === 'true';
 
@@ -387,8 +501,8 @@
       container.innerHTML = '';
       cards.forEach((card, index) => {
         const cardEl = createCardElement(card, false, index);
-        // Tap to show card detail
-        cardEl.addEventListener('click', () => showCardDetail(card));
+        // Tap to show card detail - pass full array for navigation
+        cardEl.addEventListener('click', () => showCardDetail(card, cards, index, 'traitPile'));
         container.appendChild(cardEl);
       });
     }
@@ -482,8 +596,8 @@
             myTraitPile.classList.remove('drop-hover');
 
             if (!touchMoved) {
-              // Tap - show card detail
-              showCardDetail(card);
+              // Tap - show card detail with hand array for navigation
+              showCardDetail(card, gameState.myHand, index, 'hand');
             } else if (isDragging && draggedCardIndex !== null) {
               // Check if dropped on trait pile
               const touch = e.changedTouches[0];
@@ -505,8 +619,8 @@
             cardEl.classList.add('selected');
           }
         } else {
-          // Not playable - just show detail on tap
-          cardEl.addEventListener('click', () => showCardDetail(card));
+          // Not playable - just show detail on tap with hand array for navigation
+          cardEl.addEventListener('click', () => showCardDetail(card, gameState.myHand, index, 'hand'));
         }
 
         myHand.appendChild(cardEl);
@@ -828,8 +942,21 @@
       ageAnnounceOverlay.style.display = 'none';
     };
 
-    // Show card detail view
-    function showCardDetail(card) {
+    // Show card detail view with navigation support
+    function showCardDetail(card, cardsArray = [card], index = 0, source = 'single') {
+      cardDetailCards = cardsArray;
+      cardDetailIndex = index;
+      cardDetailSource = source;
+
+      renderCardDetail();
+      cardDetailOverlay.style.display = 'flex';
+    }
+
+    // Render the current card in detail view
+    function renderCardDetail() {
+      const card = cardDetailCards[cardDetailIndex];
+      if (!card) return;
+
       let typeText = '';
       let showStar = false;
       if (card.dominant) {
@@ -849,36 +976,132 @@
         typeText = 'TRAIT';
       }
 
-      let effectText = getCardEffectText(card);
-      if (!effectText && card.effect) effectText = card.effect;
+      // For detail view, prioritize the full effect description
+      let effectText = card.effect || '';
+
+      // Look up effect description from our comprehensive mapping
+      if (!effectText && cardEffectDescriptions[card.trait]) {
+        effectText = cardEffectDescriptions[card.trait];
+      }
+
+      // For drop cards without a mapped description, parse the drop_effect
+      if (!effectText && card.drop_effect) {
+        effectText = formatDropEffect(card.drop_effect);
+      }
+
+      // For gene pool cards, show the gene pool effect
+      if (!effectText && card.gene_pool) {
+        const gpEffect = card.gene_pool_effect || 0;
+        effectText = `Gene Pool: ${gpEffect >= 0 ? '+' : ''}${gpEffect}`;
+      }
 
       const colorClass = getColorClass(card.color);
 
+      // Clean up card name - remove suffixes like (g), (1), (~), (r), etc.
+      let displayName = card.trait.replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+
+      // Try to get real card image - check mapping first, then use default conversion
+      let imageName;
+      if (cardImageMapping[displayName]) {
+        imageName = cardImageMapping[displayName];
+      } else {
+        // Convert to title case: "APEX PREDATOR" -> "Apex Predator"
+        imageName = displayName.split(' ').map(word =>
+          word.charAt(0) + word.slice(1).toLowerCase()
+        ).join(' ');
+      }
+      const imageUrl = `source-data/cards/images/${imageName}.png`;
+
       cardDetailContent.className = `card-detail-card ${colorClass}`;
       cardDetailContent.innerHTML = `
-        <div class="card-detail-type-badge">${typeText}</div>
-        ${showStar ? '<div class="card-detail-star">★</div>' : ''}
-        <div class="card-detail-name-banner">
-          <span class="card-detail-name">${card.trait}</span>
+        <div class="card-detail-image-container">
+          <img class="card-detail-image" src="${imageUrl}" alt="${displayName}"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-detail-fallback" style="display: none;">
+            <div class="card-detail-type-badge">${typeText}</div>
+            ${showStar ? '<div class="card-detail-star">★</div>' : ''}
+            <div class="card-detail-name-banner">
+              <span class="card-detail-name">${displayName}</span>
+            </div>
+            <div class="card-detail-artwork">
+              <span class="artwork-placeholder">Image Not Found</span>
+            </div>
+            <div class="card-detail-effect">${effectText || 'No special effect'}</div>
+            <div class="card-detail-face">${formatFace(card.face)}</div>
+          </div>
         </div>
-        <div class="card-detail-artwork">
-          <span class="artwork-placeholder">Artwork Coming Soon</span>
-        </div>
-        <div class="card-detail-effect">${effectText || 'No special effect'}</div>
-        <div class="card-detail-face">${formatFace(card.face)}</div>
       `;
 
-      cardDetailOverlay.style.display = 'flex';
+      // Update navigation visibility
+      cardDetailPrev.style.display = cardDetailCards.length > 1 ? 'flex' : 'none';
+      cardDetailNext.style.display = cardDetailCards.length > 1 ? 'flex' : 'none';
+
+      // Update counter
+      cardDetailCounter.textContent = `${cardDetailIndex + 1} / ${cardDetailCards.length}`;
+      cardDetailCounter.style.display = cardDetailCards.length > 1 ? 'block' : 'none';
+
+      // Show play button only if viewing hand and it's player's turn to play
+      const canPlay = cardDetailSource === 'hand' &&
+                      gameState &&
+                      gameState.isMyTurn &&
+                      gameState.turnPhase === 'play' &&
+                      !gameState.pendingAction;
+      cardDetailPlay.style.display = canPlay ? 'inline-block' : 'none';
+      cardDetailPlayable = canPlay;
     }
 
-    // Close card detail view
+    // Navigate to previous card
+    function showPrevCard() {
+      if (cardDetailCards.length <= 1) return;
+      cardDetailIndex = (cardDetailIndex - 1 + cardDetailCards.length) % cardDetailCards.length;
+      renderCardDetail();
+    }
+
+    // Navigate to next card
+    function showNextCard() {
+      if (cardDetailCards.length <= 1) return;
+      cardDetailIndex = (cardDetailIndex + 1) % cardDetailCards.length;
+      renderCardDetail();
+    }
+
+    // Play card from detail view
+    function playFromDetail() {
+      if (!cardDetailPlayable || cardDetailSource !== 'hand') return;
+      const cardIndex = cardDetailIndex;
+      cardDetailOverlay.style.display = 'none';
+      playCard(cardIndex);
+    }
+
+    // Event listeners for card detail
     cardDetailClose.addEventListener('click', () => {
       cardDetailOverlay.style.display = 'none';
     });
 
-    // Close on backdrop click
     cardDetailOverlay.querySelector('.card-detail-backdrop').addEventListener('click', () => {
       cardDetailOverlay.style.display = 'none';
+    });
+
+    cardDetailPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showPrevCard();
+    });
+
+    cardDetailNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showNextCard();
+    });
+
+    cardDetailPlay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playFromDetail();
+    });
+
+    // Keyboard navigation for card detail
+    document.addEventListener('keydown', (e) => {
+      if (cardDetailOverlay.style.display !== 'flex') return;
+      if (e.key === 'ArrowLeft') showPrevCard();
+      else if (e.key === 'ArrowRight') showNextCard();
+      else if (e.key === 'Escape') cardDetailOverlay.style.display = 'none';
     });
 
     // Render action log
