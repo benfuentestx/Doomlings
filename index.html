@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doomlings - Card Game</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <style>
+    .resume-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .resume-banner h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+    }
+    .resume-banner p {
+      margin: 0.25rem 0;
+    }
+    .resume-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .resume-actions button {
+      flex: 1;
+    }
+    .primary-btn {
+      background: white;
+      color: #667eea;
+      font-weight: bold;
+    }
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-container">
+    <h1 class="game-title">DOOMLINGS</h1>
+    <p class="game-subtitle">A card game for the end of the world</p>
+
+    <!-- Resume Game Banner (hidden by default) -->
+    <div id="resume-game-banner" class="resume-banner" style="display: none;">
+      <h3>Resume Game?</h3>
+      <p>You have an active game session</p>
+      <p><strong>Game Code:</strong> <span id="resume-game-code"></span></p>
+      <p><strong>Player:</strong> <span id="resume-player-name"></span></p>
+      <div class="resume-actions">
+        <button id="resume-btn" class="primary-btn">Resume Game</button>
+        <button id="new-game-btn" class="secondary-btn">Start New Game</button>
+      </div>
+    </div>
+
+    <div class="landing-options" id="landing-options">
+      <div class="option-card">
+        <h2>Create Game</h2>
+        <p>Start a new game and invite your friends with a game code</p>
+        <input type="text" id="create-name" placeholder="Enter your name" maxlength="20">
+        <button id="create-btn">Create Game</button>
+      </div>
+
+      <div class="option-card">
+        <h2>Join Game</h2>
+        <p>Enter a game code to join an existing game</p>
+        <input type="text" id="join-name" placeholder="Enter your name" maxlength="20">
+        <input type="text" id="join-code" placeholder="Game Code (e.g., ABC123)" maxlength="6" style="margin-top: 10px; text-transform: uppercase;">
+        <button id="join-btn" style="margin-top: 10px;">Join Game</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center; color: var(--text-secondary);">
+      <p>2-6 Players | Classic Edition | ~20-45 min</p>
+      <p style="font-size: 0.8rem; margin-top: 1rem;">Peer-to-peer multiplayer - no server required!</p>
+    </div>
+  </div>
+
+  <div id="error-message" class="message-overlay" style="display: none;">
+    <p id="error-text"></p>
+    <button onclick="hideError()" style="margin-top: 15px;">OK</button>
+  </div>
+
+  <div id="loading-message" class="message-overlay" style="display: none;">
+    <div class="spinner"></div>
+    <p id="loading-text">Connecting...</p>
+  </div>
+
+  <script type="module">
+    import { reconnectManager } from './js/reconnect-manager.js';
+
+    // DOM Elements
+    const createNameInput = document.getElementById('create-name');
+    const createBtn = document.getElementById('create-btn');
+    const joinNameInput = document.getElementById('join-name');
+    const joinCodeInput = document.getElementById('join-code');
+    const joinBtn = document.getElementById('join-btn');
+    const errorMessage = document.getElementById('error-message');
+    const errorText = document.getElementById('error-text');
+    const resumeBanner = document.getElementById('resume-game-banner');
+    const resumeGameCode = document.getElementById('resume-game-code');
+    const resumePlayerName = document.getElementById('resume-player-name');
+    const resumeBtn = document.getElementById('resume-btn');
+    const newGameBtn = document.getElementById('new-game-btn');
+
+    // Check for existing session on page load
+    const savedSession = reconnectManager.loadSession();
+    if (savedSession) {
+      // Show resume banner
+      resumeGameCode.textContent = savedSession.gameId;
+      resumePlayerName.textContent = savedSession.playerName;
+      resumeBanner.style.display = 'block';
+
+      // Resume button - go directly to game
+      resumeBtn.addEventListener('click', () => {
+        // Save to sessionStorage for compatibility with existing code
+        sessionStorage.setItem('playerData', JSON.stringify({
+          gameId: savedSession.gameId,
+          playerId: savedSession.playerId,
+          playerName: savedSession.playerName,
+          isHost: savedSession.isHost
+        }));
+        sessionStorage.setItem('isHost', savedSession.isHost ? 'true' : 'false');
+
+        // Navigate to lobby (will reconnect automatically)
+        window.location.href = 'lobby.html';
+      });
+
+      // New game button - clear session and start fresh
+      newGameBtn.addEventListener('click', () => {
+        reconnectManager.clearSession();
+        resumeBanner.style.display = 'none';
+      });
+    }
+
+    // Generate a game ID
+    function generateGameId() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let id = '';
+      for (let i = 0; i < 6; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return id;
+    }
+
+    // Create Game - just prepare data, actual connection happens in lobby
+    createBtn.addEventListener('click', () => {
+      const name = createNameInput.value.trim();
+      if (!name) {
+        showError('Please enter your name');
+        return;
+      }
+
+      const gameId = generateGameId();
+      const playerId = `host_${Date.now()}`;
+
+      // Clear any old game state from previous games
+      sessionStorage.removeItem('gameStateBackup');
+
+      const playerData = {
+        gameId: gameId,
+        playerId: playerId,
+        playerName: name,
+        isHost: true
+      };
+
+      // Save to both sessionStorage (for compatibility) and localStorage (for reconnection)
+      sessionStorage.setItem('playerData', JSON.stringify(playerData));
+      sessionStorage.setItem('isHost', 'true');
+      reconnectManager.saveSession(playerData);
+
+      window.location.href = 'lobby.html';
+    });
+
+    // Join Game - just prepare data, actual connection happens in lobby
+    joinBtn.addEventListener('click', () => {
+      const name = joinNameInput.value.trim();
+      const code = joinCodeInput.value.trim().toUpperCase();
+
+      if (!name) {
+        showError('Please enter your name');
+        return;
+      }
+      if (!code || code.length !== 6) {
+        showError('Please enter a valid 6-character game code');
+        return;
+      }
+
+      // Clear any old game state from previous games
+      sessionStorage.removeItem('gameStateBackup');
+
+      const playerData = {
+        gameId: code,
+        playerId: null, // Will be assigned when connecting
+        playerName: name,
+        isHost: false
+      };
+
+      // Save to both sessionStorage (for compatibility) and localStorage (for reconnection)
+      sessionStorage.setItem('playerData', JSON.stringify(playerData));
+      sessionStorage.setItem('isHost', 'false');
+      reconnectManager.saveSession(playerData);
+
+      window.location.href = 'lobby.html';
+    });
+
+    // Enter key support
+    createNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') createBtn.click();
+    });
+
+    joinCodeInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') joinBtn.click();
+    });
+
+    // Auto-uppercase game code
+    joinCodeInput.addEventListener('input', () => {
+      joinCodeInput.value = joinCodeInput.value.toUpperCase();
+    });
+
+    // Error handling
+    function showError(message) {
+      errorText.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+
+    window.hideError = function() {
+      errorMessage.style.display = 'none';
+    };
+  </script>
+</body>
+</html>
