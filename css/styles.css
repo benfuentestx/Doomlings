@@ -908,9 +908,6 @@ input:focus {
   }
 
   .opponent-card {
-    width: calc(50% - 10px);
-    min-width: 150px;
-    max-width: 200px;
     padding: 10px;
   }
 
@@ -1075,9 +1072,6 @@ input:focus {
 
   .opponent-card {
     flex: 0 0 auto;
-    width: auto;
-    min-width: 120px;
-    max-width: 160px;
     padding: 8px;
     border-radius: 8px;
     border-width: 2px;
@@ -1549,11 +1543,6 @@ input:focus {
   .action-options button {
     min-width: 90px;
     padding: 10px 14px;
-  }
-
-  .opponent-card {
-    min-width: 85px;
-    max-width: 110px;
   }
 
   .opponent-name {
