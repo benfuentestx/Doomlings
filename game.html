@@ -138,8 +138,18 @@
     import { peerManager } from './js/peer-manager.js';
     import { reconnectManager } from './js/reconnect-manager.js';
 
-    // Get player data
+    // Get player data - try sessionStorage first, then localStorage (for reconnection)
     let playerData = JSON.parse(sessionStorage.getItem('playerData'));
+    if (!playerData) {
+      // Try to load from localStorage (reconnection after refresh)
+      const savedSession = reconnectManager.loadSession();
+      if (savedSession) {
+        playerData = savedSession;
+        // Restore to sessionStorage for this session
+        sessionStorage.setItem('playerData', JSON.stringify(playerData));
+        sessionStorage.setItem('isHost', playerData.isHost ? 'true' : 'false');
+      }
+    }
     let gameState = null;
     let selectedCards = [];
     let pendingAction = null;
