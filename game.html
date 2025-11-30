@@ -1057,9 +1057,17 @@
         imageName = cardImageMapping[displayName];
       } else {
         // Convert to title case: "APEX PREDATOR" -> "Apex Predator"
-        imageName = displayName.split(' ').map(word =>
-          word.charAt(0) + word.slice(1).toLowerCase()
-        ).join(' ');
+        // Also handles hyphenated words: "SELF-AWARENESS" -> "Self-Awareness"
+        imageName = displayName.split(' ').map(word => {
+          if (word.includes('-')) {
+            // Handle hyphenated words - capitalize each part
+            return word.split('-').map(part =>
+              part.charAt(0) + part.slice(1).toLowerCase()
+            ).join('-');
+          } else {
+            return word.charAt(0) + word.slice(1).toLowerCase();
+          }
+        }).join(' ');
       }
       const imageUrl = `images/cards/${imageName}.png`;
 
