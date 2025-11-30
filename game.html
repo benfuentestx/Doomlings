@@ -810,13 +810,8 @@
           <div class="opponent-title">
             <span class="opponent-name">${opp.name}</span>
           </div>
-          <span class="opponent-score">${opp.score} pts</span>
+          <span class="opponent-info">Hand: ${opp.handSize} | GP: ${opp.genePool} | ${opp.score} pts</span>
         `;
-
-        // Create info row
-        const info = document.createElement('div');
-        info.className = 'opponent-info';
-        info.textContent = `Hand: ${opp.handSize} | Traits: ${opp.traitPile.length}${opp.hasPlayedThisRound ? ' | Played' : ''}`;
 
         // Create trait pile with actual cards
         const traitPile = document.createElement('div');
@@ -833,7 +828,6 @@
         });
 
         div.appendChild(header);
-        div.appendChild(info);
         div.appendChild(traitPile);
         opponentsPanel.appendChild(div);
       });
