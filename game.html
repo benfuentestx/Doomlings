@@ -69,6 +69,9 @@
     <div class="my-hand-area">
       <div class="hand-header">
         <h3>Your Hand (<span id="hand-count">0</span>)</h3>
+        <button id="hand-view-toggle" class="hand-view-toggle" title="Toggle card view">
+          <span class="toggle-icon">🖼️</span>
+        </button>
         <span id="play-instruction"></span>
       </div>
       <div class="my-hand" id="my-hand"></div>
@@ -171,6 +174,7 @@
     const myScore = document.getElementById('my-score');
     const handCount = document.getElementById('hand-count');
     const playInstruction = document.getElementById('play-instruction');
+    const handViewToggle = document.getElementById('hand-view-toggle');
     const actionLog = document.getElementById('action-log');
     const opponentsLeft = document.getElementById('opponents-left');
     const opponentsRight = document.getElementById('opponents-right');
@@ -207,6 +211,9 @@
     // Drag-and-drop state
     let draggedCardIndex = null;
     let isDragging = false;
+
+    // Hand view mode: 'text' or 'image'
+    let handViewMode = 'text';
 
     // Image name mapping for cards that don't have direct name matches
     // Maps trait name (without suffixes) to actual image file name
@@ -673,26 +680,47 @@
     function createCardElement(card, playable = false, index = 0) {
       const div = document.createElement('div');
       const colorClass = getColorClass(card.color);
-      div.className = `card ${colorClass}${playable ? ' playable' : ''}`;
-      div.dataset.index = index;
 
-      let typeText = '';
-      if (card.isDominant) typeText = 'DOMINANT';
-      else if (card.actions && card.actions.length > 0) typeText = 'ACTION';
-      else if (card.bonusPoints) typeText = 'DROP';
-      else if (card.effects && card.effects.some(e => e.name === 'modify_gene_pool')) typeText = 'GENE POOL';
-      else if (card.worldsEnd) typeText = "WORLD'S END";
-      else typeText = 'TRAIT';
+      if (handViewMode === 'image') {
+        // Image mode - show actual card image
+        div.className = `hand-card-image ${colorClass}${playable ? ' playable' : ''}`;
+        div.dataset.index = index;
 
-      let effectText = getCardEffectText(card);
+        // Get card image path (same logic as card detail view)
+        let displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+        const imageName = cardImageMapping[displayName] || displayName;
+        const imageUrl = `images/cards/${imageName}.png`;
 
-      div.innerHTML = `
-        <div class="card-color" style="background: ${getColorValue(card.color)}"></div>
-        <div class="card-face">${formatFace(card.faceValue)}</div>
-        <div class="card-name">${card.name}</div>
-        <div class="card-effect">${effectText}</div>
-        <div class="card-type">${typeText}</div>
-      `;
+        div.innerHTML = `
+          <img src="${imageUrl}" alt="${card.name}"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-image-fallback" style="display: none;">
+            <div class="fallback-name">${card.name}</div>
+          </div>
+        `;
+      } else {
+        // Text mode - show simplified card representation
+        div.className = `card ${colorClass}${playable ? ' playable' : ''}`;
+        div.dataset.index = index;
+
+        let typeText = '';
+        if (card.isDominant) typeText = 'DOMINANT';
+        else if (card.actions && card.actions.length > 0) typeText = 'ACTION';
+        else if (card.bonusPoints) typeText = 'DROP';
+        else if (card.effects && card.effects.some(e => e.name === 'modify_gene_pool')) typeText = 'GENE POOL';
+        else if (card.worldsEnd) typeText = "WORLD'S END";
+        else typeText = 'TRAIT';
+
+        let effectText = getCardEffectText(card);
+
+        div.innerHTML = `
+          <div class="card-color" style="background: ${getColorValue(card.color)}"></div>
+          <div class="card-face">${formatFace(card.faceValue)}</div>
+          <div class="card-name">${card.name}</div>
+          <div class="card-effect">${effectText}</div>
+          <div class="card-type">${typeText}</div>
+        `;
+      }
 
       return div;
     }
@@ -1389,6 +1417,13 @@
       reconnectManager.clearSession(); // Clear session when game ends
       gameOverOverlay.style.display = 'flex';
     }
+
+    // Hand view toggle
+    handViewToggle.onclick = () => {
+      handViewMode = handViewMode === 'text' ? 'image' : 'text';
+      handViewToggle.querySelector('.toggle-icon').textContent = handViewMode === 'image' ? '📝' : '🖼️';
+      renderHand();
+    };
   </script>
 </body>
 </html>
