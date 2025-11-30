@@ -39,6 +39,7 @@
 
   <script type="module">
     import { peerManager } from './js/peer-manager.js';
+    import { reconnectManager } from './js/reconnect-manager.js';
 
     // Get player data from session
     let playerData = JSON.parse(sessionStorage.getItem('playerData'));
@@ -101,6 +102,7 @@
           if (result.success) {
             playerData.playerId = result.playerId;
             sessionStorage.setItem('playerData', JSON.stringify(playerData));
+            reconnectManager.updateSession({ playerId: playerData.playerId });
             retryCount = 0;
           }
         } catch (err) {
@@ -130,6 +132,7 @@
           if (result.success) {
             playerData.playerId = result.playerId;
             sessionStorage.setItem('playerData', JSON.stringify(playerData));
+            reconnectManager.updateSession({ playerId: playerData.playerId });
           }
         }
       } catch (err) {

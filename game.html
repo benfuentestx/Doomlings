@@ -136,6 +136,7 @@
 
   <script type="module">
     import { peerManager } from './js/peer-manager.js';
+    import { reconnectManager } from './js/reconnect-manager.js';
 
     // Get player data
     let playerData = JSON.parse(sessionStorage.getItem('playerData'));
@@ -1342,6 +1343,7 @@
           <span class="score">${p.score} pts</span>
         </div>
       `).join('');
+      reconnectManager.clearSession(); // Clear session when game ends
       gameOverOverlay.style.display = 'flex';
     }
   </script>
