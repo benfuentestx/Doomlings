@@ -23,11 +23,6 @@
         </div>
       </div>
       <div id="turn-indicator"></div>
-      <div class="gene-pool-display">
-        <span class="gene-pool-label">GP:</span>
-        <span class="gene-pool-value" id="gene-pool-value">5</span>
-        <span class="gene-pool-value" id="gene-count-value" style="margin-left:4px">+0</span>
-      </div>
       <div class="game-stats">
         <span>Round: <strong id="round-num">1</strong></span>
         <span>Deck: <strong id="deck-size">0</strong></span>
@@ -165,8 +160,6 @@
     const roundNum = document.getElementById('round-num');
     const deckSize = document.getElementById('deck-size');
     const discardSize = document.getElementById('discard-size');
-    const genePoolValue = document.getElementById('gene-pool-value');
-    const geneCountValue = document.getElementById('gene-count-value');
     let stabilizeDiscards = []; // Selected cards for stabilization discard
     const actionMessage = document.getElementById('action-message');
     const actionOptions = document.getElementById('action-options');
@@ -472,13 +465,8 @@
       deckSize.textContent = gameState.deckSize;
       discardSize.textContent = gameState.discardSize;
 
-      // Update gene pool (hand size target) and gene count (from cards)
-      genePoolValue.textContent = gameState.myGenePool || 5;
+      // Update gene pool in hand area
       const geneCount = gameState.myGeneCount || 0;
-      geneCountValue.textContent = geneCount >= 0 ? `+${geneCount}` : geneCount;
-      geneCountValue.className = 'gene-pool-value' + (geneCount < 0 ? ' negative' : '');
-
-      // Also update gene pool in hand area
       handGenePoolValue.textContent = gameState.myGenePool || 5;
       handGeneCountValue.textContent = geneCount >= 0 ? `+${geneCount}` : geneCount;
       handGeneCountValue.className = 'gp-count' + (geneCount < 0 ? ' negative' : '');
