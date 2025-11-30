@@ -486,7 +486,7 @@ export class CardEffects {
           needsInput: true,
           inputType: 'view_cards',
           cards: gameState.ageDeck.slice(0, count),
-          message: `Top ${count} Age cards`,
+          message: count === 1 ? 'Next Age' : `Top ${count} Age cards`,
           optional: true
         };
       }
@@ -1760,7 +1760,7 @@ export class GameState {
       currentPlayerIndex: this.currentPlayerIndex,
       firstPlayerIndex: this.firstPlayerIndex,
       turnRestrictions: this.turnRestrictions || [],
-      players: this.players.map(p => ({
+      players: this.players.map((p, idx) => ({
         id: p.id,
         name: p.name,
         isHost: p.isHost,
@@ -1771,7 +1771,8 @@ export class GameState {
         genePool: p.genePool, // Player's target hand size
         hasPlayedThisRound: this.playersPlayedThisRound.has(p.id),
         needsStabilize: p.needsStabilize || false,
-        extraPlays: p.extraPlays || 0
+        extraPlays: p.extraPlays || 0,
+        turnOrder: (idx - this.firstPlayerIndex + this.players.length) % this.players.length
       })),
       pendingAction: this.pendingAction,
       deckSize: this.traitDeck.length,
@@ -1816,6 +1817,7 @@ export class GameState {
         type: this.pendingAction.type,
         inputType: this.pendingAction.inputType,
         options: this.pendingAction.options,
+        cards: this.pendingAction.cards,
         message: this.pendingAction.message,
         optional: this.pendingAction.optional,
         count: this.pendingAction.count

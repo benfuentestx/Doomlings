@@ -951,11 +951,14 @@ export const traits = [
   },
   {
     name: 'The Third Eye',
-    faceValue: 1,
+    faceValue: 0,
     color: 'Colorless',
     expansion: 'Base',
-    actions: [{ name: 'view_age_deck', params: { value: 3 } }],
-    actionDescription: 'Look at top 3 cards of age deck'
+    actions: [
+      { name: 'view_age_deck', params: { value: 1 } },
+      { name: 'play_another_trait', params: { num_traits: 1 } }
+    ],
+    actionDescription: 'Peek at next age, play another trait'
   },
   {
     name: 'Automimicry',

@@ -370,6 +370,16 @@ input:focus {
   border-width: 3px;
 }
 
+.opponent-card.is-me {
+  border-color: var(--success);
+  background: linear-gradient(135deg, var(--bg-medium) 0%, rgba(39, 174, 96, 0.1) 100%);
+}
+
+.opponent-card.is-me .opponent-name {
+  color: var(--success);
+  font-weight: 700;
+}
+
 .opponent-header {
   display: flex;
   justify-content: space-between;
@@ -481,13 +491,9 @@ input:focus {
   margin-top: 15px;
 }
 
-/* Player's Trait Pile - Full width for portrait mobile */
+/* Player's Trait Pile - Hidden (now shown in players panel) */
 .my-traits {
-  background: var(--bg-medium);
-  border-radius: 12px;
-  padding: 20px;
-  border: 3px solid var(--success);
-  width: 100%;
+  display: none;
 }
 
 .my-traits h3 {

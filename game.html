@@ -285,7 +285,7 @@
       'Boredom (1)': 'Draw 1 card.',
       'Doting': 'Give 2 cards from your hand to another player.',
       'Introspective': 'Draw 1 card.',
-      'The Third Eye': 'Look at the next 3 age cards.',
+      'The Third Eye': 'Peek at the next age. Play another trait.',
       // Dominant cards
       'Apex Predator': '+4 if you have the most traits in your trait pile.',
       'Camouflage (1)': '+1 for each card in your hand.',
@@ -787,42 +787,47 @@
       return `${value > 0 ? '+' : ''}${value} ${text}`;
     }
 
-    // Render opponents
+    // Render all players (including self) sorted by turn order
     function renderOpponents() {
-      const opponents = gameState.players.filter(p => p.id !== playerData.playerId);
       opponentsPanel.innerHTML = '';
 
-      // Sort opponents by turn order if available, otherwise by index
-      const sortedOpponents = opponents.sort((a, b) => {
-        const aOrder = a.turnOrder !== undefined ? a.turnOrder : gameState.players.indexOf(a);
-        const bOrder = b.turnOrder !== undefined ? b.turnOrder : gameState.players.indexOf(b);
+      // Sort ALL players by turn order
+      const sortedPlayers = [...gameState.players].sort((a, b) => {
+        const aOrder = a.turnOrder !== undefined ? a.turnOrder : 0;
+        const bOrder = b.turnOrder !== undefined ? b.turnOrder : 0;
         return aOrder - bOrder;
       });
 
-      sortedOpponents.forEach((opp, index) => {
+      sortedPlayers.forEach((player, index) => {
+        const isMe = player.id === playerData.playerId;
         const div = document.createElement('div');
-        div.className = `opponent-card${opp.isCurrentPlayer ? ' current-turn' : ''}`;
+        div.className = `opponent-card${player.isCurrentPlayer ? ' current-turn' : ''}${isMe ? ' is-me' : ''}`;
 
         // Create header
         const header = document.createElement('div');
         header.className = 'opponent-header';
+        const displayName = isMe ? `${player.name} (You)` : player.name;
+        const handInfo = isMe ? `GP: ${player.genePool}` : `Hand: ${player.handSize} | GP: ${player.genePool}`;
         header.innerHTML = `
           <div class="opponent-title">
-            <span class="opponent-name">${opp.name}</span>
+            <span class="turn-order-badge">#${player.turnOrder + 1}</span>
+            <span class="opponent-name">${displayName}</span>
           </div>
-          <span class="opponent-info">Hand: ${opp.handSize} | GP: ${opp.genePool} | ${opp.score} pts</span>
+          <span class="opponent-info">${handInfo} | ${player.score} pts</span>
         `;
 
         // Create trait pile with actual cards
         const traitPile = document.createElement('div');
         traitPile.className = 'opponent-traits';
 
-        opp.traitPile.forEach((card, cardIndex) => {
+        // Use myTraitPile for self, player.traitPile for others
+        const cards = isMe ? gameState.myTraitPile : player.traitPile;
+        cards.forEach((card, cardIndex) => {
           const cardEl = createCardElement(card, false, cardIndex);
           cardEl.classList.add('opponent-trait-card');
           // Make clickable to show in detail view
           cardEl.addEventListener('click', () => {
-            showCardDetail(card, opp.traitPile, cardIndex, 'opponent');
+            showCardDetail(card, cards, cardIndex, isMe ? 'my' : 'opponent');
           });
           traitPile.appendChild(cardEl);
         });
@@ -1287,12 +1292,23 @@
     });
 
     function showViewCardsModal(action) {
+      if (!action.cards || action.cards.length === 0) {
+        showModal(action.message || 'Cards', '<p>No cards to show</p>', false, true);
+        return;
+      }
       const cardsHtml = action.cards.map(card => {
+        // For Age cards, try to show image
         if (card.type) {
-          return `<div class="card colorless">
-            <div class="card-name">${card.name}</div>
-            <div class="card-effect">${card.effect || ''}</div>
-          </div>`;
+          const displayName = (card.name || '').toUpperCase();
+          const imageUrl = `images/cards/${displayName}.png`;
+          return `
+            <div class="hand-card-image" style="width: 100px; height: 140px;">
+              <img src="${imageUrl}" alt="${card.name}"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="card-image-fallback" style="display: none;">
+                <div class="fallback-name">${card.name}</div>
+              </div>
+            </div>`;
         }
         return createCardElement(card, false).outerHTML;
       }).join('');
