@@ -350,12 +350,14 @@ input:focus {
   width: 100%;
 }
 
+/* Opponent card container - Full width for portrait mobile */
 .opponent-card {
   background: var(--bg-medium);
   border-radius: 12px;
   padding: 12px;
   border: 2px solid transparent;
   transition: border-color 0.2s ease;
+  width: 100%;
 }
 
 .opponent-card.current-turn {
