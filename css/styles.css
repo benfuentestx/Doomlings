@@ -1623,6 +1623,23 @@ input:focus {
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
+.age-announce-image-container {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.age-announce-image {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: block;
+}
+
 .age-announce-effect {
   font-size: 1.1rem;
   line-height: 1.6;
@@ -1674,6 +1691,11 @@ input:focus {
 
   .age-announce-name {
     font-size: 1.6rem;
+  }
+
+  .age-announce-image-container {
+    max-width: 240px;
+    margin-bottom: 16px;
   }
 
   .age-announce-effect {

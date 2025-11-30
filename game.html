@@ -109,6 +109,9 @@
     <div class="age-announce-card" id="age-announce-card">
       <div class="age-announce-label">NEW AGE</div>
       <h2 class="age-announce-name" id="age-announce-name">Age Name</h2>
+      <div class="age-announce-image-container">
+        <img class="age-announce-image" id="age-announce-image" src="" alt="Age Card">
+      </div>
       <div class="age-announce-effect" id="age-announce-effect">Effect description</div>
       <button class="age-announce-btn" onclick="window.dismissAgeAnnounce()">Continue</button>
     </div>
@@ -190,6 +193,7 @@
     const ageAnnounceOverlay = document.getElementById('age-announce');
     const ageAnnounceCard = document.getElementById('age-announce-card');
     const ageAnnounceName = document.getElementById('age-announce-name');
+    const ageAnnounceImage = document.getElementById('age-announce-image');
     const ageAnnounceEffect = document.getElementById('age-announce-effect');
     const cardDetailOverlay = document.getElementById('card-detail');
     const cardDetailContent = document.getElementById('card-detail-content');
@@ -989,6 +993,12 @@
       ageAnnounceCard.className = 'age-announce-card' + (isCatastrophe ? ' catastrophe' : '');
       document.querySelector('.age-announce-label').textContent = isCatastrophe ? 'CATASTROPHE' : 'NEW AGE';
       ageAnnounceName.textContent = age.name;
+
+      // Set age card image
+      const ageName = age.name.toUpperCase();
+      const ageImageUrl = `images/cards/${ageName}.png`;
+      ageAnnounceImage.src = ageImageUrl;
+      ageAnnounceImage.alt = age.name;
 
       // Build effect description
       let effectText = age.effect || '';
