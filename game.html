@@ -1325,13 +1325,20 @@
         content += `<div style="margin-bottom: 20px;">
           <h4 style="margin-bottom: 10px;">${opp.name}</h4>
           <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-            ${opp.traits.map(t => `
-              <div class="card ${getColorClass(t.color)}" style="cursor: pointer;"
+            ${opp.traits.map(t => {
+              const displayName = (t.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+              const imageName = cardImageMapping[displayName] || displayName;
+              const imageUrl = `images/cards/${imageName}.png`;
+              return `
+              <div class="hand-card-image ${getColorClass(t.color)}" style="cursor: pointer;"
                    onclick="window.selectOpponentTrait('${opp.id}', ${t.index})">
-                <div class="card-face">${formatFace(t.faceValue)}</div>
-                <div class="card-name">${t.name}</div>
+                <img src="${imageUrl}" alt="${t.name}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="card-image-fallback" style="display: none;">
+                  <div class="fallback-name">${t.name}</div>
+                </div>
               </div>
-            `).join('')}
+            `}).join('')}
           </div>
         </div>`;
       });
@@ -1346,13 +1353,20 @@
     function showSelectOwnCardsModal(action) {
       selectedCards = [];
       const count = action.count || 1;
-      const cardsHtml = action.options.map((c, i) => `
-        <div class="card ${getColorClass(c.color)}" data-index="${c.index}"
+      const cardsHtml = action.options.map((c, i) => {
+        const displayName = (c.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+        const imageName = cardImageMapping[displayName] || displayName;
+        const imageUrl = `images/cards/${imageName}.png`;
+        return `
+        <div class="hand-card-image ${getColorClass(c.color)}" data-index="${c.index}"
              style="cursor: pointer;" onclick="window.toggleCardSelection(${c.index}, ${count})">
-          <div class="card-face">${formatFace(c.faceValue)}</div>
-          <div class="card-name">${c.name}</div>
+          <img src="${imageUrl}" alt="${c.name}"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-image-fallback" style="display: none;">
+            <div class="fallback-name">${c.name}</div>
+          </div>
         </div>
-      `).join('');
+      `}).join('');
       showModal(`Select ${count} card(s)`, cardsHtml, true, action.optional);
 
       modalConfirm.onclick = () => {
@@ -1380,13 +1394,20 @@
     };
 
     function showSelectOwnTraitModal(action) {
-      const cardsHtml = action.options.map(t => `
-        <div class="card ${getColorClass(t.color)}" style="cursor: pointer;"
+      const cardsHtml = action.options.map(t => {
+        const displayName = (t.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+        const imageName = cardImageMapping[displayName] || displayName;
+        const imageUrl = `images/cards/${imageName}.png`;
+        return `
+        <div class="hand-card-image ${getColorClass(t.color)}" style="cursor: pointer;"
              onclick="window.selectOwnTrait(${t.index})">
-          <div class="card-face">${formatFace(t.faceValue)}</div>
-          <div class="card-name">${t.name}</div>
+          <img src="${imageUrl}" alt="${t.name}"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-image-fallback" style="display: none;">
+            <div class="fallback-name">${t.name}</div>
+          </div>
         </div>
-      `).join('');
+      `}).join('');
       showModal(action.message || 'Select Trait', cardsHtml, false, action.optional);
     }
 
@@ -1396,13 +1417,20 @@
     };
 
     function showSelectFromDiscardModal(action) {
-      const cardsHtml = action.options.map(c => `
-        <div class="card ${getColorClass(c.color)}" style="cursor: pointer;"
+      const cardsHtml = action.options.map(c => {
+        const displayName = (c.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+        const imageName = cardImageMapping[displayName] || displayName;
+        const imageUrl = `images/cards/${imageName}.png`;
+        return `
+        <div class="hand-card-image ${getColorClass(c.color)}" style="cursor: pointer;"
              onclick="window.selectFromDiscard(${c.index})">
-          <div class="card-face">${formatFace(c.faceValue)}</div>
-          <div class="card-name">${c.name}</div>
+          <img src="${imageUrl}" alt="${c.name}"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-image-fallback" style="display: none;">
+            <div class="fallback-name">${c.name}</div>
+          </div>
         </div>
-      `).join('');
+      `}).join('');
       showModal('Select from Discard', cardsHtml, false, action.optional);
     }
 

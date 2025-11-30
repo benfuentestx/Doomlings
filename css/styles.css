@@ -416,14 +416,12 @@ input:focus {
 /* Opponent trait pile - Full width on mobile with card wrapping */
 .opponent-traits {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
   padding: 12px;
-  border: 2px solid var(--bg-light);
-  border-radius: 8px;
   width: 100%;
   justify-content: flex-start;
+  overflow:auto
 }
 
 /* Opponent trait cards - sized for portrait mobile */
