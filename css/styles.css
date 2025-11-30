@@ -355,7 +355,7 @@ input:focus {
   background: var(--bg-medium);
   border-radius: 12px;
   padding: 12px;
-  border: 2px solid transparent;
+  border: 2px solid gray;
   transition: border-color 0.2s ease;
   width: 100%;
 }
