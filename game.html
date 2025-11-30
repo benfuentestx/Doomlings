@@ -202,14 +202,14 @@
     // Maps trait name (without suffixes) to actual image file name
     const cardImageMapping = {
       // Cards with multiple variants that use the same image
-      'BRAVE': 'Brave',              // Brave (1), Brave (2) -> Brave.png
-      'CAMOUFLAGE': 'Camouflage',    // Camouflage (1), Camouflage (2) -> Camouflage.png
-      'FORTUNATE': 'Fortunate',      // Fortunate (~), Fortunate (1) -> Fortunate.png
-      'BOREDOM': 'Boredom',          // Boredom (1), Boredom (~) -> Boredom.png
-      'SAUDADE': 'Saudade',          // Saudade (1) -> Saudade.png
-      'AUTOMIMICRY': 'Automimicry',  // Automimicry (0), Automimicry (-1) -> Automimicry.png
+      'BRAVE': 'BRAVE',              // Brave (1), Brave (2) -> BRAVE.png
+      'CAMOUFLAGE': 'CAMOUFLAGE',    // Camouflage (1), Camouflage (2) -> CAMOUFLAGE.png
+      'FORTUNATE': 'FORTUNATE',      // Fortunate (~), Fortunate (1) -> FORTUNATE.png
+      'BOREDOM': 'BOREDOM',          // Boredom (1), Boredom (~) -> BOREDOM.png
+      'SAUDADE': 'SAUDADE',          // Saudade (1) -> SAUDADE.png
+      'AUTOMIMICRY': 'AUTOMIMICRY',  // Automimicry (0), Automimicry (-1) -> AUTOMIMICRY.png
       // Cards without images - use placeholders
-      'JUNK DNA': 'Mitochondrion',   // Junk DNA (1), (2) - use Mitochondrion as placeholder
+      'JUNK DNA': 'MITOCHONDRION',   // Junk DNA (1), (2) - use MITOCHONDRION as placeholder
     };
 
     // Card effect descriptions (for card detail view)
@@ -1051,24 +1051,8 @@
       // Clean up card name - remove suffixes like (g), (1), (~), (r), etc.
       let displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
 
-      // Try to get real card image - check mapping first, then use default conversion
-      let imageName;
-      if (cardImageMapping[displayName]) {
-        imageName = cardImageMapping[displayName];
-      } else {
-        // Convert to title case: "APEX PREDATOR" -> "Apex Predator"
-        // Also handles hyphenated words: "SELF-AWARENESS" -> "Self-Awareness"
-        imageName = displayName.split(' ').map(word => {
-          if (word.includes('-')) {
-            // Handle hyphenated words - capitalize each part
-            return word.split('-').map(part =>
-              part.charAt(0) + part.slice(1).toLowerCase()
-            ).join('-');
-          } else {
-            return word.charAt(0) + word.slice(1).toLowerCase();
-          }
-        }).join(' ');
-      }
+      // Use card name directly - all image files are UPPERCASE
+      const imageName = cardImageMapping[displayName] || displayName;
       const imageUrl = `images/cards/${imageName}.png`;
 
       cardDetailContent.className = `card-detail-card ${colorClass}`;
