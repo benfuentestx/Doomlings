@@ -344,6 +344,18 @@ export class PeerManager {
         conn.send({ type: 'actionResult', ...discardResult });
         this.broadcastState();
         break;
+
+      case 'skipStabilization':
+        const skipStabResult = this.gameState.skipStabilization(data.playerId);
+        conn.send({ type: 'actionResult', ...skipStabResult });
+        this.broadcastState();
+        break;
+
+      case 'preStabilizeDiscard':
+        const preDiscardResult = this.gameState.preStabilizeDiscard(data.playerId, data.discardIndices || []);
+        conn.send({ type: 'actionResult', ...preDiscardResult });
+        this.broadcastState();
+        break;
     }
   }
 
@@ -574,6 +586,43 @@ export class PeerManager {
         this.hostConnection.send({
           type: 'discardAndDraw',
           playerId: this.myPlayerId
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Skip stabilization (PROSPERITY age effect)
+  skipStabilization() {
+    if (this.isHost) {
+      const result = this.gameState.skipStabilization(this.myPlayerId);
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'skipStabilization',
+          playerId: this.myPlayerId
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Pre-stabilize discard (ENLIGHTENMENT age effect)
+  preStabilizeDiscard(discardIndices = []) {
+    if (this.isHost) {
+      const result = this.gameState.preStabilizeDiscard(this.myPlayerId, discardIndices);
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'preStabilizeDiscard',
+          playerId: this.myPlayerId,
+          discardIndices
         });
         return { success: true, pending: true };
       }

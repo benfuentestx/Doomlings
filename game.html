@@ -856,10 +856,46 @@
       }
 
       if (gameState.isMyTurn) {
+        // Show next age preview if available (AWAKENING)
+        if (gameState.nextAgePreview && gameState.turnPhase === 'play') {
+          const previewDiv = document.createElement('div');
+          previewDiv.className = 'next-age-preview';
+          previewDiv.innerHTML = `
+            <span class="preview-label">Next Age:</span>
+            <span class="preview-name ${gameState.nextAgePreview.type === 'catastrophe' ? 'catastrophe' : ''}">${gameState.nextAgePreview.name}</span>
+          `;
+          actionOptions.appendChild(previewDiv);
+        }
+
+        // Show play restriction indicator (GALACTIC DRIFT / HIGH TIDES)
+        if (gameState.myMustPlayColorless) {
+          const restrictionDiv = document.createElement('div');
+          restrictionDiv.className = 'play-restriction';
+          restrictionDiv.textContent = '⚡ Must play a Colorless trait';
+          actionOptions.appendChild(restrictionDiv);
+        }
+        if (gameState.myMustPlayEffectless) {
+          const restrictionDiv = document.createElement('div');
+          restrictionDiv.className = 'play-restriction';
+          restrictionDiv.textContent = '⚡ Must play an effectless trait';
+          actionOptions.appendChild(restrictionDiv);
+        }
+
         if (gameState.turnPhase === 'stabilize') {
           // Stabilization phase
           const needsDiscard = gameState.needsDiscard || 0;
           const willDraw = gameState.willDraw || 0;
+          const canSkipStabilize = gameState.ageEffects?.optionalStabilization || false;
+          const preStabilizeDiscard = gameState.ageEffects?.optionalDiscardBeforeStabilize || 0;
+
+          // Pre-stabilize discard option (ENLIGHTENMENT)
+          if (preStabilizeDiscard > 0 && !gameState.myPreStabilizeDiscardUsed) {
+            const preDiscardBtn = document.createElement('button');
+            preDiscardBtn.className = 'secondary';
+            preDiscardBtn.textContent = `Discard up to ${preStabilizeDiscard} cards first (Enlightenment)`;
+            preDiscardBtn.onclick = () => window.showPreStabilizeDiscardModal(preStabilizeDiscard);
+            actionOptions.appendChild(preDiscardBtn);
+          }
 
           if (needsDiscard > 0) {
             actionMessage.textContent = `Stabilize: Select ${needsDiscard} card(s) to discard`;
@@ -876,11 +912,21 @@
             };
             actionOptions.appendChild(stabilizeBtn);
 
+            // Skip stabilize option (PROSPERITY)
+            if (canSkipStabilize) {
+              const skipStabBtn = document.createElement('button');
+              skipStabBtn.className = 'secondary';
+              skipStabBtn.textContent = 'Skip Stabilize (Prosperity)';
+              skipStabBtn.onclick = () => peerManager.skipStabilization();
+              actionOptions.appendChild(skipStabBtn);
+            }
+
             // Mobile bar
             mobileActionBar.innerHTML = `
               <span class="action-msg">Select ${needsDiscard - stabilizeDiscards.length} more</span>
               <button ${stabilizeDiscards.length !== needsDiscard ? 'disabled' : ''}
                       onclick="window.doStabilize()">Stabilize</button>
+              ${canSkipStabilize ? '<button class="secondary" onclick="window.doSkipStabilize()">Skip</button>' : ''}
             `;
           } else if (willDraw > 0) {
             actionMessage.textContent = `Stabilize: You will draw ${willDraw} card(s)`;
@@ -893,10 +939,20 @@
             };
             actionOptions.appendChild(stabilizeBtn);
 
+            // Skip stabilize option (PROSPERITY)
+            if (canSkipStabilize) {
+              const skipStabBtn = document.createElement('button');
+              skipStabBtn.className = 'secondary';
+              skipStabBtn.textContent = 'Skip Stabilize (Prosperity)';
+              skipStabBtn.onclick = () => peerManager.skipStabilization();
+              actionOptions.appendChild(skipStabBtn);
+            }
+
             // Mobile bar
             mobileActionBar.innerHTML = `
               <span class="action-msg">Draw ${willDraw} cards</span>
               <button onclick="window.doStabilize()">Stabilize</button>
+              ${canSkipStabilize ? '<button class="secondary" onclick="window.doSkipStabilize()">Skip</button>' : ''}
             `;
           } else {
             actionMessage.textContent = 'Hand size matches Gene Pool';
@@ -909,10 +965,20 @@
             };
             actionOptions.appendChild(stabilizeBtn);
 
+            // Skip stabilize option (PROSPERITY)
+            if (canSkipStabilize) {
+              const skipStabBtn = document.createElement('button');
+              skipStabBtn.className = 'secondary';
+              skipStabBtn.textContent = 'Skip Stabilize (Prosperity)';
+              skipStabBtn.onclick = () => peerManager.skipStabilization();
+              actionOptions.appendChild(skipStabBtn);
+            }
+
             // Mobile bar
             mobileActionBar.innerHTML = `
               <span class="action-msg">Hand OK</span>
               <button onclick="window.doStabilize()">Continue</button>
+              ${canSkipStabilize ? '<button class="secondary" onclick="window.doSkipStabilize()">Skip</button>' : ''}
             `;
           }
         } else if (gameState.turnPhase === 'play') {
@@ -979,6 +1045,65 @@
       if (confirm('Discard your entire hand and draw 3 new cards?')) {
         peerManager.discardAndDraw();
       }
+    };
+
+    // Skip stabilization (PROSPERITY age effect)
+    window.doSkipStabilize = function() {
+      peerManager.skipStabilization();
+    };
+
+    // Pre-stabilize discard modal (ENLIGHTENMENT age effect)
+    window.showPreStabilizeDiscardModal = function(maxCards) {
+      if (!gameState || !gameState.hand || gameState.hand.length === 0) return;
+
+      const selectedIndices = [];
+
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3>Enlightenment - Pre-Stabilize Discard</h3>
+          <p>Discard up to ${maxCards} cards before stabilizing to draw more</p>
+          <div class="card-selection-grid" id="preStabilizeCards"></div>
+          <div class="modal-buttons">
+            <button class="secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+            <button id="confirmPreDiscard">Discard Selected (0)</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const cardGrid = modal.querySelector('#preStabilizeCards');
+      const confirmBtn = modal.querySelector('#confirmPreDiscard');
+
+      gameState.hand.forEach((card, idx) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'selectable-card';
+        cardDiv.innerHTML = `
+          <img src="images/cards/${card.name.toUpperCase()}.png" alt="${card.name}">
+          <div class="card-name">${card.name}</div>
+        `;
+        cardDiv.onclick = () => {
+          const selIdx = selectedIndices.indexOf(idx);
+          if (selIdx >= 0) {
+            selectedIndices.splice(selIdx, 1);
+            cardDiv.classList.remove('selected');
+          } else if (selectedIndices.length < maxCards) {
+            selectedIndices.push(idx);
+            cardDiv.classList.add('selected');
+          }
+          confirmBtn.textContent = `Discard Selected (${selectedIndices.length})`;
+        };
+        cardGrid.appendChild(cardDiv);
+      });
+
+      confirmBtn.onclick = () => {
+        modal.remove();
+        if (selectedIndices.length > 0) {
+          peerManager.preStabilizeDiscard(selectedIndices);
+        }
+      };
     };
 
     // Show age announcement modal
@@ -1266,6 +1391,27 @@
         case 'select_from_discard':
           showSelectFromDiscardModal(action);
           break;
+        case 'select_trait_swap':
+          showSelectTraitSwapModal(action);
+          break;
+        case 'select_color':
+          showSelectColorModal(action);
+          break;
+        case 'rearrange_traits':
+          showRearrangeTraitsModal(action);
+          break;
+        case 'select_cards_and_opponent':
+          showSelectCardsAndOpponentModal(action);
+          break;
+        case 'complex_trait_move':
+          showComplexTraitMoveModal(action);
+          break;
+        case 'select_own_trait_and_opponent':
+          showSelectOwnTraitAndOpponentModal(action);
+          break;
+        case 'select_mutual_discard':
+          showSelectMutualDiscardModal(action);
+          break;
       }
     }
 
@@ -1452,6 +1598,259 @@
 
     window.selectFromDiscard = function(index) {
       peerManager.selectCards({ index, effectType: pendingAction.effectType });
+      hideModal();
+    };
+
+    // Trait swap modal - two step: select own trait, then opponent's trait
+    let swapSelectedOwnTrait = null;
+    function showSelectTraitSwapModal(action) {
+      swapSelectedOwnTrait = null;
+      const sameColor = action.sameColor || false;
+
+      // Step 1: Select your own trait
+      const cardsHtml = action.ownOptions.map(t => {
+        const displayName = (t.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+        const imageName = cardImageMapping[displayName] || displayName;
+        const imageUrl = `images/cards/${imageName}.png`;
+        return `
+        <div class="hand-card-image ${getColorClass(t.color)}" style="cursor: pointer;"
+             data-index="${t.index}" data-color="${t.color}"
+             onclick="window.selectOwnTraitForSwap(${t.index}, '${t.color}', ${sameColor})">
+          <img src="${imageUrl}" alt="${t.name}"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="card-image-fallback" style="display: none;">
+            <div class="fallback-name">${t.name}</div>
+          </div>
+        </div>
+      `}).join('');
+      showModal(sameColor ? 'Select YOUR trait to swap (same color)' : 'Select YOUR trait to swap', cardsHtml, false, action.optional);
+    }
+
+    window.selectOwnTraitForSwap = function(index, color, sameColor) {
+      swapSelectedOwnTrait = { index, color };
+
+      // Step 2: Show opponent traits (filtered by color if sameColor)
+      let content = '';
+      pendingAction.opponentOptions.forEach(opp => {
+        const filteredTraits = sameColor
+          ? opp.traits.filter(t => t.color === color)
+          : opp.traits;
+
+        if (filteredTraits.length === 0) return;
+
+        content += `<div style="margin-bottom: 20px;">
+          <h4 style="margin-bottom: 10px;">${opp.name}</h4>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            ${filteredTraits.map(t => {
+              const displayName = (t.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+              const imageName = cardImageMapping[displayName] || displayName;
+              const imageUrl = `images/cards/${imageName}.png`;
+              return `
+              <div class="hand-card-image ${getColorClass(t.color)}" style="cursor: pointer;"
+                   onclick="window.completeTraitSwap('${opp.id}', ${t.index})">
+                <img src="${imageUrl}" alt="${t.name}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="card-image-fallback" style="display: none;">
+                  <div class="fallback-name">${t.name}</div>
+                </div>
+              </div>
+            `}).join('')}
+          </div>
+        </div>`;
+      });
+
+      if (!content) {
+        content = '<p>No valid traits to swap with</p>';
+      }
+
+      showModal(sameColor ? `Select opponent's ${color} trait` : "Select opponent's trait", content, false, pendingAction.optional);
+    };
+
+    window.completeTraitSwap = function(targetId, opponentTraitIndex) {
+      peerManager.selectCards({
+        targetId,
+        ownTraitIndex: swapSelectedOwnTrait.index,
+        opponentTraitIndex,
+        effectType: pendingAction.effectType
+      });
+      swapSelectedOwnTrait = null;
+      hideModal();
+    };
+
+    function showSelectColorModal(action) {
+      const colorClasses = {
+        'Red': 'red',
+        'Blue': 'blue',
+        'Green': 'green',
+        'Purple': 'purple',
+        'Colorless': 'colorless'
+      };
+      const content = action.options.map(opt => {
+        const colorClass = colorClasses[opt.color] || 'colorless';
+        return `
+          <button class="secondary ${colorClass}" style="padding: 20px 40px; margin: 10px; min-width: 150px; font-weight: bold;"
+                  onclick="window.selectColor('${opt.color}')">
+            ${opt.color}
+          </button>
+        `;
+      }).join('');
+      showModal(action.message || 'Select Color', content, false, false);
+    }
+
+    window.selectColor = function(color) {
+      peerManager.selectTarget({ selectedColor: color, effectType: pendingAction.effectType });
+      hideModal();
+    };
+
+    // Rearrange traits modal
+    function showRearrangeTraitsModal(action) {
+      const traits = action.traits || [];
+      const content = `
+        <p>Drag to reorder your traits (top = first played)</p>
+        <div id="rearrange-list" style="display: flex; flex-direction: column; gap: 5px;">
+          ${traits.map((t, i) => `
+            <div class="rearrange-item" data-index="${i}" draggable="true"
+                 style="padding: 10px; background: var(--surface); border-radius: 5px; cursor: move;">
+              ${t.name} (${t.faceValue})
+            </div>
+          `).join('')}
+        </div>
+        <button class="primary" style="margin-top: 15px;" onclick="window.confirmRearrange()">Confirm Order</button>
+      `;
+      showModal(action.message || 'Rearrange Traits', content, false, action.optional);
+      // Simple drag-drop would need more implementation for full functionality
+    }
+
+    window.confirmRearrange = function() {
+      const items = document.querySelectorAll('.rearrange-item');
+      const newOrder = Array.from(items).map(item => parseInt(item.dataset.index));
+      peerManager.selectTarget({ newOrder, effectType: pendingAction.effectType });
+      hideModal();
+    };
+
+    // Select cards and opponent modal (for give_cards)
+    function showSelectCardsAndOpponentModal(action) {
+      const content = `
+        <p>${action.message || 'Select cards to give'}</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px;">
+          ${action.cards.map((c, i) => `
+            <div class="selectable-card" data-index="${i}" onclick="window.toggleGiveCard(this, ${i})">
+              ${createCardElement(c, false).outerHTML}
+            </div>
+          `).join('')}
+        </div>
+        <p>Select opponent:</p>
+        ${action.opponents.map(opp => `
+          <button class="secondary" style="margin: 5px;" onclick="window.confirmGiveCards('${opp.id}')">
+            ${opp.name}
+          </button>
+        `).join('')}
+      `;
+      showModal('Give Cards', content, false, action.optional);
+      window.giveCardSelection = [];
+    }
+
+    window.toggleGiveCard = function(el, index) {
+      el.classList.toggle('selected');
+      const idx = window.giveCardSelection.indexOf(index);
+      if (idx === -1) window.giveCardSelection.push(index);
+      else window.giveCardSelection.splice(idx, 1);
+    };
+
+    window.confirmGiveCards = function(targetId) {
+      peerManager.selectCards({ targetId, cardIndices: window.giveCardSelection, effectType: pendingAction.effectType });
+      hideModal();
+    };
+
+    // Complex trait move modal
+    function showComplexTraitMoveModal(action) {
+      showSelectOwnTraitModal(action); // Reuse own trait selection for now
+    }
+
+    // Select own trait and opponent modal (for give_trait_to_opponent)
+    let giveTraitSelectedTrait = null;
+    function showSelectOwnTraitAndOpponentModal(action) {
+      const traits = action.traits || [];
+      const content = `
+        <p>Step 1: Select a trait to give away</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+          ${traits.map((t, i) => `
+            <div class="selectable-card" onclick="window.selectTraitToGive(${i}, '${t.name}')">
+              ${createCardElement(t, false).outerHTML}
+            </div>
+          `).join('')}
+        </div>
+      `;
+      showModal(action.message || 'Give Trait to Opponent', content, false, action.optional);
+    }
+
+    window.selectTraitToGive = function(index, name) {
+      giveTraitSelectedTrait = { index, name };
+      const opponents = pendingAction.opponents || [];
+      const content = `
+        <p>Selected: ${name}</p>
+        <p>Step 2: Choose opponent to receive it</p>
+        ${opponents.map(opp => `
+          <button class="secondary" style="padding: 15px 25px; margin: 5px;"
+                  onclick="window.confirmGiveTrait('${opp.id}')">
+            ${opp.name}
+          </button>
+        `).join('')}
+      `;
+      showModal('Give Trait to Opponent', content, false, pendingAction.optional);
+    };
+
+    window.confirmGiveTrait = function(targetId) {
+      peerManager.selectTarget({
+        targetId,
+        traitIndex: giveTraitSelectedTrait.index,
+        effectType: pendingAction.effectType
+      });
+      giveTraitSelectedTrait = null;
+      hideModal();
+    };
+
+    // Mutual discard modal (for RECKLESS)
+    let mutualDiscardState = { ownIndex: null, opponentId: null, opponentIndex: null };
+    function showSelectMutualDiscardModal(action) {
+      const ownTraits = action.ownTraits || [];
+      const content = `
+        <p>Select one of YOUR traits to discard:</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+          ${ownTraits.map((t, i) => `
+            <div class="selectable-card" onclick="window.selectMutualOwnTrait(${i}, '${t.name}')">
+              ${createCardElement(t, false).outerHTML}
+            </div>
+          `).join('')}
+        </div>
+      `;
+      showModal(action.message || 'Mutual Discard', content, false, action.optional);
+    }
+
+    window.selectMutualOwnTrait = function(index, name) {
+      mutualDiscardState.ownIndex = index;
+      const opponents = pendingAction.opponents || [];
+      let content = `<p>Your trait: ${name}</p><p>Now select an opponent's trait to discard:</p>`;
+      opponents.forEach(opp => {
+        content += `<div style="margin: 10px 0;"><strong>${opp.name}:</strong><div style="display: flex; flex-wrap: wrap; gap: 5px;">`;
+        (opp.traits || []).forEach((t, i) => {
+          content += `<div class="selectable-card" onclick="window.confirmMutualDiscard('${opp.id}', ${i})">
+            ${createCardElement(t, false).outerHTML}
+          </div>`;
+        });
+        content += `</div></div>`;
+      });
+      showModal('Select Opponent Trait', content, false, pendingAction.optional);
+    };
+
+    window.confirmMutualDiscard = function(targetId, opponentIndex) {
+      peerManager.selectTarget({
+        targetId,
+        ownTraitIndex: mutualDiscardState.ownIndex,
+        opponentTraitIndex: opponentIndex,
+        effectType: pendingAction.effectType
+      });
+      mutualDiscardState = { ownIndex: null, opponentId: null, opponentIndex: null };
       hideModal();
     };
 

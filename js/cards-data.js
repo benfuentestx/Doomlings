@@ -131,22 +131,135 @@ export const ageCards = [
   {
     type: 'age',
     name: 'Northern Winds',
-    turnEffects: [
-      { name: 'add_turn_restriction', params: { restricted_attribute: 'face_value', restricted_value: 0, restricted_type: 'less_than' } }
+    turnEffects: [],
+    instantEffects: [
+      { name: 'draw_cards', params: { affected_players: 'all', value: 1 } },
+      { name: 'discard_card_from_hand', params: { affected_players: 'all', num_cards: 1, random_discard: false } }
     ],
-    instantEffects: [],
     expansion: 'Base',
-    description: 'Cannot play negative face value traits'
+    description: 'Draw 1 card. Discard 1 card from your hand'
   },
   {
     type: 'age',
     name: 'Badlands',
     turnEffects: [],
     instantEffects: [
-      { name: 'draw_cards', params: { affected_players: 'all', value: 1 } }
+      { name: 'discard_card_from_hand', params: { affected_players: 'all', num_cards: 1, random_discard: false } },
+      { name: 'deal_from_discard_pile', params: { affected_players: 'all', num_cards: 1 } }
     ],
     expansion: 'Base',
-    description: 'All players draw 1 card'
+    description: 'Discard 1 card. Deal 1 card from shuffled discard pile to each player'
+  },
+  {
+    type: 'age',
+    name: 'Natural Harmony',
+    turnEffects: [
+      { name: 'cannot_play_same_color', params: {} }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'You may not play a trait of the same color as the last trait played'
+  },
+  {
+    type: 'age',
+    name: 'Prosperity',
+    turnEffects: [
+      { name: 'optional_stabilization', params: {} }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'At the end of your turn, you may choose not to stabilize'
+  },
+  {
+    type: 'age',
+    name: 'Reforestation',
+    turnEffects: [
+      { name: 'protect_traits', params: {} }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'Traits in your trait pile cannot be swapped, stolen, or discarded'
+  },
+  {
+    type: 'age',
+    name: 'Coastal Formations',
+    turnEffects: [],
+    instantEffects: [
+      { name: 'draw_card_after_stabilize', params: { affected_players: 'all', value: 1 } }
+    ],
+    expansion: 'Base',
+    description: 'Draw 1 card after you stabilize'
+  },
+  {
+    type: 'age',
+    name: 'Enlightenment',
+    turnEffects: [
+      { name: 'optional_discard_before_stabilize', params: { affected_players: 'all', max_cards: 2 } }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'You may discard up to 2 cards from your hand before you stabilize'
+  },
+  {
+    type: 'age',
+    name: 'Galactic Drift',
+    turnEffects: [
+      { name: 'colorless_allows_extra_play', params: {} }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'If you play a colorless trait, you may play another colorless trait'
+  },
+  {
+    type: 'age',
+    name: 'High Tides',
+    turnEffects: [
+      { name: 'effectless_allows_extra_play', params: {} }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'If you play an effectless trait, you may play another effectless trait'
+  },
+  {
+    type: 'age',
+    name: 'Age of Dracula',
+    turnEffects: [],
+    instantEffects: [
+      { name: 'discard_card_from_hand', params: { affected_players: 'all', num_cards: 1, random_discard: true } },
+      { name: 'steal_random_card_if_vampirism', params: {} }
+    ],
+    expansion: 'Base',
+    description: 'Discard 1 random card from your hand. If Vampirism is in your trait pile, steal 1 random card from an opponent\'s hand'
+  },
+  {
+    type: 'age',
+    name: 'Age of Nietzsche',
+    turnEffects: [
+      { name: 'optional_stabilization_draw_3', params: {} }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'Instead of stabilizing this turn, you may discard your hand and draw 3 cards'
+  },
+  {
+    type: 'age',
+    name: 'Age of Reason',
+    turnEffects: [],
+    instantEffects: [
+      { name: 'draw_keep_1_discard_2', params: { affected_players: 'all' } }
+    ],
+    expansion: 'Base',
+    description: 'Draw 3 cards. Keep 1, discard the other 2'
+  },
+  {
+    type: 'age',
+    name: 'Awakening',
+    turnEffects: [
+      { name: 'preview_next_age', params: {} }
+    ],
+    instantEffects: [],
+    expansion: 'Base',
+    description: 'Preview the next age before you take your turn'
   }
 ];
 
@@ -229,6 +342,127 @@ export const catastrophes = [
     worldEndEffect: { name: 'discard_card_from_trait_pile', params: { affected_players: 'all', color: 'Purple', num_cards: 1 } },
     expansion: 'Base',
     description: 'Gene Pool -1. Discard 1 card for each Purple trait. World\'s End: Discard 1 Purple trait.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'Solar Flare',
+    genePoolEffect: -1,
+    catastropheEffects: [
+      { name: 'discard_half_hand', params: { affected_players: 'all' } }
+    ],
+    worldEndEffect: { name: 'modify_world_end_points_for_every_color', params: { affected_players: 'all', color: 'Purple', value: -1 } },
+    expansion: 'Base',
+    description: 'Gene Pool -1. Discard half your hand rounded up. World\'s End: -1 point per Purple trait.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'The Big One',
+    genePoolEffect: -1,
+    catastropheEffects: [
+      { name: 'give_cards_to_adjacent_opponents', params: { num_cards: 1 } }
+    ],
+    worldEndEffect: { name: 'modify_world_end_points_missing_colors', params: { affected_players: 'all', value: -2 } },
+    expansion: 'Base',
+    description: 'Gene Pool -1. Give 1 card to opponents on your left and right. World\'s End: -2 to your score for each color missing from your trait pile.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'The Four Horsemen',
+    genePoolEffect: -1,
+    catastropheEffects: [
+      { name: 'discard_trait_from_pile', params: { affected_players: 'all', num_cards: 1 } }
+    ],
+    worldEndEffect: { name: 'discard_trait_from_pile_face_value', params: { affected_players: 'all', num_cards: 1, face_value: 4, compare_type: 'greater_than_or_equal' } },
+    expansion: 'Base',
+    description: 'Gene Pool -1. Discard 1 trait from your trait pile. World\'s End: Discard 1 trait from your trait pile with a face value of 4 or higher.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'The Messiah',
+    genePoolEffect: 0,
+    catastropheEffects: [
+      { name: 'reverse_turn_order', params: {} }
+    ],
+    worldEndEffect: null,
+    expansion: 'Base',
+    description: 'Play this age in reverse: first player last and last player first.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'AI Takeover',
+    genePoolEffect: -1,
+    catastropheEffects: [
+      { name: 'discard_all_but_n_cards', params: { affected_players: 'all', num_cards: 1 } }
+    ],
+    worldEndEffect: { name: 'colorless_worth_2_ignore_effects', params: { affected_players: 'all' } },
+    expansion: 'Techlings',
+    description: 'Gene Pool -1. Discard all but 1 card from your hand. World\'s End: Each colorless trait is now worth 2. Ignore all colorless trait effects. (Excluding dominants.)'
+  },
+  {
+    type: 'catastrophe',
+    name: 'Alien Terraform',
+    genePoolEffect: 0,
+    catastropheEffects: [
+      { name: 'stabilize_all_players', params: { reset_stabilize: true } }
+    ],
+    worldEndEffect: null,
+    expansion: 'Mythlings',
+    description: 'You may discard dominant cards from your hand. If you do, then stabilize immediately.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'Deus Ex Machina',
+    genePoolEffect: 0,
+    catastropheEffects: [
+      { name: 'stabilize_all_players', params: { reset_stabilize: true } }
+    ],
+    worldEndEffect: { name: 'draw_card_add_face_value_max_5', params: { affected_players: 'all' } },
+    expansion: 'Mythlings',
+    description: 'Stabilize. Crisis averted. World\'s End: Draw a card. Add its face value to your final score (+5 max). Then discard it.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'Glacial Meltdown',
+    genePoolEffect: -1,
+    catastropheEffects: [
+      { name: 'discard_card_from_hand', params: { affected_players: 'all', num_cards: 2, random_discard: true } }
+    ],
+    worldEndEffect: { name: 'discard_card_from_trait_pile', params: { affected_players: 'all', color: 'Blue', num_cards: 1 } },
+    expansion: 'Techlings',
+    description: 'Gene Pool -1. Discard 2 cards from your hand at random. World\'s End: Discard 1 blue trait from your trait pile.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'Grey Goo',
+    genePoolEffect: 0,
+    catastropheEffects: [
+      { name: 'discard_hand_and_stabilize', params: { affected_players: 'all' } }
+    ],
+    worldEndEffect: { name: 'modify_world_end_points_most_traits', params: { affected_players: 'all', value: -5 } },
+    expansion: 'Techlings',
+    description: 'Discard your hand and stabilize. World\'s End: -5 points to the player(s) with the most traits in their trait pile.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'Mega Tsunami',
+    genePoolEffect: -1,
+    catastropheEffects: [
+      { name: 'pass_hand_right', params: { affected_players: 'all' } }
+    ],
+    worldEndEffect: { name: 'discard_card_from_trait_pile', params: { affected_players: 'all', color: 'Red', num_cards: 1 } },
+    expansion: 'Dinolings',
+    description: 'Gene Pool -1. Pass your hand to the right. World\'s End: Discard 1 red trait from your trait pile.'
+  },
+  {
+    type: 'catastrophe',
+    name: 'Nuclear Winter',
+    genePoolEffect: -1,
+    catastropheEffects: [
+      { name: 'stabilize_all_then_discard', params: { affected_players: 'all', num_cards: 1 } }
+    ],
+    worldEndEffect: { name: 'discard_card_from_trait_pile', params: { affected_players: 'all', color: 'Colorless', num_cards: 1 } },
+    expansion: 'Techlings',
+    description: 'Gene Pool -1. Stabilize. Then discard 1 card from your hand. World\'s End: Discard 1 colorless trait from your trait pile.'
   }
 ];
 
@@ -360,7 +594,7 @@ export const traits = [
     color: 'Red',
     expansion: 'Base',
     actions: [{ name: 'discard_card_from_trait_pile', params: { affected_players: 'opponents', num_cards: 1, color: 'Red' } }],
-    actionDescription: 'Opponent discards 1 Red trait'
+    actionDescription: 'All opponents discard 1 red trait from their trait pile'
   },
   {
     name: 'Bad',
@@ -391,7 +625,7 @@ export const traits = [
     faceValue: 1,
     color: 'Green',
     expansion: 'Base',
-    actions: [{ name: 'play_another_trait', params: { affected_players: 'self', num_traits: 1 } }],
+    actions: [{ name: 'play_another_trait', params: { num_traits: 1 } }],
     actionDescription: 'Play another trait'
   },
   {
@@ -400,10 +634,10 @@ export const traits = [
     color: 'Red',
     expansion: 'Base',
     actions: [
-      { name: 'discard_card_from_trait_pile', params: { affected_players: 'self', num_cards: 1 } },
-      { name: 'play_another_trait', params: { affected_players: 'self', num_traits: 1 } }
+      { name: 'play_another_trait', params: { num_traits: 1 } },
+      { name: 'discard_card_from_trait_pile', params: { affected_players: 'self', num_cards: 1 } }
     ],
-    actionDescription: 'Discard 1 of your traits, then play another trait'
+    actionDescription: 'Play another trait. Then discard 1 trait from your trait pile'
   },
   {
     name: 'Phreakish Eyes',
@@ -524,7 +758,7 @@ export const traits = [
   },
   {
     name: 'Sticky Secretions',
-    faceValue: -1,
+    faceValue: 1,
     color: 'Purple',
     expansion: 'Base',
     bonusPoints: { name: 'bonus_for_every_color', params: { color: 'Purple', value: 1 } },
@@ -656,11 +890,11 @@ export const traits = [
     color: 'Red',
     expansion: 'Dinolings',
     bonusPoints: { name: 'bonus_discard_expansion', params: { expansion: 'Dinolings', value: 1 } },
-    bonusDescription: '+1 for each Dinolings card in discard'
+    bonusDescription: '+1 for each Dinoling in the discard pile'
   },
   {
     name: 'Serrated Teeth',
-    faceValue: -1,
+    faceValue: 1,
     color: 'Red',
     expansion: 'Dinolings',
     bonusPoints: { name: 'bonus_discard_dominant', params: { value: 1 } },
@@ -732,7 +966,7 @@ export const traits = [
     expansion: 'Base',
     isDominant: true,
     bonusPoints: { name: 'bonus_number_traits', params: { value: -1 } },
-    bonusDescription: '-1 for each trait you have (including this)'
+    bonusDescription: '-1 for each trait in your trait pile (including this one)'
   },
   {
     name: 'Symbiosis',
@@ -761,6 +995,24 @@ export const traits = [
     isDominant: true,
     playConditions: [{ name: 'at_least_n_traits', params: { num_traits: 3, color: 'Green' } }],
     requirementDescription: 'Requires 3 Green traits in your trait pile'
+  },
+  {
+    name: 'Vampirism',
+    faceValue: 3,
+    color: 'Purple',
+    expansion: 'Base',
+    isDominant: true,
+    actions: [{ name: 'steal_trait_and_play_action', params: {} }],
+    actionDescription: 'Steal a trait from an opponent\'s trait pile. Play its action.'
+  },
+  {
+    name: 'Viral',
+    faceValue: 2,
+    color: 'Purple',
+    expansion: 'Base',
+    isDominant: true,
+    worldEndEffect: { name: 'choose_color_opponents_lose_points', params: {} },
+    actionDescription: 'At World\'s End: Choose a color. Opponents receive -1 for each trait of that color in their trait pile.'
   },
 
   // === REQUIREMENT TRAITS ===
@@ -854,16 +1106,16 @@ export const traits = [
     faceValue: 3,
     color: 'Blue',
     expansion: 'Base',
-    actions: [{ name: 'protect_traits', params: { affected_players: 'self' } }],
-    actionDescription: 'Your traits cannot be removed this round'
+    actions: [{ name: 'give_trait_to_opponent', params: {} }],
+    actionDescription: 'Give an opponent 1 trait from your trait pile'
   },
   {
     name: 'Trunk',
-    faceValue: 0,
-    color: 'Blue',
+    faceValue: 1,
+    color: 'Green',
     expansion: 'Base',
-    actions: [{ name: 'draw_cards', params: { affected_players: 'self', value: 2 } }],
-    actionDescription: 'Draw 2 cards'
+    actions: [{ name: 'search_discard_ignore_action', params: {} }],
+    actionDescription: 'Play the top card from the discard pile. Ignore its action'
   },
   {
     name: 'Tentacles',
@@ -879,8 +1131,8 @@ export const traits = [
     faceValue: 1,
     color: 'Green',
     expansion: 'Base',
-    actions: [{ name: 'draw_cards', params: { affected_players: 'self', value: 1 } }],
-    actionDescription: 'Draw 1 card'
+    actions: [{ name: 'draw_and_play_if_color', params: { value: 2, color: 'Green' } }],
+    actionDescription: 'Draw 2 cards. If either are green, play 1 immediately (unless restricted)'
   },
   {
     name: 'Self-Replicating',
@@ -897,16 +1149,16 @@ export const traits = [
     faceValue: 3,
     color: 'Red',
     expansion: 'Base',
-    actions: [{ name: 'discard_hand_draw_new', params: { affected_players: 'self' } }],
-    actionDescription: 'Discard your hand, draw that many +1'
+    actions: [{ name: 'mutual_discard_trait', params: {} }],
+    actionDescription: 'You and an opponent discard 1 trait from each other\'s trait pile'
   },
   {
     name: 'Poisonous',
     faceValue: 2,
     color: 'Purple',
     expansion: 'Base',
-    actions: [{ name: 'discard_opponent_trait', params: {} }],
-    actionDescription: 'Discard a non-dominant trait from an opponent'
+    actions: [{ name: 'swap_self_with_opponent_trait', params: {} }],
+    actionDescription: 'Swap Poisonous with a trait from an opponent\'s trait pile'
   },
   {
     name: 'Selfish',
@@ -922,24 +1174,27 @@ export const traits = [
     color: 'Purple',
     expansion: 'Base',
     nCards: 2,
-    actions: [{ name: 'move_trait', params: {} }],
-    actionDescription: 'Move a non-dominant trait between players'
+    actions: [{ name: 'swap_trait', params: { same_color: false } }],
+    actionDescription: 'Swap 1 trait from your trait pile with an opponent\'s trait of a different color'
   },
   {
     name: 'Persuasive',
     faceValue: 1,
     color: 'Purple',
     expansion: 'Base',
-    actions: [{ name: 'swap_trait', params: {} }],
-    actionDescription: 'Swap a non-dominant trait with an opponent'
+    actions: [{ name: 'discard_color_from_hand', params: {} }],
+    actionDescription: 'Choose a color - all players discard cards of that color'
   },
   {
     name: 'Venomous',
     faceValue: 2,
     color: 'Purple',
     expansion: 'Base',
-    actions: [{ name: 'discard_card_from_hand', params: { affected_players: 'opponents', num_cards: 2, target_player: 'choose' } }],
-    actionDescription: 'Choose an opponent to discard 2 cards'
+    actions: [
+      { name: 'play_another_trait', params: { num_traits: 1 } },
+      { name: 'move_self_to_opponent', params: {} }
+    ],
+    actionDescription: 'Play another trait. Then move Venomous to an opponent\'s trait pile'
   },
   {
     name: 'Doting',
@@ -989,8 +1244,8 @@ export const traits = [
     faceValue: 1,
     color: 'Green',
     expansion: 'Base',
-    actions: [{ name: 'give_cards', params: { affected_players: 'opponent', num_cards: 1 } }],
-    actionDescription: 'Give 1 card to an opponent'
+    actions: [{ name: 'steal_trait', params: { color: 'Green' } }],
+    actionDescription: 'Steal 1 green trait from an opponent\'s trait pile'
   },
 
   // === PLAY_WHEN (Out of turn) TRAITS ===
@@ -1124,8 +1379,8 @@ export const traits = [
     color: 'Purple',
     expansion: 'Base',
     worldsEnd: true,
-    worldsEndEffect: { name: 'steal_trait_at_end', params: {} },
-    worldsEndDescription: "World's End: Steal a non-dominant trait"
+    worldsEndEffect: { name: 'play_from_hand_at_end', params: { card_name: 'Sneaky' } },
+    worldsEndDescription: "World's End: You may play Sneaky from your hand"
   },
   {
     name: 'Optimistic Nihilism',
@@ -1157,8 +1412,8 @@ export const traits = [
     color: 'Colorless',
     expansion: 'Base',
     worldsEnd: true,
-    worldsEndEffect: { name: 'draw_at_end', params: { value: 3 } },
-    worldsEndDescription: "World's End: Draw 3 cards"
+    worldsEndEffect: { name: 'choose_catastrophe_world_end', params: {} },
+    worldsEndDescription: "World's End: Choose a World's End effect from the 3 catastrophes"
   }
 ];
 

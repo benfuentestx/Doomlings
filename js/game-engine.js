@@ -115,9 +115,9 @@ export class Scoring {
     const { name, params } = bonus;
 
     switch (name) {
-      // Kidney bonus: +1 for each Kidney trait across all players
+      // Kidney bonus: +1 for each Kidney trait in your trait pile
       case 'bonus_kidney':
-        return this.countAllByNamePattern(gameState, 'Kidney');
+        return player.traitPile.filter(c => c.name && c.name.includes('Kidney')).length;
 
       // Swarm bonus: +1 for each Swarm trait across all players
       case 'bonus_swarm':
@@ -203,6 +203,12 @@ export class Scoring {
       // Catastrophe count bonus
       case 'bonus_catastrophe_count':
         return gameState.catastropheCount * (params.value || 1);
+
+      // Chosen color bonus (for Sentience - color chosen at World's End)
+      case 'bonus_chosen_color': {
+        const chosenColor = player.sentienceChosenColor || 'Red'; // Default to Red if not set
+        return this.countColor(player.traitPile, chosenColor) * (params.value || 1);
+      }
 
       default:
         return 0;
@@ -519,8 +525,69 @@ export class CardEffects {
         };
       }
 
+      // Search discard and play with action (Selective Memory)
+      case 'search_discard_and_play': {
+        if (gameState.discardPile.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_from_discard',
+          options: gameState.discardPile.map((c, i) => ({ index: i, name: c.name, color: c.color, faceValue: c.faceValue })),
+          message: 'Choose card from discard pile to play',
+          effectType: 'search_discard_and_play',
+          optional: false
+        };
+      }
+
+      // Search discard and play ignoring action (Self-Replicating)
+      case 'search_discard_ignore_action': {
+        if (gameState.discardPile.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_from_discard',
+          options: gameState.discardPile.map((c, i) => ({ index: i, name: c.name, color: c.color, faceValue: c.faceValue })),
+          message: 'Choose card from discard pile to play (ignore action)',
+          effectType: 'search_discard_ignore_action',
+          optional: false
+        };
+      }
+
       // Steal trait from opponent
       case 'steal_trait': {
+        const colorFilter = action.params.color;
+        const faceValueFilter = action.params.face_value;
+        const opponents = gameState.players.filter(p =>
+          p.id !== player.id &&
+          p.traitPile.some(t =>
+            !DeckManager.isDominant(t) &&
+            (!colorFilter || DeckManager.isColor(t, colorFilter)) &&
+            (faceValueFilter === undefined || t.faceValue === faceValueFilter)
+          ) &&
+          !(p.protected && p.protectedUntil > gameState.round)
+        );
+        if (opponents.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_opponent_trait',
+          options: opponents.map(p => ({
+            id: p.id, name: p.name,
+            traits: p.traitPile
+              .filter(t =>
+                !DeckManager.isDominant(t) &&
+                (!colorFilter || DeckManager.isColor(t, colorFilter)) &&
+                (faceValueFilter === undefined || t.faceValue === faceValueFilter)
+              )
+              .map((t, i) => ({ index: p.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue }))
+          })),
+          message: colorFilter ? `Choose ${colorFilter} trait to steal` : 'Choose trait to steal',
+          effectType: 'steal_trait',
+          optional: true
+        };
+      }
+
+      // Steal trait and stop its action (for Parasitic card)
+      // Note: Full implementation requires reactive play mechanics
+      // For now, this works like regular steal_trait
+      case 'steal_trait_and_stop_action': {
         const opponents = gameState.players.filter(p =>
           p.id !== player.id && p.traitPile.some(t => !DeckManager.isDominant(t)) &&
           !(p.protected && p.protectedUntil > gameState.round)
@@ -534,8 +601,28 @@ export class CardEffects {
             traits: p.traitPile.filter(t => !DeckManager.isDominant(t))
               .map((t, i) => ({ index: p.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue }))
           })),
-          message: 'Choose trait to steal',
-          effectType: 'steal_trait',
+          message: 'Choose trait to steal (and stop its action)',
+          effectType: 'steal_trait', // Reuse steal_trait handler
+          optional: true
+        };
+      }
+
+      // Steal trait and play its action (for Vampirism card)
+      case 'steal_trait_and_play_action': {
+        const opponents = gameState.players.filter(p =>
+          p.id !== player.id && p.traitPile.some(t => !DeckManager.isDominant(t))
+        );
+        if (opponents.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_opponent_trait',
+          options: opponents.map(p => ({
+            id: p.id, name: p.name,
+            traits: p.traitPile.filter(t => !DeckManager.isDominant(t))
+              .map((t, i) => ({ index: p.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue, actions: t.actions }))
+          })),
+          message: 'Choose trait to steal (will play its action)',
+          effectType: 'steal_trait_play_action',
           optional: true
         };
       }
@@ -627,6 +714,27 @@ export class CardEffects {
         };
       }
 
+      // Play action from opponent's trait (trigger action without copying card)
+      case 'play_opponent_trait_action': {
+        const opponents = gameState.players.filter(p =>
+          p.id !== player.id && p.traitPile.some(t => t.actions && t.actions.length > 0)
+        );
+        if (opponents.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_opponent_trait',
+          options: opponents.map(p => ({
+            id: p.id, name: p.name,
+            traits: p.traitPile
+              .filter(t => t.actions && t.actions.length > 0)
+              .map((t, i) => ({ index: p.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue }))
+          })),
+          message: 'Choose trait action to play',
+          effectType: 'play_opponent_action',
+          optional: true
+        };
+      }
+
       // Give cards to opponent
       case 'give_cards': {
         const count = params.num_cards || 1;
@@ -658,6 +766,7 @@ export class CardEffects {
 
       // Swap trait with opponent
       case 'swap_trait': {
+        const sameColor = params.same_color; // true = must match color, false = must be different color
         const ownTraits = player.traitPile.filter(t => !DeckManager.isDominant(t) && t.instanceId !== card.instanceId);
         if (ownTraits.length === 0) return { needsInput: false };
         const opponents = gameState.players.filter(p =>
@@ -673,8 +782,9 @@ export class CardEffects {
             traits: p.traitPile.filter(t => !DeckManager.isDominant(t))
               .map((t, i) => ({ index: p.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue }))
           })),
-          message: 'Choose traits to swap',
+          message: sameColor === false ? 'Choose traits to swap (different colors)' : 'Choose traits to swap',
           effectType: 'swap_trait',
+          sameColor: sameColor, // Pass parameter to resolution
           optional: true
         };
       }
@@ -703,6 +813,124 @@ export class CardEffects {
       case 'skip_stabilization': {
         player.skipStabilize = true;
         return { needsInput: false };
+      }
+
+      // Give trait to opponent (Scutes)
+      case 'give_trait_to_opponent': {
+        const ownTraits = player.traitPile.filter(t => !DeckManager.isDominant(t) && t.instanceId !== card.instanceId);
+        if (ownTraits.length === 0) return { needsInput: false };
+        const opponents = gameState.players.filter(p => p.id !== player.id);
+        if (opponents.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_own_trait_and_opponent',
+          ownTraitOptions: ownTraits.map((t, i) => ({ index: player.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue })),
+          opponentOptions: opponents.map(p => ({ id: p.id, name: p.name })),
+          message: 'Choose a trait to give to an opponent',
+          effectType: 'give_trait_to_opponent',
+          optional: true
+        };
+      }
+
+      // Mutual discard trait (Reckless)
+      case 'mutual_discard_trait': {
+        const ownTraits = player.traitPile.filter(t => !DeckManager.isDominant(t) && t.instanceId !== card.instanceId);
+        if (ownTraits.length === 0) return { needsInput: false };
+        const opponents = gameState.players.filter(p =>
+          p.id !== player.id &&
+          p.traitPile.some(t => !DeckManager.isDominant(t)) &&
+          !(p.protected && p.protectedUntil > gameState.round)
+        );
+        if (opponents.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_mutual_discard',
+          ownTraitOptions: ownTraits.map((t, i) => ({ index: player.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue })),
+          opponentOptions: opponents.map(p => ({
+            id: p.id, name: p.name,
+            traits: p.traitPile.filter(t => !DeckManager.isDominant(t))
+              .map((t, i) => ({ index: p.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue }))
+          })),
+          message: 'Choose your trait and opponent trait to discard',
+          effectType: 'mutual_discard_trait',
+          optional: true
+        };
+      }
+
+      // Discard all cards of a chosen color from all players' hands (Persuasive)
+      case 'discard_color_from_hand': {
+        const colors = ['Red', 'Blue', 'Green', 'Purple', 'Colorless'];
+        return {
+          needsInput: true,
+          inputType: 'select_color',
+          options: colors.map(c => ({ color: c })),
+          message: 'Choose a color - all players discard cards of that color',
+          effectType: 'discard_color_from_hand'
+        };
+      }
+
+      // Draw cards and play if specific color (Photosynthesis)
+      case 'draw_and_play_if_color': {
+        const count = params.value || 2;
+        const targetColor = params.color || 'Green';
+        const drawn = gameState.drawCards(count);
+        player.hand.push(...drawn);
+        gameState.log(`${player.name} drew ${drawn.length} card(s)`);
+
+        // Check if any drawn cards match the color
+        const matchingCards = drawn.filter(c => c.color === targetColor || c.color.includes(targetColor));
+        if (matchingCards.length > 0 && !player.hasPlayedTraitThisTurn) {
+          // Offer to play one immediately
+          return {
+            needsInput: true,
+            inputType: 'select_own_cards',
+            count: 1,
+            options: matchingCards.map((c, i) => ({
+              index: player.hand.indexOf(c),
+              name: c.name,
+              color: c.color,
+              faceValue: c.faceValue
+            })),
+            message: `You drew ${targetColor} card(s). Play 1 immediately? (Unless restricted)`,
+            effectType: 'play_drawn_card',
+            optional: true
+          };
+        }
+        return { needsInput: false };
+      }
+
+      // Swap this card with opponent's trait (Poisonous)
+      case 'swap_self_with_opponent_trait': {
+        const opponents = gameState.players.filter(p =>
+          p.id !== player.id && p.traitPile.some(t => !DeckManager.isDominant(t))
+        );
+        if (opponents.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_opponent_trait',
+          options: opponents.map(p => ({
+            id: p.id, name: p.name,
+            traits: p.traitPile.filter(t => !DeckManager.isDominant(t))
+              .map((t, i) => ({ index: p.traitPile.indexOf(t), name: t.name, color: t.color, faceValue: t.faceValue }))
+          })),
+          message: 'Choose an opponent\'s trait to swap with this card',
+          effectType: 'swap_self_with_opponent_trait',
+          cardToSwap: card
+        };
+      }
+
+      // Move this card to opponent's trait pile (Venomous)
+      case 'move_self_to_opponent': {
+        const opponents = gameState.players.filter(p => p.id !== player.id);
+        if (opponents.length === 0) return { needsInput: false };
+        return {
+          needsInput: true,
+          inputType: 'select_opponent',
+          options: opponents.map(p => ({ id: p.id, name: p.name })),
+          message: 'Choose an opponent to give this card to',
+          effectType: 'move_self_to_opponent',
+          cardToMove: card
+        };
       }
 
       default:
@@ -760,6 +988,33 @@ export class CardEffects {
         }
         return { success: true };
 
+      case 'steal_trait_play_action':
+        if (!targetPlayer) return { success: false, error: 'No target selected' };
+        const stolenTraitWithAction = gameState.removeTraitFromPile(targetPlayer, data.traitIndex);
+        if (stolenTraitWithAction) {
+          player.traitPile.push(stolenTraitWithAction);
+          // Apply gene pool effect to new owner
+          if (stolenTraitWithAction.effects) {
+            for (const effect of stolenTraitWithAction.effects) {
+              if (effect.name === 'modify_gene_pool' && effect.params.affected_players === 'self') {
+                player.genePool = Math.max(1, Math.min(8, player.genePool + effect.params.value));
+                gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
+              }
+            }
+          }
+          gameState.log(`${player.name} stole ${stolenTraitWithAction.name} from ${targetPlayer.name}`);
+          // Play the stolen trait's actions
+          if (stolenTraitWithAction.actions) {
+            for (const action of stolenTraitWithAction.actions) {
+              const actionResult = this.executeAction(action, player, gameState, stolenTraitWithAction);
+              if (actionResult.needsInput) {
+                return { success: true, pendingAction: actionResult };
+              }
+            }
+          }
+        }
+        return { success: true };
+
       case 'copy_trait':
         if (!targetPlayer) return { success: false, error: 'No target selected' };
         const copiedTrait = { ...targetPlayer.traitPile[data.traitIndex], instanceId: `copy_${Date.now()}` };
@@ -776,6 +1031,22 @@ export class CardEffects {
         gameState.log(`${player.name} copied ${copiedTrait.name}`);
         return { success: true };
 
+      case 'play_opponent_action':
+        if (!targetPlayer) return { success: false, error: 'No target selected' };
+        const traitWithAction = targetPlayer.traitPile[data.traitIndex];
+        if (traitWithAction && traitWithAction.actions) {
+          gameState.log(`${player.name} plays ${traitWithAction.name}'s action from ${targetPlayer.name}'s trait pile`);
+          // Process each action from the selected trait
+          for (const action of traitWithAction.actions) {
+            const actionResult = this.executeAction(action, player, gameState, card);
+            if (actionResult.needsInput) {
+              // Queue the action for player input
+              return { success: true, pendingAction: actionResult };
+            }
+          }
+        }
+        return { success: true };
+
       case 'discard_opponent_trait':
         if (!targetPlayer) return { success: false, error: 'No target selected' };
         const discardedTrait = gameState.removeTraitFromPile(targetPlayer, data.traitIndex);
@@ -783,6 +1054,48 @@ export class CardEffects {
           gameState.discardPile.push(discardedTrait);
           gameState.log(`${player.name} discarded ${discardedTrait.name} from ${targetPlayer.name}`);
         }
+        return { success: true };
+
+      case 'give_trait_to_opponent':
+        if (!targetPlayer) return { success: false, error: 'No target selected' };
+        const givenTrait = gameState.removeTraitFromPile(player, data.ownTraitIndex);
+        if (givenTrait) {
+          targetPlayer.traitPile.push(givenTrait);
+          // Apply gene pool effect to new owner
+          if (givenTrait.effects) {
+            for (const effect of givenTrait.effects) {
+              if (effect.name === 'modify_gene_pool' && effect.params.affected_players === 'self') {
+                targetPlayer.genePool = Math.max(1, Math.min(8, targetPlayer.genePool + effect.params.value));
+                gameState.log(`${targetPlayer.name}'s Gene Pool is now ${targetPlayer.genePool}`);
+              }
+            }
+          }
+          // Remove gene pool effect from original owner
+          if (givenTrait.removeEffects) {
+            for (const effect of givenTrait.removeEffects) {
+              if (effect.name === 'modify_gene_pool' && effect.params.affected_players === 'self') {
+                player.genePool = Math.max(1, Math.min(8, player.genePool + effect.params.value));
+                gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
+              }
+            }
+          }
+          gameState.log(`${player.name} gave ${givenTrait.name} to ${targetPlayer.name}`);
+        }
+        return { success: true };
+
+      case 'mutual_discard_trait':
+        if (!targetPlayer) return { success: false, error: 'No target selected' };
+        // Discard player's own trait
+        const ownDiscarded = gameState.removeTraitFromPile(player, data.ownTraitIndex);
+        // Discard opponent's trait
+        const oppDiscarded = gameState.removeTraitFromPile(targetPlayer, data.oppTraitIndex);
+        if (ownDiscarded) {
+          gameState.discardPile.push(ownDiscarded);
+        }
+        if (oppDiscarded) {
+          gameState.discardPile.push(oppDiscarded);
+        }
+        gameState.log(`${player.name} and ${targetPlayer.name} each discarded a trait`);
         return { success: true };
 
       default:
@@ -833,6 +1146,50 @@ export class CardEffects {
         gameState.log(`${player.name} took ${pickedCard.name} from discard`);
         return { success: true };
 
+      case 'search_discard_and_play': {
+        const playedCard = gameState.discardPile.splice(data.index, 1)[0];
+        gameState.log(`${player.name} plays ${playedCard.name} from discard`);
+        // Play the card to trait pile
+        player.traitPile.push(playedCard);
+        // Apply gene pool effects
+        if (playedCard.effects) {
+          for (const effect of playedCard.effects) {
+            if (effect.name === 'modify_gene_pool' && effect.params.affected_players === 'self') {
+              player.genePool = Math.max(1, Math.min(8, player.genePool + effect.params.value));
+              gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
+            }
+          }
+        }
+        // Process the card's actions
+        if (playedCard.actions) {
+          for (const action of playedCard.actions) {
+            const actionResult = this.executeAction(action, player, gameState, playedCard);
+            if (actionResult.needsInput) {
+              return { success: true, pendingAction: actionResult };
+            }
+          }
+        }
+        return { success: true };
+      }
+
+      case 'search_discard_ignore_action': {
+        const playedCard = gameState.discardPile.splice(data.index, 1)[0];
+        gameState.log(`${player.name} plays ${playedCard.name} from discard (ignoring action)`);
+        // Play the card to trait pile
+        player.traitPile.push(playedCard);
+        // Apply gene pool effects
+        if (playedCard.effects) {
+          for (const effect of playedCard.effects) {
+            if (effect.name === 'modify_gene_pool' && effect.params.affected_players === 'self') {
+              player.genePool = Math.max(1, Math.min(8, player.genePool + effect.params.value));
+              gameState.log(`${player.name}'s Gene Pool is now ${player.genePool}`);
+            }
+          }
+        }
+        // Do NOT process actions - that's the point of "ignore action"
+        return { success: true };
+      }
+
       case 'give_cards':
         const target = gameState.getPlayer(data.targetId);
         if (!target) return { success: false, error: 'No target selected' };
@@ -851,12 +1208,28 @@ export class CardEffects {
       case 'swap_trait':
         const swapTarget = gameState.getPlayer(data.targetId);
         if (!swapTarget) return { success: false, error: 'No target selected' };
-        const ownTrait = gameState.removeTraitFromPile(player, data.ownTraitIndex);
-        const opponentTrait = gameState.removeTraitFromPile(swapTarget, data.opponentTraitIndex);
-        if (ownTrait && opponentTrait) {
-          player.traitPile.push(opponentTrait);
-          swapTarget.traitPile.push(ownTrait);
-          gameState.log(`${player.name} swapped ${ownTrait.name} with ${swapTarget.name}'s ${opponentTrait.name}`);
+        const ownTrait = player.traitPile[data.ownTraitIndex];
+        const opponentTrait = swapTarget.traitPile[data.opponentTraitIndex];
+
+        // Validate color constraint if specified
+        if (pendingAction.sameColor === false && ownTrait && opponentTrait) {
+          // Must be different colors
+          if (ownTrait.color === opponentTrait.color) {
+            return { success: false, error: 'Traits must be different colors' };
+          }
+        } else if (pendingAction.sameColor === true && ownTrait && opponentTrait) {
+          // Must be same color
+          if (ownTrait.color !== opponentTrait.color) {
+            return { success: false, error: 'Traits must be the same color' };
+          }
+        }
+
+        const removedOwnTrait = gameState.removeTraitFromPile(player, data.ownTraitIndex);
+        const removedOpponentTrait = gameState.removeTraitFromPile(swapTarget, data.opponentTraitIndex);
+        if (removedOwnTrait && removedOpponentTrait) {
+          player.traitPile.push(removedOpponentTrait);
+          swapTarget.traitPile.push(removedOwnTrait);
+          gameState.log(`${player.name} swapped ${removedOwnTrait.name} with ${swapTarget.name}'s ${removedOpponentTrait.name}`);
         }
         return { success: true };
 
@@ -865,6 +1238,89 @@ export class CardEffects {
           const reorderedTraits = data.newOrder.map(idx => player.traitPile[idx]).filter(t => t);
           player.traitPile = reorderedTraits;
           gameState.log(`${player.name} rearranged their traits`);
+        }
+        return { success: true };
+
+      case 'discard_color_from_hand':
+        if (!data.selectedColor) return { success: false, error: 'No color selected' };
+        let totalDiscarded = 0;
+        for (const p of gameState.players) {
+          const beforeCount = p.hand.length;
+          p.hand = p.hand.filter(c => {
+            const matches = c.color === data.selectedColor || c.color.includes(data.selectedColor);
+            if (matches) {
+              gameState.discardPile.push(c);
+              totalDiscarded++;
+            }
+            return !matches;
+          });
+          const discarded = beforeCount - p.hand.length;
+          if (discarded > 0) {
+            gameState.log(`${p.name} discarded ${discarded} ${data.selectedColor} card(s)`);
+          }
+        }
+        return { success: true };
+
+      case 'play_drawn_card':
+        if (data.selectedIndices && data.selectedIndices.length > 0) {
+          const cardIndex = data.selectedIndices[0];
+          const cardToPlay = player.hand[cardIndex];
+          if (cardToPlay) {
+            // Check if card can be played
+            if (gameState.canPlayCard(player, cardToPlay)) {
+              player.hand.splice(cardIndex, 1);
+              player.traitPile.push(cardToPlay);
+              player.hasPlayedTraitThisTurn = true;
+              gameState.lastPlayedTraitColor = cardToPlay.color;
+              gameState.log(`${player.name} immediately played ${cardToPlay.name}`);
+            } else {
+              gameState.log(`${player.name} cannot play ${cardToPlay.name} (restricted)`);
+            }
+          }
+        }
+        return { success: true };
+
+      case 'swap_self_with_opponent_trait':
+        if (!targetPlayer) return { success: false, error: 'No target selected' };
+        const opponentTrait = gameState.removeTraitFromPile(targetPlayer, data.traitIndex);
+        const selfCard = pendingAction.cardToSwap;
+        if (opponentTrait && selfCard) {
+          // Remove the just-played card from player's trait pile
+          const selfIndex = player.traitPile.findIndex(t => t.instanceId === selfCard.instanceId);
+          if (selfIndex >= 0) {
+            player.traitPile.splice(selfIndex, 1);
+          }
+          // Swap: give opponent's trait to player, give played card to opponent
+          player.traitPile.push(opponentTrait);
+          targetPlayer.traitPile.push(selfCard);
+          gameState.log(`${player.name} swapped ${selfCard.name} with ${targetPlayer.name}'s ${opponentTrait.name}`);
+        }
+        return { success: true };
+
+      case 'move_self_to_opponent':
+        if (!targetPlayer) return { success: false, error: 'No target selected' };
+        const cardToMove = pendingAction.cardToMove;
+        if (cardToMove) {
+          // Remove the just-played card from player's trait pile
+          const cardIndex = player.traitPile.findIndex(t => t.instanceId === cardToMove.instanceId);
+          if (cardIndex >= 0) {
+            player.traitPile.splice(cardIndex, 1);
+            // Move card to opponent's trait pile
+            targetPlayer.traitPile.push(cardToMove);
+            // Apply effects to new owner
+            if (cardToMove.effects) {
+              for (const effect of cardToMove.effects) {
+                ActionProcessor.applyPassiveEffect(gameState, targetPlayer, effect);
+              }
+            }
+            // Remove effects from original player
+            if (cardToMove.removeEffects) {
+              for (const effect of cardToMove.removeEffects) {
+                ActionProcessor.applyPassiveEffect(gameState, player, effect);
+              }
+            }
+            gameState.log(`${player.name} moved ${cardToMove.name} to ${targetPlayer.name}'s trait pile`);
+          }
         }
         return { success: true };
 
@@ -921,6 +1377,142 @@ export class CardEffects {
               gameState.log(`${player.name} discarded ${toDiscard} card(s) for Dominant traits`);
             }
           }
+          break;
+
+        case 'discard_all_but_n_cards':
+          // Discard all but N cards from hand
+          for (const player of gameState.players) {
+            const keepCount = params.num_cards || 1;
+            const toDiscard = Math.max(0, player.hand.length - keepCount);
+            for (let i = 0; i < toDiscard; i++) {
+              const idx = Math.floor(Math.random() * player.hand.length);
+              gameState.discardPile.push(player.hand.splice(idx, 1)[0]);
+            }
+            if (toDiscard > 0) {
+              gameState.log(`${player.name} discarded ${toDiscard} card(s), keeping ${player.hand.length}`);
+            }
+          }
+          break;
+
+        case 'discard_hand_and_stabilize':
+          // Discard entire hand, then draw to gene pool
+          for (const player of gameState.players) {
+            const discarded = player.hand.length;
+            gameState.discardPile.push(...player.hand.splice(0));
+            if (discarded > 0) {
+              gameState.log(`${player.name} discarded entire hand (${discarded} cards)`);
+            }
+            // Draw to gene pool
+            const toDraw = Math.max(0, player.genePool - player.hand.length);
+            const drawn = gameState.drawCards(toDraw);
+            player.hand.push(...drawn);
+            if (drawn.length > 0) {
+              gameState.log(`${player.name} drew ${drawn.length} card(s) to stabilize`);
+            }
+          }
+          break;
+
+        case 'stabilize_all_then_discard':
+          // Stabilize all players to gene pool, then discard N cards
+          for (const player of gameState.players) {
+            // First stabilize
+            if (player.hand.length < player.genePool) {
+              const toDraw = player.genePool - player.hand.length;
+              const drawn = gameState.drawCards(toDraw);
+              player.hand.push(...drawn);
+              gameState.log(`${player.name} drew ${drawn.length} card(s) to stabilize`);
+            } else if (player.hand.length > player.genePool) {
+              const toDiscard = player.hand.length - player.genePool;
+              for (let i = 0; i < toDiscard; i++) {
+                const idx = Math.floor(Math.random() * player.hand.length);
+                gameState.discardPile.push(player.hand.splice(idx, 1)[0]);
+              }
+              gameState.log(`${player.name} discarded ${toDiscard} card(s) to stabilize`);
+            }
+            // Then discard additional cards
+            const numToDiscard = params.num_cards || 1;
+            const actualDiscard = Math.min(numToDiscard, player.hand.length);
+            for (let i = 0; i < actualDiscard; i++) {
+              const idx = Math.floor(Math.random() * player.hand.length);
+              gameState.discardPile.push(player.hand.splice(idx, 1)[0]);
+            }
+            if (actualDiscard > 0) {
+              gameState.log(`${player.name} then discarded ${actualDiscard} more card(s)`);
+            }
+          }
+          break;
+
+        case 'pass_hand_right':
+          // Pass entire hand to the right (opposite of normal passing)
+          CardEffects.handlePassCardsRight(gameState, gameState.players[0].hand.length);
+          break;
+
+        case 'discard_half_hand':
+          // Each player discards half their hand rounded up
+          for (const player of gameState.players) {
+            const halfSize = Math.ceil(player.hand.length / 2);
+            for (let i = 0; i < halfSize; i++) {
+              const idx = Math.floor(Math.random() * player.hand.length);
+              gameState.discardPile.push(player.hand.splice(idx, 1)[0]);
+            }
+            if (halfSize > 0) {
+              gameState.log(`${player.name} discarded ${halfSize} card(s) (half of hand)`);
+            }
+          }
+          break;
+
+        case 'give_cards_to_adjacent_opponents':
+          // Each player gives 1 card to opponents on left and right
+          const numCards = params.num_cards || 1;
+          const cardsToGive = [];
+          for (const player of gameState.players) {
+            const givenCards = [];
+            for (let i = 0; i < numCards && player.hand.length > 0; i++) {
+              const idx = Math.floor(Math.random() * player.hand.length);
+              givenCards.push(player.hand.splice(idx, 1)[0]);
+            }
+            cardsToGive.push(givenCards);
+          }
+          // Distribute cards to adjacent players
+          for (let i = 0; i < gameState.players.length; i++) {
+            const leftIdx = (i - 1 + gameState.players.length) % gameState.players.length;
+            const rightIdx = (i + 1) % gameState.players.length;
+            if (cardsToGive[i].length > 0) {
+              // Give to left neighbor
+              if (gameState.players[leftIdx]) {
+                gameState.players[leftIdx].hand.push(...cardsToGive[i].slice(0, 1));
+              }
+              // Give to right neighbor if 2+ cards
+              if (cardsToGive[i].length > 1 && gameState.players[rightIdx]) {
+                gameState.players[rightIdx].hand.push(...cardsToGive[i].slice(1));
+              }
+              gameState.log(`${gameState.players[i].name} gave cards to adjacent opponents`);
+            }
+          }
+          break;
+
+        case 'discard_trait_from_pile':
+          // Each player discards N traits from their trait pile
+          for (const player of gameState.players) {
+            const numToDiscard = params.num_cards || 1;
+            for (let i = 0; i < numToDiscard; i++) {
+              const idx = player.traitPile.findIndex(t => !DeckManager.isDominant(t));
+              if (idx !== -1) {
+                const discarded = gameState.removeTraitFromPile(player, idx);
+                if (discarded) {
+                  gameState.discardPile.push(discarded);
+                  gameState.log(`${player.name} discarded ${discarded.name} from trait pile`);
+                }
+              }
+            }
+          }
+          break;
+
+        case 'reverse_turn_order':
+          // Reverse the turn order for this round
+          gameState.players.reverse();
+          gameState.currentPlayerIndex = 0;
+          gameState.log('Turn order reversed for this round');
           break;
 
         default:
@@ -1005,6 +1597,101 @@ export class CardEffects {
         }
         break;
 
+      case 'modify_world_end_points_missing_colors':
+        // Points penalty for each color missing from trait pile
+        for (const player of gameState.players) {
+          const colors = ['Red', 'Blue', 'Green', 'Purple'];
+          let missingCount = 0;
+          for (const color of colors) {
+            const hasColor = player.traitPile.some(t => DeckManager.isColor(t, color));
+            if (!hasColor) missingCount++;
+          }
+          const modifier = missingCount * (params.value || 0);
+          player.worldEndBonus = (player.worldEndBonus || 0) + modifier;
+          if (modifier !== 0) {
+            gameState.log(`${player.name} gets ${modifier > 0 ? '+' : ''}${modifier} for ${missingCount} missing colors`);
+          }
+        }
+        break;
+
+      case 'discard_trait_from_pile_face_value':
+        // Discard traits with face value comparison
+        for (const player of gameState.players) {
+          const numCards = params.num_cards || 1;
+          for (let i = 0; i < numCards; i++) {
+            const idx = player.traitPile.findIndex(t => {
+              if (DeckManager.isDominant(t)) return false;
+              const faceValue = Scoring.getBaseFaceValue(t, gameState, player);
+              if (params.compare_type === 'greater_than_or_equal') {
+                return faceValue >= params.face_value;
+              } else if (params.compare_type === 'greater_than') {
+                return faceValue > params.face_value;
+              } else if (params.compare_type === 'less_than') {
+                return faceValue < params.face_value;
+              }
+              return false;
+            });
+            if (idx !== -1) {
+              const discarded = gameState.removeTraitFromPile(player, idx);
+              if (discarded) {
+                gameState.discardPile.push(discarded);
+                gameState.log(`${player.name} lost ${discarded.name} (World's End)`);
+              }
+            }
+          }
+        }
+        break;
+
+      case 'colorless_worth_2_ignore_effects':
+        // Each colorless trait is worth 2 points, ignore colorless effects (excluding dominants)
+        for (const player of gameState.players) {
+          let colorlessCount = 0;
+          for (const trait of player.traitPile) {
+            if (DeckManager.isColor(trait, 'Colorless') && !DeckManager.isDominant(trait)) {
+              colorlessCount++;
+            }
+          }
+          const modifier = colorlessCount * 2;
+          player.worldEndBonus = (player.worldEndBonus || 0) + modifier;
+          if (modifier > 0) {
+            gameState.log(`${player.name} gets +${modifier} for ${colorlessCount} colorless traits (worth 2 each, effects ignored)`);
+          }
+        }
+        break;
+
+      case 'draw_card_add_face_value_max_5':
+        // Draw a card, add its face value to score (max +5), then discard it
+        for (const player of gameState.players) {
+          const drawn = gameState.drawCards(1);
+          if (drawn.length > 0) {
+            const card = drawn[0];
+            const faceValue = Scoring.getBaseFaceValue(card, gameState, player);
+            const bonus = Math.min(5, Math.max(0, faceValue));
+            player.worldEndBonus = (player.worldEndBonus || 0) + bonus;
+            gameState.discardPile.push(card);
+            gameState.log(`${player.name} drew ${card.name} (face ${faceValue}), gets +${bonus} points`);
+          }
+        }
+        break;
+
+      case 'modify_world_end_points_most_traits':
+        // Player(s) with most traits gets modifier
+        let maxTraits = 0;
+        let maxPlayers = [];
+        for (const player of gameState.players) {
+          if (player.traitPile.length > maxTraits) {
+            maxTraits = player.traitPile.length;
+            maxPlayers = [player];
+          } else if (player.traitPile.length === maxTraits) {
+            maxPlayers.push(player);
+          }
+        }
+        for (const player of maxPlayers) {
+          player.worldEndBonus = (player.worldEndBonus || 0) + (params.value || 0);
+          gameState.log(`${player.name} gets ${params.value > 0 ? '+' : ''}${params.value} for most traits`);
+        }
+        break;
+
       default:
         gameState.log(`Unknown world end effect: ${name}`);
     }
@@ -1017,6 +1704,15 @@ export class CardEffects {
       gameState.players[nextIdx].hand.push(...cardsToPass[i]);
     }
     gameState.log(`All players passed ${count} cards to the left`);
+  }
+
+  static handlePassCardsRight(gameState, count) {
+    const cardsToPass = gameState.players.map(p => p.hand.splice(0, Math.min(count, p.hand.length)));
+    for (let i = 0; i < gameState.players.length; i++) {
+      const prevIdx = (i - 1 + gameState.players.length) % gameState.players.length;
+      gameState.players[prevIdx].hand.push(...cardsToPass[i]);
+    }
+    gameState.log(`All players passed their hand to the right`);
   }
 }
 
@@ -1106,12 +1802,24 @@ export class GameState {
     this.ignoreActions = false;
     this.overrideStabilizeTarget = null;
     this.cardsPerTurn = 1;
+    this.lastPlayedTraitColor = null;
+    this.drawAfterStabilize = 0;
+
+    // Reset Age effect flags
+    this.optionalStabilization = false;
+    this.optionalDiscardBeforeStabilize = 0;
+    this.colorlessAllowsExtraPlay = false;
+    this.effectlessAllowsExtraPlay = false;
+    this.previewNextAge = false;
+    this.protectTraitsThisRound = false;
 
     // Reset player-specific round state
     for (const player of this.players) {
       player.extraPlays = 0;
       player.ignoreActionsOnExtraPlays = false;
       player.skipStabilize = false;
+      player.colorlessExtraPlayUsed = false;
+      player.effectlessExtraPlayUsed = false;
     }
 
     // Start from first player
@@ -1138,12 +1846,64 @@ export class GameState {
       this.log(`Round effect: ${age.description}`);
     }
 
+    // Process turn effects to set flags
+    if (age.turnEffects && age.turnEffects.length > 0) {
+      this.processTurnEffects(age.turnEffects);
+    }
+
     // Apply instant effects
     if (age.instantEffects && age.instantEffects.length > 0) {
       this.applyInstantEffects(age.instantEffects);
     }
 
     this.turnPhase = 'play';
+  }
+
+  // Process turn effects to set round flags
+  processTurnEffects(effects) {
+    for (const effect of effects) {
+      const { name, params } = effect;
+
+      switch (name) {
+        case 'optional_stabilization':
+          // PROSPERITY: Player may choose not to stabilize
+          this.optionalStabilization = true;
+          this.log('Optional: You may choose not to stabilize this round');
+          break;
+
+        case 'optional_discard_before_stabilize':
+          // ENLIGHTENMENT: Player may discard up to N cards before stabilizing
+          this.optionalDiscardBeforeStabilize = params.max_cards || 2;
+          this.log(`Optional: You may discard up to ${this.optionalDiscardBeforeStabilize} cards before stabilizing`);
+          break;
+
+        case 'colorless_allows_extra_play':
+          // GALACTIC DRIFT: Playing colorless allows playing another colorless
+          this.colorlessAllowsExtraPlay = true;
+          this.log('Playing a colorless trait allows playing another colorless trait');
+          break;
+
+        case 'effectless_allows_extra_play':
+          // HIGH TIDES: Playing effectless allows playing another effectless
+          this.effectlessAllowsExtraPlay = true;
+          this.log('Playing an effectless trait allows playing another effectless trait');
+          break;
+
+        case 'preview_next_age':
+          // AWAKENING: Preview the next age before taking your turn
+          this.previewNextAge = true;
+          this.log('You may preview the next age before taking your turn');
+          break;
+
+        case 'protect_traits':
+          // REFORESTATION: Traits cannot be swapped, stolen, or discarded
+          this.protectTraitsThisRound = true;
+          this.log('All traits are protected from swapping, stealing, and discarding this round');
+          break;
+
+        // Other turn effects are handled as restrictions in canPlayCard()
+      }
+    }
   }
 
   // Apply instant effects from ages
@@ -1186,6 +1946,21 @@ export class GameState {
             }
           }
           this.log(`All players discarded ${params.num_cards || 1} card(s)`);
+          break;
+
+        case 'deal_from_discard_pile':
+          // Shuffle discard pile and deal cards to players
+          if (this.discardPile.length > 0) {
+            this.discardPile = DeckManager.shuffle(this.discardPile);
+            const dealTargets = params.affected_players === 'all' ? this.players : this.players;
+            const numCards = params.num_cards || 1;
+            for (const player of dealTargets) {
+              for (let i = 0; i < numCards && this.discardPile.length > 0; i++) {
+                player.hand.push(this.discardPile.shift());
+              }
+            }
+            this.log(`Dealt ${numCards} card(s) from discard pile to each player`);
+          }
           break;
 
         case 'stabilize_all_players':
@@ -1239,6 +2014,41 @@ export class GameState {
               }
             }
           }
+          break;
+
+        case 'draw_card_after_stabilize':
+          // Set flag to draw a card after stabilization
+          this.drawAfterStabilize = params.value || 1;
+          this.log(`Players will draw ${this.drawAfterStabilize} card(s) after stabilizing`);
+          break;
+
+        case 'steal_random_card_if_vampirism':
+          // Age of Dracula: If player has Vampirism, steal random card from opponent
+          for (const player of this.players) {
+            const hasVampirism = player.traitPile.some(c => c.name === 'Vampirism');
+            if (hasVampirism) {
+              const opponents = this.players.filter(p => p.id !== player.id && p.hand.length > 0);
+              if (opponents.length > 0) {
+                const opponent = opponents[Math.floor(Math.random() * opponents.length)];
+                const cardIdx = Math.floor(Math.random() * opponent.hand.length);
+                const stolenCard = opponent.hand.splice(cardIdx, 1)[0];
+                player.hand.push(stolenCard);
+                this.log(`${player.name} (with Vampirism) stole a card from ${opponent.name}`);
+              }
+            }
+          }
+          break;
+
+        case 'draw_keep_1_discard_2':
+          // Age of Reason: Draw 3, keep 1, discard 2
+          const reasonTargets = params.affected_players === 'all' ? this.players : this.players;
+          for (const player of reasonTargets) {
+            const drawn = this.drawCards(3);
+            player.hand.push(...drawn);
+            // This will require player input to choose which to keep
+            this.log(`${player.name} drew 3 cards (must discard 2)`);
+          }
+          // Note: This needs UI handling to let players choose which 2 to discard
           break;
 
         default:
@@ -1313,6 +2123,11 @@ export class GameState {
               return { canPlay: false, reason: `Cannot play traits with face value less than ${restricted_value}` };
             }
           }
+        } else if (restriction.name === 'cannot_play_same_color') {
+          // Natural Harmony: cannot play same color as last trait played
+          if (this.lastPlayedTraitColor && DeckManager.isColor(card, this.lastPlayedTraitColor)) {
+            return { canPlay: false, reason: `Cannot play same color as last trait (${this.lastPlayedTraitColor})` };
+          }
         }
       }
     }
@@ -1320,6 +2135,14 @@ export class GameState {
     // Check dominant limit (max 2)
     if (DeckManager.isDominant(card) && this.countDominants(player) >= 2) {
       return { canPlay: false, reason: 'Already have 2 dominant traits' };
+    }
+
+    // Check Age effect extra play restrictions (GALACTIC DRIFT / HIGH TIDES)
+    if (player.mustPlayColorless && !DeckManager.isColor(card, 'Colorless')) {
+      return { canPlay: false, reason: 'Must play a colorless trait (Galactic Drift)' };
+    }
+    if (player.mustPlayEffectless && !this.isEffectlessTrait(card)) {
+      return { canPlay: false, reason: 'Must play an effectless trait (High Tides)' };
     }
 
     // Check play conditions from card's playConditions array
@@ -1362,6 +2185,52 @@ export class GameState {
     }
 
     return { canPlay: true };
+  }
+
+  // Check if a trait card is "effectless" (no actions, effects, or bonusPoints)
+  isEffectlessTrait(card) {
+    const hasActions = card.actions && card.actions.length > 0;
+    const hasEffects = card.effects && card.effects.length > 0;
+    const hasBonusPoints = card.bonusPoints && Object.keys(card.bonusPoints).length > 0;
+    const hasWorldsEnd = card.worldsEnd || card.worldsEndEffect;
+    const hasPersistent = card.persistent || card.persistentEffect;
+
+    return !hasActions && !hasEffects && !hasBonusPoints && !hasWorldsEnd && !hasPersistent;
+  }
+
+  // Check and grant bonus plays from Age effects (GALACTIC DRIFT / HIGH TIDES)
+  checkAgeEffectBonusPlays(player, card) {
+    // GALACTIC DRIFT: Playing colorless allows one additional colorless play
+    if (this.colorlessAllowsExtraPlay && !player.colorlessExtraPlayUsed) {
+      if (DeckManager.isColor(card, 'Colorless')) {
+        // Check if player has another colorless card they can play
+        const hasColorless = player.hand.some(c =>
+          DeckManager.isColor(c, 'Colorless') && this.canPlayCard(player, c).canPlay
+        );
+        if (hasColorless) {
+          player.extraPlays = (player.extraPlays || 0) + 1;
+          player.colorlessExtraPlayUsed = true;
+          player.mustPlayColorless = true; // Track that extra play must be colorless
+          this.log(`${player.name} may play another colorless trait (Galactic Drift)`);
+        }
+      }
+    }
+
+    // HIGH TIDES: Playing effectless allows one additional effectless play
+    if (this.effectlessAllowsExtraPlay && !player.effectlessExtraPlayUsed) {
+      if (this.isEffectlessTrait(card)) {
+        // Check if player has another effectless card they can play
+        const hasEffectless = player.hand.some(c =>
+          this.isEffectlessTrait(c) && this.canPlayCard(player, c).canPlay
+        );
+        if (hasEffectless) {
+          player.extraPlays = (player.extraPlays || 0) + 1;
+          player.effectlessExtraPlayUsed = true;
+          player.mustPlayEffectless = true; // Track that extra play must be effectless
+          this.log(`${player.name} may play another effectless trait (High Tides)`);
+        }
+      }
+    }
   }
 
   // Remove a trait from a player's pile and apply remove effects (reverse gene pool changes)
@@ -1436,9 +2305,19 @@ export class GameState {
     player.traitPile.push(card);
     this.log(`${player.name} played ${card.name}`);
 
+    // Track last played trait color for Natural Harmony age restriction
+    this.lastPlayedTraitColor = card.color;
+
     // Track plays
     if (hasExtraPlays) {
       player.extraPlays--;
+      // Reset Age effect extra play restrictions after using the extra play
+      if (player.mustPlayColorless) {
+        player.mustPlayColorless = false;
+      }
+      if (player.mustPlayEffectless) {
+        player.mustPlayEffectless = false;
+      }
     } else {
       this.playersPlayedThisRound.add(playerId);
     }
@@ -1483,6 +2362,9 @@ export class GameState {
         return { success: true, needsInput: true, inputType: effectResult.inputType };
       }
     }
+
+    // Check for Age effect bonus plays (GALACTIC DRIFT / HIGH TIDES)
+    this.checkAgeEffectBonusPlays(player, card);
 
     // Check for more extra plays
     if (player.extraPlays && player.extraPlays > 0) {
@@ -1589,9 +2471,100 @@ export class GameState {
       this.log(`${player.name} stabilized`);
     }
 
+    // Check for draw after stabilize effect (Coastal Formations)
+    if (this.drawAfterStabilize && this.drawAfterStabilize > 0) {
+      const drawn = this.drawCards(this.drawAfterStabilize);
+      player.hand.push(...drawn);
+      this.log(`${player.name} drew ${this.drawAfterStabilize} card(s) after stabilizing`);
+    }
+
     player.needsStabilize = false;
     this.advanceTurn();
     return { success: true };
+  }
+
+  // Skip stabilization entirely (PROSPERITY age effect)
+  skipStabilization(playerId) {
+    const player = this.getPlayer(playerId);
+    if (!player) return { success: false, error: 'Player not found' };
+
+    const currentPlayer = this.players[this.currentPlayerIndex];
+    if (currentPlayer.id !== playerId) return { success: false, error: 'Not your turn' };
+    if (this.turnPhase !== 'stabilize') return { success: false, error: 'Not stabilize phase' };
+
+    // Only allowed if optionalStabilization is active (PROSPERITY)
+    if (!this.optionalStabilization) {
+      return { success: false, error: 'Cannot skip stabilization this round' };
+    }
+
+    this.log(`${player.name} chose not to stabilize (Prosperity)`);
+    player.needsStabilize = false;
+    this.advanceTurn();
+    return { success: true };
+  }
+
+  // Pre-stabilize discard (ENLIGHTENMENT age effect)
+  preStabilizeDiscard(playerId, discardIndices = []) {
+    const player = this.getPlayer(playerId);
+    if (!player) return { success: false, error: 'Player not found' };
+
+    const currentPlayer = this.players[this.currentPlayerIndex];
+    if (currentPlayer.id !== playerId) return { success: false, error: 'Not your turn' };
+    if (this.turnPhase !== 'stabilize') return { success: false, error: 'Not stabilize phase' };
+
+    // Only allowed if optionalDiscardBeforeStabilize is active (ENLIGHTENMENT)
+    if (!this.optionalDiscardBeforeStabilize) {
+      return { success: false, error: 'Cannot discard before stabilizing this round' };
+    }
+
+    // Validate discard count
+    if (discardIndices.length > this.optionalDiscardBeforeStabilize) {
+      return { success: false, error: `Can only discard up to ${this.optionalDiscardBeforeStabilize} cards` };
+    }
+
+    if (discardIndices.length === 0) {
+      // Player chose not to discard anything
+      return { success: true, message: 'No cards discarded' };
+    }
+
+    // Discard selected cards
+    discardIndices.sort((a, b) => b - a);
+    for (const idx of discardIndices) {
+      if (idx >= 0 && idx < player.hand.length) {
+        this.discardPile.push(player.hand.splice(idx, 1)[0]);
+      }
+    }
+    this.log(`${player.name} discarded ${discardIndices.length} card(s) before stabilizing (Enlightenment)`);
+
+    // Mark that pre-stabilize discard has been used
+    player.preStabilizeDiscardUsed = true;
+    return { success: true };
+  }
+
+  // Get next age preview (AWAKENING age effect)
+  getNextAgePreview(playerId) {
+    const player = this.getPlayer(playerId);
+    if (!player) return { success: false, error: 'Player not found' };
+
+    // Only show preview if previewNextAge is active (AWAKENING)
+    if (!this.previewNextAge) {
+      return { success: false, error: 'Age preview not available' };
+    }
+
+    // Peek at the top card of the age deck
+    if (this.ageDeck.length === 0) {
+      return { success: true, preview: null, message: 'No more ages in deck' };
+    }
+
+    const nextAge = this.ageDeck[0];
+    return {
+      success: true,
+      preview: {
+        name: nextAge.name,
+        type: nextAge.type,
+        description: nextAge.description || null
+      }
+    };
   }
 
   advanceTurn() {
@@ -1735,9 +2708,41 @@ export class GameState {
         this.log(`${player.name}: ${card.name} - Choose color at World's End`);
         break;
 
+      case 'choose_color_for_bonus':
+        // Store chosen color on player for Sentience bonus calculation
+        // This would need UI interaction - for now, auto-choose the most common color
+        const colorCounts = {
+          Red: Scoring.countColor(player.traitPile, 'Red'),
+          Blue: Scoring.countColor(player.traitPile, 'Blue'),
+          Green: Scoring.countColor(player.traitPile, 'Green'),
+          Purple: Scoring.countColor(player.traitPile, 'Purple')
+        };
+        const bestColor = Object.keys(colorCounts).reduce((a, b) => colorCounts[a] > colorCounts[b] ? a : b);
+        player.sentienceChosenColor = bestColor;
+        this.log(`${player.name}: ${card.name} - Auto-chose ${bestColor} (${colorCounts[bestColor]} traits)`);
+        break;
+
       case 'steal_trait_at_end':
         // This would need UI interaction, for now just log
         this.log(`${player.name}: ${card.name} - May steal a non-dominant trait`);
+        break;
+
+      case 'play_from_hand_at_end':
+        // Special case: If this specific card is in hand at World's End, you may play it
+        const cardName = params.card_name || card.name;
+        const cardInHand = player.hand.find(c => c.name === cardName);
+        if (cardInHand) {
+          const idx = player.hand.indexOf(cardInHand);
+          player.hand.splice(idx, 1);
+          player.traitPile.push(cardInHand);
+          this.log(`${player.name}: Played ${cardName} from hand at World's End`);
+        }
+        break;
+
+      case 'choose_catastrophe_world_end':
+        // This would need UI interaction to let player choose from the 3 catastrophes
+        this.log(`${player.name}: ${card.name} - Choose a World's End effect from the 3 catastrophes`);
+        // TODO: Implement UI to let player select which catastrophe World's End effect to apply
         break;
 
       default:
@@ -1761,6 +2766,15 @@ export class GameState {
       currentPlayerIndex: this.currentPlayerIndex,
       firstPlayerIndex: this.firstPlayerIndex,
       turnRestrictions: this.turnRestrictions || [],
+      // Age effect flags
+      ageEffects: {
+        optionalStabilization: this.optionalStabilization || false,
+        optionalDiscardBeforeStabilize: this.optionalDiscardBeforeStabilize || 0,
+        colorlessAllowsExtraPlay: this.colorlessAllowsExtraPlay || false,
+        effectlessAllowsExtraPlay: this.effectlessAllowsExtraPlay || false,
+        previewNextAge: this.previewNextAge || false,
+        protectTraitsThisRound: this.protectTraitsThisRound || false
+      },
       players: this.players.map((p, idx) => ({
         id: p.id,
         name: p.name,
@@ -1773,7 +2787,10 @@ export class GameState {
         hasPlayedThisRound: this.playersPlayedThisRound.has(p.id),
         needsStabilize: p.needsStabilize || false,
         extraPlays: p.extraPlays || 0,
-        turnOrder: (idx - this.firstPlayerIndex + this.players.length) % this.players.length
+        turnOrder: (idx - this.firstPlayerIndex + this.players.length) % this.players.length,
+        mustPlayColorless: p.mustPlayColorless || false,
+        mustPlayEffectless: p.mustPlayEffectless || false,
+        preStabilizeDiscardUsed: p.preStabilizeDiscardUsed || false
       })),
       pendingAction: this.pendingAction,
       deckSize: this.traitDeck.length,
@@ -1796,6 +2813,18 @@ export class GameState {
     const needsDiscard = handSize > genePoolSize ? handSize - genePoolSize : 0;
     const willDraw = handSize < genePoolSize ? genePoolSize - handSize : 0;
 
+    // Get next age preview if AWAKENING effect is active and it's player's turn
+    let nextAgePreview = null;
+    const isMyTurn = this.players[this.currentPlayerIndex]?.id === playerId;
+    if (this.previewNextAge && isMyTurn && this.ageDeck.length > 0) {
+      const nextAge = this.ageDeck[0];
+      nextAgePreview = {
+        name: nextAge.name,
+        type: nextAge.type,
+        description: nextAge.description || null
+      };
+    }
+
     return {
       ...fullState,
       myHand: player ? player.hand : [],
@@ -1803,11 +2832,16 @@ export class GameState {
       myScore: player ? Scoring.calculateScore(this, player) : 0,
       myGenePool: player ? player.genePool : 5, // Target hand size
       myExtraPlays: player ? (player.extraPlays || 0) : 0,
-      isMyTurn: this.players[this.currentPlayerIndex]?.id === playerId,
+      isMyTurn,
       currentPlayerId: this.players[this.currentPlayerIndex]?.id,
       canPlayAny,
       needsDiscard,
       willDraw,
+      nextAgePreview,
+      // Player-specific age effect state
+      myMustPlayColorless: player?.mustPlayColorless || false,
+      myMustPlayEffectless: player?.mustPlayEffectless || false,
+      myPreStabilizeDiscardUsed: player?.preStabilizeDiscardUsed || false,
       players: fullState.players.map(p => ({
         ...p,
         hand: undefined, // Hide other players' hands
@@ -1847,7 +2881,16 @@ export class GameState {
       ignoreActions: this.ignoreActions,
       overrideStabilizeTarget: this.overrideStabilizeTarget,
       cardsPerTurn: this.cardsPerTurn,
-      playersPlayedThisRound: [...this.playersPlayedThisRound]
+      playersPlayedThisRound: [...this.playersPlayedThisRound],
+      // Age effect flags
+      optionalStabilization: this.optionalStabilization,
+      optionalDiscardBeforeStabilize: this.optionalDiscardBeforeStabilize,
+      colorlessAllowsExtraPlay: this.colorlessAllowsExtraPlay,
+      effectlessAllowsExtraPlay: this.effectlessAllowsExtraPlay,
+      previewNextAge: this.previewNextAge,
+      protectTraitsThisRound: this.protectTraitsThisRound,
+      drawAfterStabilize: this.drawAfterStabilize,
+      lastPlayedTraitColor: this.lastPlayedTraitColor
     });
   }
 
@@ -1862,6 +2905,15 @@ export class GameState {
     game.ignoreActions = parsed.ignoreActions || false;
     game.overrideStabilizeTarget = parsed.overrideStabilizeTarget || null;
     game.cardsPerTurn = parsed.cardsPerTurn || 1;
+    // Age effect flags
+    game.optionalStabilization = parsed.optionalStabilization || false;
+    game.optionalDiscardBeforeStabilize = parsed.optionalDiscardBeforeStabilize || 0;
+    game.colorlessAllowsExtraPlay = parsed.colorlessAllowsExtraPlay || false;
+    game.effectlessAllowsExtraPlay = parsed.effectlessAllowsExtraPlay || false;
+    game.previewNextAge = parsed.previewNextAge || false;
+    game.protectTraitsThisRound = parsed.protectTraitsThisRound || false;
+    game.drawAfterStabilize = parsed.drawAfterStabilize || 0;
+    game.lastPlayedTraitColor = parsed.lastPlayedTraitColor || null;
     return game;
   }
 }
