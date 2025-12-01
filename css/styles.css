@@ -605,6 +605,7 @@ input:focus {
   height: 100%;
   object-fit: cover;
   display: block;
+  pointer-events: none;
 }
 
 .hand-card-image:hover {
@@ -2172,6 +2173,7 @@ input:focus {
   height: auto;
   border-radius: 4px;
   margin-bottom: 4px;
+  pointer-events: none;
 }
 
 .selectable-card .card-name {
