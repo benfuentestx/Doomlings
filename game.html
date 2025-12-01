@@ -1519,7 +1519,8 @@
         const imageName = cardImageMapping[displayName] || displayName;
         const imageUrl = `images/cards/${imageName}.png`;
         return `
-        <div class="hand-card-image selectable ${getColorClass(c.color)}" data-index="${c.index}" data-max="${count}">
+        <div class="hand-card-image ${getColorClass(c.color)}" data-index="${c.index}"
+             onclick="window.toggleCardSelection(${c.index}, ${count})">
           <img src="${imageUrl}" alt="${c.name}"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div class="card-image-fallback" style="display: none;">
@@ -1529,12 +1530,6 @@
       `}).join('');
       showModal(`Select ${count} card(s)`, cardsHtml, true, action.optional);
 
-      // Add touch/click handlers after modal is shown
-      modalCards.querySelectorAll('.hand-card-image.selectable').forEach(card => {
-        card.addEventListener('click', handleCardSelect);
-        card.addEventListener('touchend', handleCardSelectTouch);
-      });
-
       modalConfirm.onclick = () => {
         if (selectedCards.length === 0) {
           alert('Select at least one card');
@@ -1543,27 +1538,6 @@
         peerManager.selectCards({ indices: selectedCards, effectType: pendingAction.effectType });
         hideModal();
       };
-    }
-
-    function handleCardSelectTouch(e) {
-      e.preventDefault();
-      handleCardSelect.call(this, e);
-    }
-
-    function handleCardSelect(e) {
-      const card = this;
-      const index = parseInt(card.dataset.index);
-      const maxCount = parseInt(card.dataset.max) || 1;
-      const idx = selectedCards.indexOf(index);
-      if (idx === -1) {
-        if (selectedCards.length < maxCount) {
-          selectedCards.push(index);
-          card.classList.add('selected');
-        }
-      } else {
-        selectedCards.splice(idx, 1);
-        card.classList.remove('selected');
-      }
     }
 
     window.toggleCardSelection = function(index, maxCount) {
