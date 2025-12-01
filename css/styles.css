@@ -336,9 +336,9 @@ input:focus {
 
 .game-stats {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 /* Opponents Panel */
@@ -892,10 +892,6 @@ input:focus {
     padding: 10px 15px;
   }
 
-  .game-stats {
-    gap: 10px;
-    font-size: 0.8rem;
-  }
 
    .opponent-card {
     padding: 10px;
@@ -1023,10 +1019,6 @@ input:focus {
     font-size: 0.75rem;
   }
 
-  /* Hide stats on mobile - shown via tap */
-  .game-stats {
-    display: none;
-  }
 
   /* Gene pool - compact pill */
   .gene-pool-display {

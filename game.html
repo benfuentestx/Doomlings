@@ -48,8 +48,7 @@
           <div class="catastrophe-dot" id="cat-2"></div>
           <div class="catastrophe-dot" id="cat-3"></div>
         </div>
-      </div>
-      <div id="turn-indicator"></div>
+      </div>      
       <div class="game-stats">
         <span>Round: <strong id="round-num">1</strong></span>
         <span>Deck: <strong id="deck-size">0</strong></span>
@@ -87,8 +86,9 @@
     <!-- My Hand -->
     <div class="my-hand-area">
       <div class="hand-header">
-        <h3>Your Hand (<span id="hand-count">0</span>)</h3>
+        <div id="turn-indicator"></div>
         <div class="hand-gene-pool">
+          <span>Your Hand (<span id="hand-count">0</span>)</span>
           <span class="gp-label">GP:</span>
           <span class="gp-value" id="hand-gene-pool-value">5</span>
           <span class="gp-count" id="hand-gene-count-value">+0</span>
