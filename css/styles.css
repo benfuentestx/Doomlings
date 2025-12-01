@@ -904,15 +904,7 @@ input:focus {
     font-size: 0.8rem;
   }
 
-  .opponents-panel {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    max-height: none;
-  }
-
-  .opponent-card {
+   .opponent-card {
     padding: 10px;
   }
 
@@ -1059,17 +1051,7 @@ input:focus {
     font-size: 0.85rem;
   }
 
-  /* ========== OPPONENTS - COLLAPSIBLE COMPACT ROW ========== */
-  .opponents-panel {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 6px;
-    padding: 6px 8px;
-    background: var(--bg-dark);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
+
 
   .opponents-panel::-webkit-scrollbar {
     display: none;

@@ -810,7 +810,6 @@
         const handInfo = isMe ? `GP: ${player.genePool}` : `Hand: ${player.handSize} | GP: ${player.genePool}`;
         header.innerHTML = `
           <div class="opponent-title">
-            <span class="turn-order-badge">#${player.turnOrder + 1}</span>
             <span class="opponent-name">${displayName}</span>
           </div>
           <span class="opponent-info">${handInfo} | ${player.score} pts</span>
