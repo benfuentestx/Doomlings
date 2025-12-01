@@ -356,6 +356,12 @@ export class PeerManager {
         conn.send({ type: 'actionResult', ...preDiscardResult });
         this.broadcastState();
         break;
+
+      case 'acknowledgeCatastrophe':
+        const ackCatResult = this.gameState.acknowledgeCatastrophe();
+        conn.send({ type: 'actionResult', ...ackCatResult });
+        this.broadcastState();
+        break;
     }
   }
 
@@ -623,6 +629,23 @@ export class PeerManager {
           type: 'preStabilizeDiscard',
           playerId: this.myPlayerId,
           discardIndices
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Acknowledge catastrophe and proceed with the round
+  acknowledgeCatastrophe() {
+    if (this.isHost) {
+      const result = this.gameState.acknowledgeCatastrophe();
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'acknowledgeCatastrophe'
         });
         return { success: true, pending: true };
       }

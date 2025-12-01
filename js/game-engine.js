@@ -1831,7 +1831,9 @@ export class GameState {
       this.currentAge = this.ageDeck.shift();
 
       if (this.currentAge.type === 'catastrophe') {
-        this.handleCatastrophe();
+        // Wait for player acknowledgment before processing catastrophe
+        this.turnPhase = 'catastrophe';
+        this.log(`CATASTROPHE: ${this.currentAge.name}!`);
       } else {
         this.log(`Age: ${this.currentAge.name}`);
         this.handleAgeEffect();
@@ -2059,12 +2061,22 @@ export class GameState {
     }
   }
 
+  // Called when player acknowledges the catastrophe announcement
+  acknowledgeCatastrophe() {
+    if (this.turnPhase !== 'catastrophe') {
+      return { success: false, error: 'No catastrophe to acknowledge' };
+    }
+    this.handleCatastrophe();
+    return { success: true };
+  }
+
   handleCatastrophe() {
     this.catastropheCount++;
     this.log(`CATASTROPHE ${this.catastropheCount}/3: ${this.currentAge.name}!`);
 
     // First player rotates left on catastrophe
     this.firstPlayerIndex = (this.firstPlayerIndex + 1) % this.players.length;
+    this.currentPlayerIndex = this.firstPlayerIndex;
 
     // Apply Gene Pool effect (permanent)
     if (this.currentAge.genePoolEffect) {
@@ -2084,7 +2096,8 @@ export class GameState {
     // Apply catastrophe effects using new format
     CardEffects.applyCatastropheEffects(this, this.currentAge);
 
-    this.startNewRound();
+    // Set to play phase so players can take their turns during this catastrophe round
+    this.turnPhase = 'play';
   }
 
   drawCards(count) {

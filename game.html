@@ -1146,6 +1146,10 @@
 
     window.dismissAgeAnnounce = function() {
       ageAnnounceOverlay.style.display = 'none';
+      // If we're in catastrophe phase, acknowledge it to proceed
+      if (gameState && gameState.turnPhase === 'catastrophe') {
+        peerManager.acknowledgeCatastrophe();
+      }
     };
 
     // Show card detail view with navigation support
