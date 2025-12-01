@@ -1205,7 +1205,7 @@ export class CardEffects {
         gameState.log(`${player.name} gave ${givenCards.length} card(s) to ${target.name}`);
         return { success: true };
 
-      case 'swap_trait':
+      case 'swap_trait': {
         const swapTarget = gameState.getPlayer(data.targetId);
         if (!swapTarget) return { success: false, error: 'No target selected' };
         const ownTrait = player.traitPile[data.ownTraitIndex];
@@ -1232,6 +1232,7 @@ export class CardEffects {
           gameState.log(`${player.name} swapped ${removedOwnTrait.name} with ${swapTarget.name}'s ${removedOpponentTrait.name}`);
         }
         return { success: true };
+      }
 
       case 'rearrange_traits':
         if (data.newOrder && Array.isArray(data.newOrder)) {
@@ -1280,7 +1281,7 @@ export class CardEffects {
         }
         return { success: true };
 
-      case 'swap_self_with_opponent_trait':
+      case 'swap_self_with_opponent_trait': {
         if (!targetPlayer) return { success: false, error: 'No target selected' };
         const opponentTrait = gameState.removeTraitFromPile(targetPlayer, data.traitIndex);
         const selfCard = pendingAction.cardToSwap;
@@ -1296,6 +1297,7 @@ export class CardEffects {
           gameState.log(`${player.name} swapped ${selfCard.name} with ${targetPlayer.name}'s ${opponentTrait.name}`);
         }
         return { success: true };
+      }
 
       case 'move_self_to_opponent':
         if (!targetPlayer) return { success: false, error: 'No target selected' };
