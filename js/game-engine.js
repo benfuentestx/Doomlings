@@ -1802,7 +1802,8 @@ export class GameState {
       score: 0,
       genePool: 0, // Birth of Life age will set this to 5
       connected: true,
-      needsStabilize: false
+      needsStabilize: false,
+      pendingAgeDiscard: 0 // Cards to discard before playing (Age of Reason)
     };
     this.players.push(player);
     return player;
@@ -2099,10 +2100,9 @@ export class GameState {
           for (const player of reasonTargets) {
             const drawn = this.drawCards(3);
             player.hand.push(...drawn);
-            // This will require player input to choose which to keep
+            player.pendingAgeDiscard = 2; // Must discard 2 before playing
             this.log(`${player.name} drew 3 cards (must discard 2)`);
           }
-          // Note: This needs UI handling to let players choose which 2 to discard
           break;
 
         default:
@@ -2346,6 +2346,11 @@ export class GameState {
     const player = this.getPlayer(playerId);
     if (!player) return { success: false, error: 'Player not found' };
 
+    // Must resolve pending age discards first (Age of Reason)
+    if (player.pendingAgeDiscard > 0) {
+      return { success: false, error: `Must discard ${player.pendingAgeDiscard} card(s) first` };
+    }
+
     const currentPlayer = this.players[this.currentPlayerIndex];
     if (currentPlayer.id !== playerId) return { success: false, error: 'Not your turn' };
 
@@ -2493,6 +2498,38 @@ export class GameState {
 
     // Skip stabilization when using this action
     this.advanceTurn();
+    return { success: true };
+  }
+
+  // Resolve age effect discard (Age of Reason - discard 2 of 3 drawn)
+  resolveAgeDiscard(playerId, discardIndices) {
+    const player = this.getPlayer(playerId);
+    if (!player) return { success: false, error: 'Player not found' };
+
+    if (player.pendingAgeDiscard <= 0) {
+      return { success: false, error: 'No pending age discard' };
+    }
+
+    if (!discardIndices || discardIndices.length !== player.pendingAgeDiscard) {
+      return { success: false, error: `Must discard exactly ${player.pendingAgeDiscard} card(s)` };
+    }
+
+    // Validate indices
+    for (const idx of discardIndices) {
+      if (idx < 0 || idx >= player.hand.length) {
+        return { success: false, error: 'Invalid card index' };
+      }
+    }
+
+    // Sort indices descending to remove from end first (prevents index shifting issues)
+    const sortedIndices = [...discardIndices].sort((a, b) => b - a);
+    for (const idx of sortedIndices) {
+      this.discardPile.push(player.hand.splice(idx, 1)[0]);
+    }
+
+    this.log(`${player.name} discarded ${discardIndices.length} card(s) for Age of Reason`);
+    player.pendingAgeDiscard = 0;
+
     return { success: true };
   }
 
@@ -3067,7 +3104,8 @@ export class GameState {
         turnOrder: (idx - this.firstPlayerIndex + this.players.length) % this.players.length,
         mustPlayColorless: p.mustPlayColorless || false,
         mustPlayEffectless: p.mustPlayEffectless || false,
-        preStabilizeDiscardUsed: p.preStabilizeDiscardUsed || false
+        preStabilizeDiscardUsed: p.preStabilizeDiscardUsed || false,
+        pendingAgeDiscard: p.pendingAgeDiscard || 0
       })),
       pendingAction: this.pendingAction,
       deckSize: this.traitDeck.length,

@@ -188,6 +188,7 @@
     const deckSize = document.getElementById('deck-size');
     const discardSize = document.getElementById('discard-size');
     let stabilizeDiscards = []; // Selected cards for stabilization discard
+    let ageDiscards = []; // Selected cards for age effect discard (Age of Reason)
     const actionMessage = document.getElementById('action-message');
     const actionOptions = document.getElementById('action-options');
     const myTraitPile = document.getElementById('my-trait-pile');
@@ -553,7 +554,12 @@
       myHand.innerHTML = '';
       handCount.textContent = gameState.myHand.length;
 
-      const canPlay = gameState.isMyTurn && gameState.turnPhase === 'play' && !gameState.pendingAction;
+      // Check for pending age discard (Age of Reason)
+      const myPlayer = gameState.players.find(p => p.id === gameState.myPlayerId);
+      const pendingAgeDiscard = myPlayer?.pendingAgeDiscard || 0;
+      const isAgeDiscarding = gameState.isMyTurn && gameState.turnPhase === 'play' && pendingAgeDiscard > 0;
+
+      const canPlay = gameState.isMyTurn && gameState.turnPhase === 'play' && !gameState.pendingAction && pendingAgeDiscard === 0;
       const isStabilizing = gameState.isMyTurn && gameState.turnPhase === 'stabilize';
       const needsDiscard = gameState.needsDiscard || 0;
 
@@ -653,6 +659,12 @@
             draggedCardIndex = null;
             e.preventDefault();
           });
+        } else if (isAgeDiscarding) {
+          // In age discard mode - select cards to discard (Age of Reason)
+          cardEl.addEventListener('click', () => toggleAgeDiscard(index, cardEl, pendingAgeDiscard));
+          if (ageDiscards.includes(index)) {
+            cardEl.classList.add('selected');
+          }
         } else if (isStabilizing && needsDiscard > 0) {
           // In stabilize mode - can select cards to discard
           cardEl.addEventListener('click', () => toggleStabilizeDiscard(index, cardEl, needsDiscard));
@@ -678,6 +690,22 @@
         }
       } else {
         stabilizeDiscards.splice(idx, 1);
+        cardEl.classList.remove('selected');
+      }
+      // Update action area to reflect current selection count
+      updateActionArea();
+    }
+
+    // Toggle card selection for age effect discard (Age of Reason)
+    function toggleAgeDiscard(index, cardEl, maxDiscards) {
+      const idx = ageDiscards.indexOf(index);
+      if (idx === -1) {
+        if (ageDiscards.length < maxDiscards) {
+          ageDiscards.push(index);
+          cardEl.classList.add('selected');
+        }
+      } else {
+        ageDiscards.splice(idx, 1);
         cardEl.classList.remove('selected');
       }
       // Update action area to reflect current selection count
@@ -981,8 +1009,32 @@
             `;
           }
         } else if (gameState.turnPhase === 'play') {
-          // Play phase
-          if (!gameState.canPlayAny) {
+          // Check for pending age discard first (Age of Reason)
+          const myPlayer = gameState.players.find(p => p.id === gameState.myPlayerId);
+          const pendingAgeDiscard = myPlayer?.pendingAgeDiscard || 0;
+
+          if (pendingAgeDiscard > 0) {
+            // Must discard cards before playing (Age of Reason)
+            actionMessage.textContent = `Age of Reason: Select ${pendingAgeDiscard} card(s) to discard`;
+
+            const discardBtn = document.createElement('button');
+            discardBtn.textContent = `Discard ${ageDiscards.length}/${pendingAgeDiscard}`;
+            discardBtn.disabled = ageDiscards.length !== pendingAgeDiscard;
+            discardBtn.onclick = () => {
+              if (ageDiscards.length === pendingAgeDiscard) {
+                peerManager.resolveAgeDiscard(ageDiscards);
+                ageDiscards = [];
+              }
+            };
+            actionOptions.appendChild(discardBtn);
+
+            // Mobile bar
+            mobileActionBar.innerHTML = `
+              <span class="action-msg">Select ${pendingAgeDiscard - ageDiscards.length} more</span>
+              <button ${ageDiscards.length !== pendingAgeDiscard ? 'disabled' : ''}
+                onclick="window.doAgeDiscard()">Discard ${ageDiscards.length}/${pendingAgeDiscard}</button>
+            `;
+          } else if (!gameState.canPlayAny) {
             // Can't play any cards - must skip turn
             actionMessage.textContent = "You can't play any cards this turn";
 
@@ -1049,6 +1101,16 @@
     // Skip stabilization (PROSPERITY age effect)
     window.doSkipStabilize = function() {
       peerManager.skipStabilization();
+    };
+
+    // Age effect discard (Age of Reason)
+    window.doAgeDiscard = function() {
+      const myPlayer = gameState.players.find(p => p.id === gameState.myPlayerId);
+      const pendingAgeDiscard = myPlayer?.pendingAgeDiscard || 0;
+      if (pendingAgeDiscard > 0 && ageDiscards.length === pendingAgeDiscard) {
+        peerManager.resolveAgeDiscard(ageDiscards);
+        ageDiscards = [];
+      }
     };
 
     // Pre-stabilize discard modal (ENLIGHTENMENT age effect)
@@ -1527,13 +1589,16 @@
     function showSelectOwnCardsModal(action) {
       selectedCards = [];
       const count = action.count || 1;
+      const availableCount = action.options.length;
+      const requiredCount = Math.min(count, availableCount);
+
       const cardsHtml = action.options.map((c, i) => {
         const displayName = (c.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
         const imageName = cardImageMapping[displayName] || displayName;
         const imageUrl = `images/cards/${imageName}.png`;
         return `
         <div class="hand-card-image ${getColorClass(c.color)}" data-index="${c.index}"
-             onclick="window.toggleCardSelection(${c.index}, ${count})">
+             onclick="window.toggleCardSelection(${c.index}, ${requiredCount})">
           <img src="${imageUrl}" alt="${c.name}"
                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div class="card-image-fallback" style="display: none;">
@@ -1541,11 +1606,11 @@
           </div>
         </div>
       `}).join('');
-      showModal(`Select ${count} card(s)`, cardsHtml, true, action.optional);
+      showModal(`Select ${requiredCount} card(s)`, cardsHtml, true, action.optional);
 
       modalConfirm.onclick = () => {
-        if (selectedCards.length === 0) {
-          alert('Select at least one card');
+        if (selectedCards.length < requiredCount) {
+          alert(`Select ${requiredCount} card(s)`);
           return;
         }
         peerManager.selectCards({ indices: selectedCards, effectType: pendingAction.effectType });

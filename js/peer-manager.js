@@ -363,6 +363,12 @@ export class PeerManager {
         this.broadcastState();
         break;
 
+      case 'resolveAgeDiscard':
+        const ageDiscardResult = this.gameState.resolveAgeDiscard(data.playerId, data.discardIndices);
+        conn.send({ type: 'actionResult', ...ageDiscardResult });
+        this.broadcastState();
+        break;
+
       case 'submitReveal':
         const revealResult = this.gameState.submitMultiPlayerResponse(data.playerId, { cardIndex: data.cardIndex });
         conn.send({ type: 'actionResult', ...revealResult });
@@ -700,6 +706,25 @@ export class PeerManager {
       if (this.hostConnection && this.hostConnection.open) {
         this.hostConnection.send({
           type: 'acknowledgeCatastrophe'
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Resolve age effect discard (Age of Reason)
+  resolveAgeDiscard(discardIndices) {
+    if (this.isHost) {
+      const result = this.gameState.resolveAgeDiscard(this.myPlayerId, discardIndices);
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'resolveAgeDiscard',
+          playerId: this.myPlayerId,
+          discardIndices
         });
         return { success: true, pending: true };
       }
