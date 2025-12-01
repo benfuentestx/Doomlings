@@ -1031,8 +1031,8 @@ export const traits = [
     faceValue: 1,
     color: 'Purple',
     expansion: 'Base',
-    actions: [{ name: 'view_top_deck', params: { value: 3 } }],
-    actionDescription: 'Look at top 3 cards of trait deck'
+    actions: [{ name: 'opponents_reveal_steal_play', params: { reveal_count: 1 } }],
+    actionDescription: 'Opponents reveal 1 card. Steal 1 and play it immediately.'
   },
   {
     name: 'Directly Register',

@@ -1415,6 +1415,15 @@
         case 'select_mutual_discard':
           showSelectMutualDiscardModal(action);
           break;
+        case 'reveal_card':
+          showRevealCardModal(action);
+          break;
+        case 'waiting_for_reveals':
+          showWaitingForRevealsModal(action);
+          break;
+        case 'select_revealed_card':
+          showSelectRevealedCardModal(action);
+          break;
       }
     }
 
@@ -1854,6 +1863,143 @@
         effectType: pendingAction.effectType
       });
       mutualDiscardState = { ownIndex: null, opponentId: null, opponentIndex: null };
+      hideModal();
+    };
+
+    // === Multi-Player Reveal/Steal Modal Functions ===
+
+    // Show modal for opponents to select a card to reveal
+    function showRevealCardModal(action) {
+      const cards = action.cards || [];
+      if (cards.length === 0) {
+        // Auto-submit empty reveal if no cards
+        peerManager.submitReveal(-1);
+        return;
+      }
+
+      const cardsHtml = cards.map((card, index) => {
+        const displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+        const imageName = cardImageMapping[displayName] || displayName;
+        const imageUrl = `images/cards/${imageName}.png`;
+        return `
+          <div class="hand-card-image ${getColorClass(card.color)}"
+               style="cursor: pointer;"
+               onclick="window.selectCardToReveal(${index})">
+            <img src="${imageUrl}" alt="${card.name}" style="pointer-events: none;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="card-image-fallback" style="display: none;">
+              <div class="fallback-name">${card.name}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const content = `
+        <p class="reveal-prompt">Select a card to reveal to all players:</p>
+        <div class="reveal-cards-grid">${cardsHtml}</div>
+      `;
+
+      showModal(action.message || 'Reveal a Card', content, false, false);
+    }
+
+    window.selectCardToReveal = function(cardIndex) {
+      peerManager.submitReveal(cardIndex);
+      hideModal();
+    };
+
+    // Show modal for source player while waiting for opponents to reveal
+    function showWaitingForRevealsModal(action) {
+      const participants = action.participants || [];
+      const revealedCards = action.revealedCards || [];
+
+      let content = '<div class="waiting-reveals-container">';
+      content += '<p class="waiting-prompt">Waiting for opponents to reveal cards...</p>';
+      content += '<div class="reveal-status-list">';
+
+      participants.forEach(p => {
+        const hasRevealed = p.responded;
+        const statusClass = hasRevealed ? 'revealed' : 'waiting';
+        const statusIcon = hasRevealed ? '✓' : '...';
+        content += `
+          <div class="reveal-status-item ${statusClass}">
+            <span class="player-name">${p.playerName}</span>
+            <span class="status-icon">${statusIcon}</span>
+          </div>
+        `;
+      });
+
+      content += '</div>';
+
+      // Show any already revealed cards
+      if (revealedCards.length > 0) {
+        content += '<div class="revealed-cards-preview">';
+        content += '<p>Revealed so far:</p>';
+        content += '<div class="revealed-cards-row">';
+        revealedCards.forEach(rc => {
+          const card = rc.card;
+          const displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+          const imageName = cardImageMapping[displayName] || displayName;
+          const imageUrl = `images/cards/${imageName}.png`;
+          content += `
+            <div class="revealed-card-item">
+              <div class="revealed-by">${rc.playerName}</div>
+              <div class="hand-card-image ${getColorClass(card.color)}">
+                <img src="${imageUrl}" alt="${card.name}" style="pointer-events: none;"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="card-image-fallback" style="display: none;">
+                  <div class="fallback-name">${card.name}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        content += '</div></div>';
+      }
+
+      content += '</div>';
+
+      showModal(action.message || 'Waiting for Reveals', content, false, false);
+    }
+
+    // Show modal for source player to select a revealed card to steal
+    function showSelectRevealedCardModal(action) {
+      const revealedCards = action.revealedCards || [];
+
+      if (revealedCards.length === 0) {
+        showModal('No Cards Revealed', '<p>No opponents revealed cards.</p>', false, true);
+        return;
+      }
+
+      let content = '<div class="steal-cards-container">';
+      content += '<p class="steal-prompt">Select a card to steal and play immediately:</p>';
+      content += '<div class="steal-cards-grid">';
+
+      revealedCards.forEach(rc => {
+        const card = rc.card;
+        const displayName = (card.name || '').replace(/\s*\([^)]*\)\s*$/, '').toUpperCase();
+        const imageName = cardImageMapping[displayName] || displayName;
+        const imageUrl = `images/cards/${imageName}.png`;
+        content += `
+          <div class="steal-card-option" onclick="window.selectRevealedCardToSteal('${rc.playerId}', ${rc.cardIndex})">
+            <div class="steal-from-label">From: ${rc.playerName}</div>
+            <div class="hand-card-image ${getColorClass(card.color)}">
+              <img src="${imageUrl}" alt="${card.name}" style="pointer-events: none;"
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="card-image-fallback" style="display: none;">
+                <div class="fallback-name">${card.name}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      content += '</div></div>';
+
+      showModal(action.message || 'Steal a Card', content, false, false);
+    }
+
+    window.selectRevealedCardToSteal = function(fromPlayerId, cardIndex) {
+      peerManager.selectRevealedCard(fromPlayerId, cardIndex);
       hideModal();
     };
 

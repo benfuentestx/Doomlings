@@ -933,6 +933,55 @@ export class CardEffects {
         };
       }
 
+      // Opponents reveal cards, player steals one and plays it (Clever)
+      case 'opponents_reveal_steal_play': {
+        const revealCount = params.reveal_count || 1;
+        const opponents = gameState.players.filter(p => p.id !== player.id && p.hand.length > 0);
+
+        if (opponents.length === 0) {
+          gameState.log(`${player.name} played Clever but no opponents have cards to reveal`);
+          return { needsInput: false };
+        }
+
+        // Create multi-player action - opponents must reveal cards
+        const participants = {};
+        for (const opp of opponents) {
+          participants[opp.id] = {
+            required: true,
+            responded: false,
+            response: null,
+            playerName: opp.name,
+            handSize: opp.hand.length
+          };
+        }
+
+        gameState.multiPlayerAction = {
+          id: `reveal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          type: 'reveal_cards',
+          sourcePlayerId: player.id,
+          sourcePlayerName: player.name,
+          sourceCard: { name: card.name, instanceId: card.instanceId },
+          participants,
+          config: {
+            revealCount,
+            nextAction: 'steal_revealed_and_play'
+          },
+          createdAt: Date.now(),
+          timeoutMs: 60000 // 60 second timeout
+        };
+
+        gameState.log(`${player.name} played Clever - opponents must reveal a card`);
+
+        // Return waiting state for the source player
+        return {
+          needsInput: true,
+          inputType: 'waiting_for_multi_player',
+          message: 'Waiting for opponents to reveal cards...',
+          multiPlayerActionId: gameState.multiPlayerAction.id,
+          participants: opponents.map(o => ({ id: o.id, name: o.name, responded: false }))
+        };
+      }
+
       default:
         gameState.log(`Unknown action: ${name}`);
         return { needsInput: false };
@@ -1738,6 +1787,7 @@ export class GameState {
     this.turnPhase = 'waiting'; // 'waiting', 'play', 'stabilize', 'action'
     this.playersPlayedThisRound = new Set();
     this.ageEffect = null; // Current age's rule effect
+    this.multiPlayerAction = null; // For actions requiring input from multiple players
   }
 
   addPlayer(id, name, isHost) {
@@ -2641,6 +2691,218 @@ export class GameState {
     return { success: true };
   }
 
+  // ============== MULTI-PLAYER ACTION HANDLING ==============
+
+  // Submit a response for a multi-player action (e.g., opponent reveals a card)
+  submitMultiPlayerResponse(playerId, response) {
+    const mpa = this.multiPlayerAction;
+    if (!mpa) {
+      return { success: false, error: 'No multi-player action in progress' };
+    }
+
+    const participant = mpa.participants[playerId];
+    if (!participant) {
+      return { success: false, error: 'You are not a participant in this action' };
+    }
+
+    if (participant.responded) {
+      return { success: false, error: 'You have already responded' };
+    }
+
+    const player = this.getPlayer(playerId);
+
+    // Handle different multi-player action types
+    switch (mpa.type) {
+      case 'reveal_cards': {
+        const cardIndex = response.cardIndex;
+        if (cardIndex < 0 || cardIndex >= player.hand.length) {
+          return { success: false, error: 'Invalid card index' };
+        }
+
+        const card = player.hand[cardIndex];
+
+        // Store the response - copy card data for display to others
+        participant.responded = true;
+        participant.response = {
+          cardIndex,
+          card: {
+            name: card.name,
+            color: card.color,
+            faceValue: card.faceValue,
+            instanceId: card.instanceId,
+            isDominant: card.isDominant,
+            actionDescription: card.actionDescription,
+            bonusDescription: card.bonusDescription
+          }
+        };
+
+        this.log(`${player.name} revealed a card`);
+        break;
+      }
+
+      default:
+        return { success: false, error: `Unknown multi-player action type: ${mpa.type}` };
+    }
+
+    // Check if all participants have responded
+    const allResponded = Object.values(mpa.participants).every(p => p.responded);
+
+    if (allResponded) {
+      return this.resolveMultiPlayerAction();
+    }
+
+    return { success: true, waiting: true };
+  }
+
+  // Resolve a completed multi-player action
+  resolveMultiPlayerAction() {
+    const mpa = this.multiPlayerAction;
+    if (!mpa) {
+      return { success: false, error: 'No multi-player action to resolve' };
+    }
+
+    const sourcePlayer = this.getPlayer(mpa.sourcePlayerId);
+    if (!sourcePlayer) {
+      this.multiPlayerAction = null;
+      return { success: false, error: 'Source player not found' };
+    }
+
+    switch (mpa.config.nextAction) {
+      case 'steal_revealed_and_play': {
+        // Collect all revealed cards
+        const revealedCards = [];
+        for (const [participantId, participant] of Object.entries(mpa.participants)) {
+          if (participant.response) {
+            revealedCards.push({
+              playerId: participantId,
+              playerName: participant.playerName,
+              cardIndex: participant.response.cardIndex,
+              card: participant.response.card
+            });
+          }
+        }
+
+        if (revealedCards.length === 0) {
+          this.log('No cards were revealed');
+          this.multiPlayerAction = null;
+          this.turnPhase = 'stabilize';
+          return { success: true };
+        }
+
+        // Set up pending action for source player to select a revealed card
+        this.pendingAction = {
+          player: mpa.sourcePlayerId,
+          type: 'select_revealed_card',
+          inputType: 'select_revealed_card',
+          message: 'Choose a revealed card to steal and play immediately',
+          revealedCards,
+          effectType: 'steal_revealed_and_play',
+          optional: false
+        };
+
+        // Clear multiPlayerAction so getStateForPlayer uses pendingAction
+        this.multiPlayerAction = null;
+
+        this.log(`${sourcePlayer.name} must choose a revealed card to steal`);
+        return { success: true, proceedToSteal: true };
+      }
+
+      default:
+        this.multiPlayerAction = null;
+        return { success: false, error: `Unknown next action: ${mpa.config.nextAction}` };
+    }
+  }
+
+  // Handle selection of a revealed card to steal and play
+  handleRevealedCardSelection(playerId, data) {
+    if (!this.pendingAction ||
+        this.pendingAction.player !== playerId ||
+        this.pendingAction.effectType !== 'steal_revealed_and_play') {
+      return { success: false, error: 'No pending steal action' };
+    }
+
+    const { fromPlayerId, cardIndex } = data;
+    const sourcePlayer = this.getPlayer(playerId);
+    const targetPlayer = this.getPlayer(fromPlayerId);
+
+    if (!targetPlayer) {
+      return { success: false, error: 'Target player not found' };
+    }
+
+    // Validate the card is still at the expected index
+    if (cardIndex < 0 || cardIndex >= targetPlayer.hand.length) {
+      return { success: false, error: 'Card no longer available' };
+    }
+
+    // Steal the card from target's hand
+    const stolenCard = targetPlayer.hand.splice(cardIndex, 1)[0];
+
+    this.log(`${sourcePlayer.name} stole ${stolenCard.name} from ${targetPlayer.name}`);
+
+    // Add the stolen card to source player's trait pile
+    sourcePlayer.traitPile.push(stolenCard);
+
+    // Apply gene pool effects from the card (if any)
+    if (stolenCard.effects) {
+      for (const effect of stolenCard.effects) {
+        if (effect.name === 'modify_gene_pool') {
+          const targets = effect.params.affected_players === 'all' ? this.players :
+                         effect.params.affected_players === 'self' ? [sourcePlayer] :
+                         [sourcePlayer];
+          for (const p of targets) {
+            p.genePool = Math.max(1, Math.min(8, p.genePool + effect.params.value));
+          }
+          this.log(`${sourcePlayer.name}'s Gene Pool is now ${sourcePlayer.genePool}`);
+        }
+      }
+    }
+
+    // Clear the multi-player action
+    this.multiPlayerAction = null;
+    this.pendingAction = null;
+
+    // If the stolen card has actions, trigger them
+    if (stolenCard.actions && stolenCard.actions.length > 0 && !this.ignoreActions) {
+      this.log(`${sourcePlayer.name} plays ${stolenCard.name}'s action`);
+      const actionResult = CardEffects.handleAction(this, sourcePlayer, stolenCard);
+
+      if (actionResult.needsInput) {
+        this.pendingAction = {
+          player: sourcePlayer.id,
+          ...actionResult
+        };
+        return { success: true, actionPending: true };
+      }
+    }
+
+    // Move to stabilize phase
+    this.turnPhase = 'stabilize';
+    return { success: true };
+  }
+
+  // Force timeout for multi-player action (auto-reveal random cards)
+  forceMultiPlayerActionTimeout() {
+    const mpa = this.multiPlayerAction;
+    if (!mpa) return { success: false };
+
+    // For any participant who hasn't responded, auto-select a random card
+    for (const [participantId, participant] of Object.entries(mpa.participants)) {
+      if (!participant.responded) {
+        const player = this.getPlayer(participantId);
+        if (player && player.hand.length > 0) {
+          const randomIndex = Math.floor(Math.random() * player.hand.length);
+          this.submitMultiPlayerResponse(participantId, { cardIndex: randomIndex });
+        } else {
+          // Player has no cards, mark as responded with null
+          participant.responded = true;
+          participant.response = null;
+        }
+      }
+    }
+
+    return { success: true };
+  }
+
   endGame() {
     this.state = 'finished';
     this.turnPhase = 'finished';
@@ -2840,6 +3102,80 @@ export class GameState {
       };
     }
 
+    // Build pending action for this specific player
+    let pendingActionForPlayer = null;
+
+    // First check if there's a multi-player action that involves this player
+    if (this.multiPlayerAction) {
+      const mpa = this.multiPlayerAction;
+      const isSource = mpa.sourcePlayerId === playerId;
+      const participant = mpa.participants[playerId];
+
+      if (isSource) {
+        // Source player sees waiting status with participant progress
+        const participantStatus = Object.entries(mpa.participants).map(([id, p]) => ({
+          playerId: id,
+          playerName: p.playerName,
+          responded: p.responded
+        }));
+
+        // Build revealed cards array for display
+        const revealedCards = [];
+        for (const [pid, p] of Object.entries(mpa.participants)) {
+          if (p.responded && p.response && p.response.card) {
+            revealedCards.push({
+              playerId: pid,
+              playerName: p.playerName,
+              cardIndex: p.response.cardIndex,
+              card: p.response.card
+            });
+          }
+        }
+
+        pendingActionForPlayer = {
+          inputType: 'waiting_for_reveals',
+          message: `Waiting for opponents to reveal cards...`,
+          multiPlayerActionId: mpa.id,
+          sourceCard: mpa.sourceCard,
+          participants: participantStatus,
+          revealedCards,
+          allResponded: participantStatus.every(p => p.responded)
+        };
+      } else if (participant && !participant.responded) {
+        // This player is a participant who needs to reveal a card
+        pendingActionForPlayer = {
+          inputType: 'reveal_card',
+          message: `${mpa.sourcePlayerName} played ${mpa.sourceCard.name}. Select a card to reveal.`,
+          multiPlayerActionId: mpa.id,
+          sourcePlayerName: mpa.sourcePlayerName,
+          sourceCard: mpa.sourceCard,
+          cards: player.hand.map((c, i) => ({
+            index: i,
+            name: c.name,
+            color: c.color,
+            faceValue: c.faceValue
+          }))
+        };
+      }
+      // If participant already responded, they just wait (no pending action for them)
+    }
+
+    // If no multi-player action applies, check regular pending action
+    if (!pendingActionForPlayer && this.pendingAction?.player === playerId) {
+      pendingActionForPlayer = {
+        type: this.pendingAction.type,
+        inputType: this.pendingAction.inputType,
+        options: this.pendingAction.options,
+        cards: this.pendingAction.cards,
+        message: this.pendingAction.message,
+        optional: this.pendingAction.optional,
+        count: this.pendingAction.count,
+        // Include revealed cards for steal selection
+        revealedCards: this.pendingAction.revealedCards || null,
+        effectType: this.pendingAction.effectType
+      };
+    }
+
     return {
       ...fullState,
       myHand: player ? player.hand : [],
@@ -2863,14 +3199,13 @@ export class GameState {
         handSize: p.hand ? p.hand.length : 0,
         isCurrentPlayer: this.players[this.currentPlayerIndex]?.id === p.id
       })),
-      pendingAction: this.pendingAction?.player === playerId ? {
-        type: this.pendingAction.type,
-        inputType: this.pendingAction.inputType,
-        options: this.pendingAction.options,
-        cards: this.pendingAction.cards,
-        message: this.pendingAction.message,
-        optional: this.pendingAction.optional,
-        count: this.pendingAction.count
+      pendingAction: pendingActionForPlayer,
+      // Include multi-player action info for UI (e.g., showing who is waiting)
+      multiPlayerAction: this.multiPlayerAction ? {
+        id: this.multiPlayerAction.id,
+        type: this.multiPlayerAction.type,
+        sourcePlayerName: this.multiPlayerAction.sourcePlayerName,
+        sourceCard: this.multiPlayerAction.sourceCard
       } : null
     };
   }
@@ -2905,7 +3240,8 @@ export class GameState {
       previewNextAge: this.previewNextAge,
       protectTraitsThisRound: this.protectTraitsThisRound,
       drawAfterStabilize: this.drawAfterStabilize,
-      lastPlayedTraitColor: this.lastPlayedTraitColor
+      lastPlayedTraitColor: this.lastPlayedTraitColor,
+      multiPlayerAction: this.multiPlayerAction
     });
   }
 
@@ -2929,6 +3265,7 @@ export class GameState {
     game.protectTraitsThisRound = parsed.protectTraitsThisRound || false;
     game.drawAfterStabilize = parsed.drawAfterStabilize || 0;
     game.lastPlayedTraitColor = parsed.lastPlayedTraitColor || null;
+    game.multiPlayerAction = parsed.multiPlayerAction || null;
     return game;
   }
 }

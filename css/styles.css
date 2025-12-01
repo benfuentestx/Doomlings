@@ -336,7 +336,7 @@ input:focus {
 
 .game-stats {
   display: flex;
-  gap: 10px;
+  gap: 5px;
   color: var(--text-secondary);
   font-size: 0.8rem;
 }
@@ -2171,4 +2171,141 @@ input:focus {
 
 .modal-buttons button.secondary:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   MULTI-PLAYER REVEAL/STEAL MODALS
+======================================== */
+
+/* Reveal card modal */
+.reveal-prompt,
+.steal-prompt,
+.waiting-prompt {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.reveal-cards-grid,
+.steal-cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  padding: 8px;
+}
+
+/* Waiting for reveals modal */
+.waiting-reveals-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.reveal-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.reveal-status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reveal-status-item.waiting {
+  opacity: 0.7;
+}
+
+.reveal-status-item.revealed {
+  background: rgba(39, 174, 96, 0.2);
+  border-color: var(--success);
+}
+
+.reveal-status-item .player-name {
+  font-weight: 500;
+}
+
+.reveal-status-item .status-icon {
+  font-size: 1.2rem;
+}
+
+.reveal-status-item.revealed .status-icon {
+  color: var(--success);
+}
+
+.revealed-cards-preview {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.revealed-cards-preview p {
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+}
+
+.revealed-cards-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.revealed-card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.revealed-by {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Steal card modal */
+.steal-cards-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.steal-card-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.steal-card-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.steal-card-option:active {
+  transform: scale(0.97);
+}
+
+.steal-from-label {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 500;
+  background: rgba(233, 69, 96, 0.2);
+  padding: 3px 10px;
+  border-radius: 4px;
 }

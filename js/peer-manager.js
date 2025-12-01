@@ -362,6 +362,21 @@ export class PeerManager {
         conn.send({ type: 'actionResult', ...ackCatResult });
         this.broadcastState();
         break;
+
+      case 'submitReveal':
+        const revealResult = this.gameState.submitMultiPlayerResponse(data.playerId, { cardIndex: data.cardIndex });
+        conn.send({ type: 'actionResult', ...revealResult });
+        this.broadcastState();
+        break;
+
+      case 'selectRevealedCard':
+        const selectRevealedResult = this.gameState.handleRevealedCardSelection(data.playerId, {
+          fromPlayerId: data.fromPlayerId,
+          cardIndex: data.cardIndex
+        });
+        conn.send({ type: 'actionResult', ...selectRevealedResult });
+        this.broadcastState();
+        break;
     }
   }
 
@@ -629,6 +644,45 @@ export class PeerManager {
           type: 'preStabilizeDiscard',
           playerId: this.myPlayerId,
           discardIndices
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Submit a card to reveal (for multi-player actions like Clever)
+  submitReveal(cardIndex) {
+    if (this.isHost) {
+      const result = this.gameState.submitMultiPlayerResponse(this.myPlayerId, { cardIndex });
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'submitReveal',
+          playerId: this.myPlayerId,
+          cardIndex
+        });
+        return { success: true, pending: true };
+      }
+      return { success: false, error: 'Not connected' };
+    }
+  }
+
+  // Select a revealed card to steal (for Clever-type effects)
+  selectRevealedCard(fromPlayerId, cardIndex) {
+    if (this.isHost) {
+      const result = this.gameState.handleRevealedCardSelection(this.myPlayerId, { fromPlayerId, cardIndex });
+      this.broadcastState();
+      return result;
+    } else {
+      if (this.hostConnection && this.hostConnection.open) {
+        this.hostConnection.send({
+          type: 'selectRevealedCard',
+          playerId: this.myPlayerId,
+          fromPlayerId,
+          cardIndex
         });
         return { success: true, pending: true };
       }
